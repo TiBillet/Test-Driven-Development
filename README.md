@@ -1,6 +1,6 @@
 # Test-Driven-Development
 
-To Do for dev TiBillet with us !
+ToDo list for dev TiBillet with us !
 
 ## Installation
 
@@ -18,5 +18,15 @@ git clone git@github.com:TiBillet/LaBoutik.git
 git clone git@github.com:TiBillet/Fedow.git
 ```
 
+Create the .env file with your own domain if needed :
 
-## 
+```bash
+cp env_example .env
+```
+
+launch the rocket !
+
+```bash
+docker compose up -d
+docker compose logs -f
+```

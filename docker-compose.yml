@@ -1,0 +1,63 @@
+services:
+  #### FEDOW ####
+  fedow_django:
+    extends:
+      file: ../Fedow/docker-compose.yml
+      service: fedow_django
+    command: 'bash start_dev.sh'
+
+  fedow_memcached:
+    extends:
+      file: ../Fedow/docker-compose.yml
+      service: fedow_memcached
+
+  fedow_nginx:
+    extends:
+      file: ../Fedow/docker-compose.yml
+      service: fedow_nginx
+    labels:
+      - traefik.http.routers.fedow_nginx.rule=Host(`fedow.$DOMAIN`)
+
+  #### LESPASS ####
+
+  lespass_postgres:
+    extends:
+      file: ../Lespass/docker-compose.yml
+      service: lespass_postgres
+
+  lespas_memcached:
+    extends:
+      file: ../Lespass/docker-compose.yml
+      service: lespas_memcached
+
+  lespas_redis:
+    extends:
+      file: ../Lespass/docker-compose.yml
+      service: lespas_redis
+
+  lespass_django:
+    extends:
+      file: ../Lespass/docker-compose.yml
+      service: lespass_django
+    volumes:
+      - ./sql_test:/sql_test
+    command: 'bash start_dev.sh'
+
+  lespass_celery:
+    extends:
+      file: ../Lespass/docker-compose.yml
+      service: lespass_celery
+
+  lespass_nginx:
+    extends:
+      file: ../Lespass/docker-compose.yml
+      service: lespass_nginx
+
+networks:
+  frontend:
+    external: true
+  fedow_backend:
+  lespass_backend:
+
+volumes:
+  lespass_dev_db:

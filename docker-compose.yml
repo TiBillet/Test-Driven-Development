@@ -45,7 +45,8 @@ services:
     extends:
       file: ../Lespass/docker-compose.yml
       service: lespass_celery
-  #    command: 'bash start_dev.sh'
+#    command: "poetry run celery -A TiBillet worker -l INFO"
+    command: 'bash start_dev.sh'
 
   lespass_nginx:
     extends:
@@ -55,34 +56,35 @@ services:
       - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`billetistan.$DOMAIN`)
 
   #### CASHLESS 1 ####
-  laboutik_postgres:
-    extends:
-      file: ../LaBoutik/docker-compose.yml
-      service: laboutik_postgres
 
-  laboutik_redis:
-    extends:
-      file: ../LaBoutik/docker-compose.yml
-      service: laboutik_redis
-
-  laboutik_django:
-    extends:
-      file: ../LaBoutik/docker-compose.yml
-      service: laboutik_django
-    command: 'bash start_dev.sh'
-
-  laboutik_celery:
-    extends:
-      file: ../LaBoutik/docker-compose.yml
-      service: laboutik_celery
+#  laboutik_postgres:
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_postgres
+#
+#  laboutik_redis:
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_redis
+#
+#  laboutik_django:
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_django
 #    command: 'bash start_dev.sh'
-
-  laboutik_nginx:
-    extends:
-      file: ../LaBoutik/docker-compose.yml
-      service: laboutik_nginx
-    labels:
-      - traefik.http.routers.laboutik_nginx.rule=Host(`cashless.$DOMAIN`)
+#
+#  laboutik_celery:
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_celery
+##    command: 'bash start_dev.sh'
+#
+#  laboutik_nginx:
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_nginx
+#    labels:
+#      - traefik.http.routers.laboutik_nginx.rule=Host(`cashless.$DOMAIN`)
 
 networks:
   frontend:
@@ -94,3 +96,4 @@ networks:
 volumes:
   lespass_dev_db:
   laboutik_postgres_data:
+  fedow_database:

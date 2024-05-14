@@ -57,34 +57,34 @@ services:
 
   #### CASHLESS 1 ####
 
-#  laboutik_postgres:
-#    extends:
-#      file: ../LaBoutik/docker-compose.yml
-#      service: laboutik_postgres
-#
-#  laboutik_redis:
-#    extends:
-#      file: ../LaBoutik/docker-compose.yml
-#      service: laboutik_redis
-#
-#  laboutik_django:
-#    extends:
-#      file: ../LaBoutik/docker-compose.yml
-#      service: laboutik_django
+  laboutik_postgres:
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_postgres
+
+  laboutik_redis:
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_redis
+
+  laboutik_django:
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_django
+    command: 'bash start_dev.sh'
+
+  laboutik_celery:
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_celery
 #    command: 'bash start_dev.sh'
-#
-#  laboutik_celery:
-#    extends:
-#      file: ../LaBoutik/docker-compose.yml
-#      service: laboutik_celery
-##    command: 'bash start_dev.sh'
-#
-#  laboutik_nginx:
-#    extends:
-#      file: ../LaBoutik/docker-compose.yml
-#      service: laboutik_nginx
-#    labels:
-#      - traefik.http.routers.laboutik_nginx.rule=Host(`cashless.$DOMAIN`)
+
+  laboutik_nginx:
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_nginx
+    labels:
+      - traefik.http.routers.laboutik_nginx.rule=Host(`cashless.$DOMAIN`)
 
 networks:
   frontend:

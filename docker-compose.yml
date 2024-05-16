@@ -45,8 +45,8 @@ services:
     extends:
       file: ../Lespass/docker-compose.yml
       service: lespass_celery
-#    command: "poetry run celery -A TiBillet worker -l INFO"
-    command: 'bash start_dev.sh'
+    command: "poetry run celery -A TiBillet worker -l INFO"
+#    command: 'bash start_dev.sh'
 
   lespass_nginx:
     extends:
@@ -77,12 +77,13 @@ services:
     extends:
       file: ../LaBoutik/docker-compose.yml
       service: laboutik_celery
-#    command: 'bash start_dev.sh'
+    command: 'bash start_dev.sh'
 
   laboutik_nginx:
     extends:
       file: ../LaBoutik/docker-compose.yml
       service: laboutik_nginx
+    #TODO: Mettre un nginx rule pour dev/prod
     labels:
       - traefik.http.routers.laboutik_nginx.rule=Host(`cashless.$DOMAIN`)
 

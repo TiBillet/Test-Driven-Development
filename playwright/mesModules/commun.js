@@ -1,14 +1,12 @@
+/* attention tests spécifiques à la db utilisée pour le cashless;
+nom monnaie, valeur des articles: 5, 10, ...
+*/
+
 import fetch from "node-fetch"
 import { test, expect, chromium } from '@playwright/test'
-import { env } from './env_sua.js'
+import { env } from './env.js'
 import * as IP from "ip"
 import Big from './big.js'
-
-
-export const loadTrad = async function () {
-  // https://cashless.filaos.re/static/webview/js/modules/i8n.js
-  // https://cashless.filaos.re/static/webview/js/modules/languages/languageEn.js
-}
 
 /**
  * Connexion au serveur cashless
@@ -73,10 +71,10 @@ export const goTableOrder = async function (page, table) {
   await test.step('Aller à la table ' + table, async () => {
     // attente affichage menu burger
     await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
-    
+
     // Clique sur le menu burger
     await page.locator('.menu-burger-icon').click()
-    
+
     // Clique sur le menu TABLES
     await page.locator('text=TABLES').click()
 
@@ -140,48 +138,46 @@ export const resetCardCashless = async function (page, carte) {
 
   // Clique sur le menu burger
   await page.locator('.menu-burger-icon').click()
+
   // Click text=POINTS DE VENTES
-  await page.locator('text=POINTS DE VENTES').click()
-  // Click #menu-burger-conteneur >> text=Bar 1
+  const psTrans = await getTranslate(page, 'pointOfSales', 'uppercase')
+  await page.locator('text=' + psTrans).click()
+
+  // Click "CASHLESS"
   await page.locator('#menu-burger-conteneur >> text=CASHLESS').click()
 
-  // attente affichage menu burger
-  await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
+  // attendre point de ventes, le titre contient "service directe" et "cashless"
+  const titre = await getTranslate(page, 'directService', 'capitalize')
+  await page.locator('.navbar-horizontal .titre-vue', { hasText: titre }).waitFor({ state: 'visible' })
+  await page.locator('.navbar-horizontal .titre-vue', { hasText: 'Cashless' }).waitFor({ state: 'visible' })
 
-  await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[nom="VIDER CARTE"]').click()
-  // moyen de paiement "CASHLESS" présent
-  await expect(page.locator('#popup-cashless bouton-basique >> text=CASHLESS')).toBeVisible()
-  // Total pour moyen de paiement "CASHLESS" 35.7 €
-  await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CASHLESS' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 35.7 €')
+  // vider carte / clean card
+  await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[methode="ViderCarte"]').click()
 
-  // moyen de paiement "ESPECE" présent
-  await expect(page.locator('#popup-cashless bouton-basique >> text=ESPECE')).toBeVisible()
-  // Total pour moyen de paiement "ESPECE" 35.7 €
-  await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'ESPECE' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 35.7 €')
-
-  // moyen de paiement "CB" présent
-  await expect(page.locator('#popup-cashless bouton-basique >> text=CB')).toBeVisible()
-  // Total pour moyen de paiement "CB" 35.7 €
-  await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CB' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 35.7 €')
-
-  // bouton RETOUR présent
-  await expect(page.locator('#popup-cashless bouton-basique >> text=RETOUR')).toBeVisible()
-
-  // clique sur "ESPECE"
-  await page.locator('#popup-cashless bouton-basique >> text=ESPECE').click()
-
-  // confirmation espèce
-  await confirmation(page, 'espece')
-
-  // VALIDER
-  await page.locator('#popup-confirme-valider').click()
-
-  // cliquer sur bouton "VALIDER"
+  // valider vider carte
   await page.locator('#bt-valider').click()
+
+  // attente affichage "Attente lecture carte"
+  const msgAwaitingCard = await getTranslate(page, 'awaitingCardReading', 'capitalize')
+  await page.locator('#popup-cashless', { hasText: msgAwaitingCard }).waitFor({ state: 'visible' })
 
   // cliquer sur carte nfc simulée
   await page.locator('#' + carte).click()
+
+  // attente affichage "popup-cashless"
+  await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+  // vidage carte ok
+  const msgTrans = await getTranslate(page, 'clearingCardOk', 'capitalize')
+  await expect(page.locator('#popup-cashless .test-return-reset', { hasText: msgTrans })).toBeVisible()
+
+  // clique sur bouton "RETOUR"
+  await page.locator('#popup-retour').click()
+
+  // #popup-cashless éffacé
+  await expect(page.locator('#popup-cashless')).toBeHidden()
 }
+
 
 /**
  * Test le popup de confirmation de type de paiement
@@ -198,14 +194,16 @@ export const confirmation = async function (page, typePaiement, sommeDonnee, com
     await expect(page.locator('#popup-cashless-confirm')).toBeVisible()
 
     // text "Confirmez le paiement" visible
-    await expect(page.locator('#popup-cashless-confirm > h1 > div', { hasText: 'Confirmez le paiement' })).toBeVisible()
+    const popupTitleTrans = await getTranslate(page, 'confirmPayment', 'capitalize')
+    await expect(page.locator('#popup-cashless-confirm .test-return-confirm-payment', { hasText: popupTitleTrans })).toBeVisible()
 
     // récupère la fonction du bouton valider
     fonc = await page.locator('#popup-cashless-confirm bouton-basique:nth-child(2)').getAttribute('onclick')
 
     // text contient "ESPECE" + fonction attendue
     if (typePaiement === 'espece') {
-      await expect(page.locator('.test-return-payment-method')).toHaveText('espèce')
+      const paymentType = await getTranslate(page, 'cash')
+      await expect(page.locator('.test-return-payment-method')).toHaveText(paymentType)
 
       foncAttendue = 'validateGivenSum(\'vue_pv.obtenirIdentiteClientSiBesoin\')'
       if (complementaire === true) {
@@ -213,13 +211,14 @@ export const confirmation = async function (page, typePaiement, sommeDonnee, com
       }
 
       // innsérer la valeur "sommeDonnee"
-      await page.locator('#given-sum').fill(sommeDonnee)
+      await page.locator('#given-sum').fill(sommeDonnee.toString())
 
     }
 
     // text contient "CB" + fonction attendue
     if (typePaiement === 'cb') {
-      await expect(page.locator('.test-return-payment-method')).toHaveText('cb')
+      const paymentType = await getTranslate(page, 'cb')
+      await expect(page.locator('.test-return-payment-method')).toHaveText(paymentType)
 
       foncAttendue = 'vue_pv.obtenirIdentiteClientSiBesoin(\'carte_bancaire\')'
       if (complementaire === true) {
@@ -254,28 +253,30 @@ export const creditCardCashless = async function (page, carte, nbXCredit10, nbXC
     // attente affichage menu burger
     await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
 
+    // Clique sur le menu burger
+    await page.locator('.menu-burger-icon').click()
+
+    // Click text=POINTS DE VENTES
+    const psTrans = await getTranslate(page, 'pointOfSales', 'uppercase')
+    await page.locator('text=' + psTrans).click()
+
+    // Click "CASHLESS"
+    await page.locator('#menu-burger-conteneur >> text=CASHLESS').click()
+
+    // attendre point de ventes, le titre contient "service directe" et "cashless"
+    const titre = await getTranslate(page, 'directService', 'capitalize')
+    await page.locator('.navbar-horizontal .titre-vue', { hasText: titre }).waitFor({ state: 'visible' })
+    await page.locator('.navbar-horizontal .titre-vue', { hasText: 'Cashless' }).waitFor({ state: 'visible' })
+
     // créditer credit, nbXCredit10 x 10 crédits
     if (nbXCredit10 >= 1) {
-      // Clique sur le menu burger
-      await page.locator('.menu-burger-icon').click()
-      // Click text=POINTS DE VENTES
-      await page.locator('text=POINTS DE VENTES').click()
-      // Click menu CASHLESS
-      await page.locator('#menu-burger-conteneur >> text=CASHLESS').click()
-
-      // attente affichage menu burger
-      await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
-
-      // 10 crédits
+      // article 10 crédits
       await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[nom="TestCoin +10"]').click({ clickCount: nbXCredit10 })
     }
 
     // créditer credit cadeau, nbXCreditCadeau5 x 5 crédits cadeau
     if (nbXCreditCadeau5 >= 1) {
-      // attente affichage menu burger
-      await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
-
-      // 5 crédits
+      // article 5 crédits
       await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[nom="TestCoin Cadeau +5"]').click({ clickCount: nbXCreditCadeau5 })
     }
 
@@ -283,17 +284,22 @@ export const creditCardCashless = async function (page, carte, nbXCredit10, nbXC
     await page.locator('#bt-valider').click()
 
     // attente affichage "Type(s) de paiement"
-    await page.locator('#popup-cashless', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
-
-    // payer en espèces + confirmation
+    const popupTitleTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
+    await page.locator('#popup-cashless .selection-type-paiement', { hasText: popupTitleTrans }).waitFor({ state: 'visible' })
+    
+    // payer en espèces + confirmation -- cash-uppercase
     if (paiement === undefined || paiement === 'espece') {
-      await page.locator('#popup-cashless bouton-basique >> text=ESPÈCE').click()
+      const cashPaymentTrans = await getTranslate(page, 'cash', 'uppercase')
+      await page.locator(`#popup-cashless bouton-basique >> text=${cashPaymentTrans}`).click()
+      // confirmer sans test le choix "espèce"
       await confirmation(page, 'espece', sommeDonnee)
     }
 
-    // payer par CB + confirmation
+    // payer par CB + confirmation -- cb-uppercase
     if (paiement === 'cb') {
-      await page.locator('#popup-cashless bouton-basique >> text=CB').click()
+      const creditCardPaymentTrans = await getTranslate(page, 'cb', 'uppercase')
+      await page.locator(`#popup-cashless bouton-basique >> text=${creditCardPaymentTrans}`).click()
+      // confirmer sans test le choix "cb"
       await confirmation(page, 'cb')
     }
 
@@ -531,7 +537,8 @@ export const getBackGroundColor = async function (page, selector) {
 
 export const getTranslate = async function (page, indexTrad, option) {
   return await page.evaluate(async ([indexTrad, option]) => {
-    return getTranslate(indexTrad, option)
+    // attenttion supprimer tous les "\n"  de la traductuion
+    return getTranslate(indexTrad, option).replace(/\n/g, "")
   }, [indexTrad, option])
 }
 
@@ -642,7 +649,7 @@ export const getStatePrepaByRoom = async function (page, room) {
         })
       }
     })
-    return {articles, locationId}
+    return { articles, locationId }
   }, [room])
 }
 
@@ -651,7 +658,7 @@ export const getStatePrepaByRoom = async function (page, room) {
  * @param value un décimal Big https://github.com/MikeMcl/big.js
  * @returns {number}
  */
-export function bigToFloat (value) {
+export function bigToFloat(value) {
   try {
     return parseFloat(new Big(value).valueOf())
   } catch (error) {
@@ -664,7 +671,7 @@ export function bigToFloat (value) {
  * @param {array.<object>} list liste(objet) d'articles
  * @returns {number}
  */
-export function totalListeArticles (list) {
+export function totalListeArticles(list) {
   let total = new Big(0)
   for (let i = 0; i < list.length; i++) {
     const article = list[i]

@@ -1,6 +1,6 @@
 // cashless_demo1.env DEBUG=True / DEMO=True / language = fr
 import { test, expect } from '@playwright/test'
-import { connectionAdmin, goPointSale, selectArticles, resetCardCashless, creditCardCashless } from '../../mesModules/commun_sua.js'
+import { connectionAdmin, goPointSale, selectArticles, resetCardCashless, creditCardCashless } from '../../mesModules/commun.js'
 
 
 // attention la taille d'écran choisie affiche le menu burger

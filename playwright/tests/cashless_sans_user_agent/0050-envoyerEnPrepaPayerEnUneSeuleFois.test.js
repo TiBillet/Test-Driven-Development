@@ -1,0 +1,692 @@
+// cashless_demo1.env DEBUG=True / DEMO=True / language = fr
+import { test, expect } from '@playwright/test'
+import { connectionAdmin, goPointSale, selectArticles, resetCardCashless, creditCardCashless } from '../../mesModules/commun_sua.js'
+
+
+// attention la taille d'écran choisie affiche le menu burger
+let page
+
+test.use({
+  viewport: { width: 375, height: 800 },
+  deviceScaleFactor: 1,
+  ignoreHTTPSErrors: true
+})
+
+test.describe("Commandes, payer en une seule fois", () => {
+  test("Contexte: aller point de vente 'RESTO'", async ({ browser }) => {
+    page = await browser.newPage()
+    await connectionAdmin(page)
+  })
+
+  test("contexte: vider carte client 1 et la crediter de 40€", async () => {
+    // vider carte client 1
+    await resetCardCashless(page, 'nfc-client1')
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // vidage carte ok
+    await expect(page.locator('.test-return-reset')).toHaveText('Vidage carte ok')
+
+    // retour
+    await page.locator('#popup-retour').click()
+
+    // créditer de 10 €  et 0 cadeau
+    // 4 * 10 + 0 * 5
+    await creditCardCashless(page, 'nfc-client1', 4, 0, 'cb')
+
+    // Transaction OK !
+    await expect(page.locator('.test-return-title-content')).toHaveText('Transaction ok')
+
+    // total cb de 40 €
+    await expect(page.locator('.test-return-total-achats')).toHaveText('Total(cb) 40.00 €')
+
+    // retour créditation
+    await page.locator('#popup-retour').click()
+  })
+
+  test('Commande sur table 2, paiement en cashless', async () => {
+    // aller au point de vente RESTO
+    await goPointSale(page, 'RESTO')
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
+    // table éphémère visible
+    await expect(page.locator('#tables-liste .test-table-ephemere')).toBeVisible()
+
+    // sélectionne la table S02
+    await page.locator('#tables-liste .table-bouton', { hasText: 'S02' }).click()
+
+    // pv resto affiché
+    await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table S02, PV Resto')).toBeVisible()
+
+    // addition vide
+    await expect(page.locator('#achats-liste')).toBeEmpty()
+
+    // total addition = 0
+    await expect(page.locator('#bt-valider-total')).toHaveText('TOTAL 0 €')
+
+    // sélection des articles
+    const listeArticles = [{ nom: "Despé", nb: 2, prix: 3.2 }, { nom: "CdBoeuf", nb: 1, prix: 25 },
+    { nom: "Café", nb: 2, prix: 1 }]
+    await selectArticles(page, listeArticles, "Resto")
+
+    // valider commande
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // clique sur "ENVOYER EN PREPARATION ET PAYER EN UNE SEULE FOIS"
+    await page.locator('#popup-cashless #test-prepa2').click()
+
+    // attendre moyens de paiement
+    await page.locator('#popup-cashless .selection-type-paiement', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
+
+    // bouton "CASHLESS" présent
+    await expect(page.locator('#popup-cashless bouton-basique >> text=CASHLESS')).toBeVisible()
+
+    // total = 33.4€
+    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CASHLESS' }).locator('.sous-element-texte >> text=TOTAL 33.4 €')).toBeVisible()
+
+    // sélection du cashless comme moyen de paiement
+    await page.locator('#popup-cashless bouton-basique >> text=CASHLESS').click()
+
+    // sélection client 1
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
+
+    // méssage "Envoyée en préparation"
+    await page.locator('.test-return-msg-prepa', { hasText: 'Envoyée en préparation' }).click()
+
+    // total (moyen de paiement) valeur €
+    await expect(page.locator('.test-return-total-achats', { hasText: 'Total(cashless) 33.4 €' })).toBeVisible()
+
+    // sur carte client 1 avant achats
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'TEST - carte avant achats 40.00 €' })).toBeVisible()
+
+    // sur carte client 1 après achats
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 6.60 €' })).toBeVisible()
+
+    // retour
+    await page.locator('#popup-retour').click()
+  })
+
+  test("Contexte: 0 € sur première carte et 10 € pour la deuxième", async () => {
+    // vidage carte client 1
+    await resetCardCashless(page, 'nfc-client1')
+
+    // Vidage carte OK !
+    await expect(page.locator('#popup-cashless .test-return-reset', { hasText: 'Vidage carte OK' })).toBeVisible()
+
+    // clique sur bouton "RETOUR"
+    await page.locator('#popup-retour').click()
+
+    // vidage carte client 2
+    await resetCardCashless(page, 'nfc-client2')
+
+    // clique sur bouton "RETOUR"
+    await page.locator('#popup-retour').click()
+
+    // client 2 = 10 € (1 *10 + 0 * 5)
+    await creditCardCashless(page, 'nfc-client2', 1, 0, 'cb')
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // Transaction OK !
+    await expect(page.locator('.test-return-title-content')).toHaveText('Transaction ok')
+
+    // sur carte 10 €
+    await expect(page.locator('.test-return-total-carte')).toHaveText('ROBOCOP - carte 10 €')
+
+    // clique sur bouton "RETOUR"
+    await page.locator('#popup-retour').click()
+
+    // #popup-cashless éffacé
+    await expect(page.locator('#popup-cashless')).toBeHidden()
+  })
+
+  test('Commande sur table 3, paiement en cashless, fonds insuffisant sur première carte', async () => {
+    // aller au point de vente RESTO
+    await goPointSale(page, 'RESTO')
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
+    // table éphémère visible
+    await expect(page.locator('#tables-liste .test-table-ephemere')).toBeVisible()
+
+    // sélectionne la table S03
+    await page.locator('#tables-liste .table-bouton', { hasText: 'S03' }).click()
+
+    // pv resto affiché
+    await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table S03, PV Resto')).toBeVisible()
+
+    // addition vide
+    await expect(page.locator('#achats-liste')).toBeEmpty()
+
+    // total addition = 0
+    await expect(page.locator('#bt-valider-total')).toHaveText('TOTAL 0 €')
+
+    // sélection des articles
+    const listeArticles = [{ nom: "Guinness", nb: 1, prix: 4.99 }, { nom: "Pression 33", nb: 1, prix: 2 }]
+    await selectArticles(page, listeArticles, "Resto")
+
+    // valider commande
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // clique sur "ENVOYER EN PREPARATION ET PAYER EN UNE SEULE FOIS"
+    await page.locator('#popup-cashless #test-prepa2').click()
+
+    // attendre moyens de paiement
+    await page.locator('#popup-cashless .selection-type-paiement', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
+
+    // bouton "CASHLESS" présent
+    await expect(page.locator('#popup-cashless bouton-basique >> text=CASHLESS')).toBeVisible()
+
+    // total = 6.99€
+    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CASHLESS' }).locator('.sous-element-texte >> text=TOTAL 6.99 €')).toBeVisible()
+
+    // sélection du cashless comme moyen de paiement
+    await page.locator('#popup-cashless bouton-basique >> text=CASHLESS').click()
+
+    // sélection client 1
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // message Fonds insuffisants affiché
+    await expect(page.locator('.message-fonds-insuffisants', { hasText: 'Fonds insuffisants' })).toBeVisible()
+
+    // il manque 6.99 €
+    await expect(page.locator('.message-fonds-insuffisants')).toContainText('manque 6.99 €')
+
+    // sélection 2ème carte cashless
+    await page.locator('#popup-cashless bouton-basique').getByText('AUTRE CARTE').click()
+
+    // sélection client 2 affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // sélection client 2
+    await page.locator('#nfc-client2').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
+
+    // méssage "Envoyée en préparation"
+    await page.locator('.test-return-msg-prepa', { hasText: 'Envoyée en préparation' }).click()
+
+    // total (moyen de paiement) valeur €
+    await expect(page.locator('.test-return-total-achats', { hasText: 'Total(cashless) 6.99 €' })).toBeVisible()
+
+    // total des cartes cashless
+    await expect(page.locator('.test-return-purchase-cards', { hasText: 'Total des cartes 10.00 €' })).toBeVisible()
+
+    // contenu 1ère carte cashless après achats
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
+
+    // clique sur bouton "RETOUR"
+    await page.locator('#popup-retour').click()
+  })
+
+  test("Contexte: 0 € sur première carte et 0 € pour la deuxième", async () => {
+    // vidage carte client 1
+    await resetCardCashless(page, 'nfc-client1')
+
+    // Vidage carte OK !
+    await expect(page.locator('#popup-cashless .test-return-reset', { hasText: 'Vidage carte OK' })).toBeVisible()
+
+    // clique sur bouton "RETOUR"
+    await page.locator('#popup-retour').click()
+
+    // vidage carte client 2
+    await resetCardCashless(page, 'nfc-client2')
+
+    // Vidage carte OK !
+    await expect(page.locator('#popup-cashless .test-return-reset', { hasText: 'Vidage carte OK' })).toBeVisible()
+
+    // clique sur bouton "RETOUR"
+    await page.locator('#popup-retour').click()
+
+    // #popup-cashless éffacé
+    await expect(page.locator('#popup-cashless')).toBeHidden()
+  })
+
+  test('Commande sur table 4, paiement en cashless, fonds insuffisant sur première et deuxième carte', async () => {
+    // aller au point de vente RESTO
+    await goPointSale(page, 'RESTO')
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
+    // table éphémère visible
+    await expect(page.locator('#tables-liste .test-table-ephemere')).toBeVisible()
+
+    // sélectionne la table S04
+    await page.locator('#tables-liste .table-bouton', { hasText: 'S04' }).click()
+
+    // pv resto affiché
+    await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table S04, PV Resto')).toBeVisible()
+
+    // addition vide
+    await expect(page.locator('#achats-liste')).toBeEmpty()
+
+    // total addition = 0
+    await expect(page.locator('#bt-valider-total')).toHaveText('TOTAL 0 €')
+
+    // sélection des articles
+    const listeArticles = [{ nom: "Soft P", nb: 3, prix: 1 }]
+    await selectArticles(page, listeArticles, "Resto")
+
+    // valider commande
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // clique sur "ENVOYER EN PREPARATION ET PAYER EN UNE SEULE FOIS"
+    await page.locator('#popup-cashless #test-prepa2').click()
+
+    // attendre moyens de paiement
+    await page.locator('#popup-cashless .selection-type-paiement', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
+
+    // bouton "CASHLESS" présent
+    await expect(page.locator('#popup-cashless bouton-basique >> text=CASHLESS')).toBeVisible()
+
+    // total = 3€
+    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CASHLESS' }).locator('.sous-element-texte >> text=TOTAL 3 €')).toBeVisible()
+
+    // sélection du cashless comme moyen de paiement
+    await page.locator('#popup-cashless bouton-basique >> text=CASHLESS').click()
+
+    // sélection client 1
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // message Fonds insuffisants affiché
+    await expect(page.locator('.message-fonds-insuffisants', { hasText: 'Fonds insuffisants' })).toBeVisible()
+
+    // il manque 3 €
+    await expect(page.locator('.message-fonds-insuffisants')).toContainText('manque 3.00 €')
+
+    // sélection 2ème carte cashless
+    await page.locator('#popup-cashless bouton-basique').getByText('AUTRE CARTE').click()
+
+    // sélection client 2 affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // sélection client 2
+    await page.locator('#nfc-client2').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 2ème carte message fonds insuffisants affiché
+    await expect(page.locator('.message-fonds-insuffisants', { hasText: 'Fonds insuffisants' })).toBeVisible()
+
+    // text "sur deuxieme carte" affichée
+    await expect(page.locator('.message-fonds-insuffisants', { hasText: 'sur deuxieme carte' })).toBeVisible()
+
+    // il manque 3 €
+    await expect(page.locator('.message-fonds-insuffisants')).toContainText('manque 3.00 €')
+
+    // bouton "RETOUR" présent
+    await expect(page.locator('#popup-retour')).toBeVisible()
+
+    // clique sur bouton "RETOUR"
+    await page.locator('#popup-retour').click()
+
+    // #popup-cashless éffacé
+    await expect(page.locator('#popup-cashless')).toBeHidden()
+  })
+
+  test('Commande sur table 5, paiement en cashless, fonds insuffisant sur carte, complémentaire espèce, somme donnée 10', async () => {
+    // cartes vidées sur contexte précédant
+
+    // aller au point de vente RESTO
+    await goPointSale(page, 'RESTO')
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
+    // table éphémère visible
+    await expect(page.locator('#tables-liste .test-table-ephemere')).toBeVisible()
+
+    // sélectionne la table S05
+    await page.locator('#tables-liste .table-bouton', { hasText: 'S05' }).click()
+
+    // pv resto affiché
+    await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table S05, PV Resto')).toBeVisible()
+
+    // addition vide
+    await expect(page.locator('#achats-liste')).toBeEmpty()
+
+    // total addition = 0
+    await expect(page.locator('#bt-valider-total')).toHaveText('TOTAL 0 €')
+
+    // sélection des articles
+    const listeArticles = [{ nom: "Gateau", nb: 1, prix: 8 }]
+    await selectArticles(page, listeArticles, "Resto")
+
+    // valider commande
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // clique sur "ENVOYER EN PREPARATION ET PAYER EN UNE SEULE FOIS"
+    await page.locator('#popup-cashless #test-prepa2').click()
+
+    // attendre moyens de paiement
+    await page.locator('#popup-cashless .selection-type-paiement', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
+
+    // bouton "CASHLESS" présent
+    await expect(page.locator('#popup-cashless bouton-basique >> text=CASHLESS')).toBeVisible()
+
+    // total = 8€
+    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CASHLESS' }).locator('.sous-element-texte >> text=TOTAL 8 €')).toBeVisible()
+
+    // sélection du cashless comme moyen de paiement
+    await page.locator('#popup-cashless bouton-basique >> text=CASHLESS').click()
+
+    // sélection client 1
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // message Fonds insuffisants affiché
+    await expect(page.locator('.message-fonds-insuffisants', { hasText: 'Fonds insuffisants' })).toBeVisible()
+
+    // il manque 8 €
+    await expect(page.locator('.message-fonds-insuffisants')).toContainText('manque 8.00 €')
+
+    // sélection ESPÈCE
+    await page.locator('#popup-cashless bouton-basique').getByText('ESPÈCE').click()
+
+    // attendre confirmation paiement
+    await expect(page.locator('.test-return-confirm-payment', { hasText: 'Confirmez le paiement' })).toBeVisible()
+
+    // somme donnée premier essai 10
+    await page.locator('#given-sum').fill('10')
+
+    // valider/confirmer
+    await page.locator('#popup-confirme-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
+
+    // méssage "Envoyée en préparation"
+    await page.locator('.test-return-msg-prepa', { hasText: 'Envoyée en préparation' }).click()
+
+    // total (moyen de paiement) valeur €
+    await expect(page.locator('.test-return-total-achats', { hasText: 'Total(espèce) 8.00 €' })).toBeVisible()
+
+    // première carte aprèss achats
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
+
+    // somme donnée
+    await expect(page.locator('.test-return-given-sum')).toHaveText('somme donnée 10 €')
+
+    // monnaie à rendre
+    await expect(page.locator('.test-return-change')).toHaveText('Monnaie à rendre 2 €')
+
+    // retour
+    await page.locator('#popup-retour').click()
+  })
+
+  test('Commande sur table Ex01, paiement cashless, fonds insuffisant sur carte, complémentaire cb', async () => {
+    // cartes vidées sur contexte précédant
+
+    // aller au point de vente RESTO
+    await goPointSale(page, 'RESTO')
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
+    // table éphémère visible
+    await expect(page.locator('#tables-liste .test-table-ephemere')).toBeVisible()
+
+    // sélectionne la table Ex01
+    await page.locator('#tables-liste .table-bouton', { hasText: 'Ex01' }).click()
+
+    // pv resto affiché
+    await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table Ex01, PV Resto')).toBeVisible()
+
+    // addition vide
+    await expect(page.locator('#achats-liste')).toBeEmpty()
+
+    // total addition = 0
+    await expect(page.locator('#bt-valider-total')).toHaveText('TOTAL 0 €')
+
+    // sélection des articles
+    const listeArticles = [{ nom: "Despé", nb: 1, prix: 3.2 }, { nom: "Guinness", nb: 1, prix: 4.99 }]
+    await selectArticles(page, listeArticles, "Resto")
+
+    // valider commande
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // clique sur "ENVOYER EN PREPARATION ET PAYER EN UNE SEULE FOIS"
+    await page.locator('#popup-cashless #test-prepa2').click()
+
+    // attendre moyens de paiement
+    await page.locator('#popup-cashless .selection-type-paiement', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
+
+    // bouton "CASHLESS" présent
+    await expect(page.locator('#popup-cashless bouton-basique >> text=CASHLESS')).toBeVisible()
+
+    // total = 8.19 €
+    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CASHLESS' }).locator('.sous-element-texte >> text=TOTAL 8.19 €')).toBeVisible()
+
+    // sélection du cashless comme moyen de paiement
+    await page.locator('#popup-cashless bouton-basique >> text=CASHLESS').click()
+
+    // sélection client 1
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // message Fonds insuffisants affiché
+    await expect(page.locator('.message-fonds-insuffisants', { hasText: 'Fonds insuffisants' })).toBeVisible()
+
+    // il manque 8.19 €
+    await expect(page.locator('.message-fonds-insuffisants')).toContainText('manque 8.19 €')
+
+    // sélection CB
+    await page.locator('#popup-cashless bouton-basique').getByText('CB').click()
+
+    // attendre confirmation paiement
+    await expect(page.locator('.test-return-confirm-payment', { hasText: 'Confirmez le paiement' })).toBeVisible()
+
+    // moyen de paiement cb affiché
+    await expect(page.locator('.test-return-payment-method', { hasText: 'cb' })).toBeVisible()
+
+    // valider/confirmer
+    await page.locator('#popup-confirme-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
+
+    // méssage "Envoyée en préparation"
+    await page.locator('.test-return-msg-prepa', { hasText: 'Envoyée en préparation' }).click()
+
+    // total (moyen de paiement) valeur €
+    await expect(page.locator('.test-return-total-achats', { hasText: 'Total(cb) 8.19 €' })).toBeVisible()
+
+    // retour
+    await page.locator('#popup-retour').click()
+  })
+
+  test('Commande sur table Ex02: total  32.1, paiement en espèce, somme donnée 1er essai 20 et 2ème essai 50', async () => {
+    // table éphémère visible
+    await expect(page.locator('#tables-liste .test-table-ephemere')).toBeVisible()
+
+    // sélectionne la table Ex02
+    await page.locator('#tables-liste .table-bouton', { hasText: 'Ex02' }).click()
+
+    // pv resto affiché
+    await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table Ex02, PV Resto')).toBeVisible()
+
+    // addition vide
+    await expect(page.locator('#achats-liste')).toBeEmpty()
+
+    // total addition = 0
+    await expect(page.locator('#bt-valider-total')).toHaveText('TOTAL 0 €')
+
+    // sélection des articles, total 32.1 €
+    const listeArticles = [{ nom: "Eau 1L", nb: 1, prix: 1.5 }, { nom: "CdBoeuf", nb: 1, prix: 25 },
+    { nom: "Chimay Bleue", nb: 2, prix: 2.8 }]
+    await selectArticles(page, listeArticles, "Resto")
+
+    // valider commande
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // clique sur "ENVOYER EN PREPARATION ET PAYER EN UNE SEULE FOIS"
+    await page.locator('#popup-cashless #test-prepa2').click()
+
+    // attendre moyens de paiement
+    await page.locator('#popup-cashless .selection-type-paiement', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
+
+    // bouton "ESPÈCE" présent
+    await expect(page.locator('#popup-cashless bouton-basique >> text=ESPÈCE')).toBeVisible()
+
+    // total = 32.1€
+    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'ESPÈCE' }).locator('.sous-element-texte >> text=TOTAL 32.1 €')).toBeVisible()
+
+    // valeur ESPÈCE
+    await page.locator('#popup-cashless bouton-basique >> text=ESPÈCE').click()
+
+    // attendre confirmation paiement
+    await expect(page.locator('.test-return-confirm-payment', { hasText: 'Confirmez le paiement' })).toBeVisible()
+
+    // somme donnée premier essai 20
+    await page.locator('#given-sum').fill('20')
+
+    // valider/confirmer
+    await page.locator('#popup-confirme-valider').click()
+
+    // message d'erreur affiché "total = 32.1"
+    await expect(page.locator('#given-sum-msg-erreur', { hasText: 'total = 32.1' })).toBeVisible()
+
+    // somme donnée premier essai 50
+    await page.locator('#given-sum').fill('50')
+
+    // valider/confirmer
+    await page.locator('#popup-confirme-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
+
+    // méssage "Envoyée en préparation"
+    await page.locator('.test-return-msg-prepa', { hasText: 'Envoyée en préparation' }).click()
+
+    // total (moyen de paiement) valeur €
+    await expect(page.locator('.test-return-total-achats', { hasText: 'Total(espèce) 32.1 €' })).toBeVisible()
+
+    // somme donnée
+    await expect(page.locator('.test-return-given-sum')).toHaveText('somme donnée 50 €')
+
+    // monnaie à rendre
+    await expect(page.locator('.test-return-change')).toHaveText('Monnaie à rendre 17.9 €')
+
+    // retour
+    await page.locator('#popup-retour').click()
+  })
+
+  test('Commande sur table Ex03, paiement en cb', async () => {
+    // table éphémère visible
+    await expect(page.locator('#tables-liste .test-table-ephemere')).toBeVisible()
+
+    // sélectionne la table Ex03
+    await page.locator('#tables-liste .table-bouton', { hasText: 'Ex03' }).click()
+
+    // pv resto affiché
+    await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table Ex03, PV Resto')).toBeVisible()
+
+    // addition vide
+    await expect(page.locator('#achats-liste')).toBeEmpty()
+
+    // total addition = 0
+    await expect(page.locator('#bt-valider-total')).toHaveText('TOTAL 0 €')
+
+    // sélection des articles, total 5.8 €
+    const listeArticles = [{ nom: "Despé", nb: 1, prix: 3.2 }, { nom: "Chimay Rouge", nb: 1, prix: 2.6 }]
+    await selectArticles(page, listeArticles, "Resto")
+
+    // valider commande
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // clique sur "ENVOYER EN PREPARATION ET PAYER EN UNE SEULE FOIS"
+    await page.locator('#popup-cashless #test-prepa2').click()
+
+    // attendre moyens de paiement
+    await page.locator('#popup-cashless .selection-type-paiement', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
+
+    // bouton "CB" présent
+    await expect(page.locator('#popup-cashless bouton-basique >> text=CB')).toBeVisible()
+
+    // total = 5.8€
+    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CB' }).locator('.sous-element-texte >> text=TOTAL 5.8 €')).toBeVisible()
+
+    // clique sur cb
+    await page.locator('#popup-cashless bouton-basique >> text=CB').click()
+
+    // attendre confirmation paiement
+    await expect(page.locator('.test-return-confirm-payment', { hasText: 'Confirmez le paiement' })).toBeVisible()
+
+    // type de paiement cb affiché
+    await expect(page.locator('.test-return-payment-method', { hasText: 'cb' })).toBeVisible()
+
+    // valider/confirmer
+    await page.locator('#popup-confirme-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
+
+    // méssage "Envoyée en préparation"
+    await page.locator('.test-return-msg-prepa', { hasText: 'Envoyée en préparation' }).click()
+
+    // total (moyen de paiement) valeur €
+    await expect(page.locator('.test-return-total-achats', { hasText: 'Total(cb) 5.8 €' })).toBeVisible()
+
+    await page.close()
+  })
+})

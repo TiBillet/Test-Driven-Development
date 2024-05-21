@@ -1,11 +1,14 @@
 // cashless_demo1.env DEBUG=1 / DEMO=1 / language = fr
 import { test, expect } from '@playwright/test'
-import { connectionAdmin, resetCardCashless, creditCardCashless, getTranslate, getBackGroundColor } from '../../mesModules/commun.js'
+import { connection, changeLanguage, resetCardCashless, creditCardCashless, getTranslate, getStyleValue } from '../../mesModules/commun.js'
 import { env } from '../../mesModules/env.js'
 
 
 // attention la taille d'écran choisie affiche le menu burger
-let page, currencySymbol, transaction, ok, total, cardTrans, returnTrans
+let page, currencySymbolTrans, transactionTrans, okTrans, totalTrans, cardTrans, returnTrans, cashTrans, cbTrans
+let givenSumTrans, changeTrans
+const language = "en"
+
 test.use({
   viewport: { width: 550, height: 1000 },
   ignoreHTTPSErrors: true
@@ -14,18 +17,25 @@ test.use({
 test.describe("Cashless, carte client 1", () => {
   test("Connection", async ({ browser }) => {
     page = await browser.newPage()
-    await connectionAdmin(page)
+    await connection(page)
+
+    // changer de langue
+    await changeLanguage(page, language)
 
     // attente affichage menu burger
     await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
 
     // obtenir les traductions qui seront utilisées
-    currencySymbol = await getTranslate(page, 'currencySymbol')
-    transaction = await getTranslate(page, 'transaction', 'capitalize')
-    ok = await getTranslate(page, 'ok')
-    total = await getTranslate(page, 'total', 'capitalize')
+    currencySymbolTrans = await getTranslate(page, 'currencySymbol')
+    transactionTrans = await getTranslate(page, 'transaction', 'capitalize')
+    okTrans = await getTranslate(page, 'ok')
+    totalTrans = await getTranslate(page, 'total', 'capitalize')
     cardTrans = await getTranslate(page, 'card')
     returnTrans = await getTranslate(page, 'return', 'uppercase')
+    cashTrans = await getTranslate(page, 'cash')
+    cbTrans = await getTranslate(page, 'cb')
+    givenSumTrans = await getTranslate(page, 'givenSum')
+    changeTrans = await getTranslate(page, 'change', 'capitalize')
   })
 
   test("Check carte client 1, tests : bouton retour + sur carte = 0 + cotisation", async () => {
@@ -57,7 +67,7 @@ test.describe("Cashless, carte client 1", () => {
 
     // 0 sur carte
     const onTrans = await getTranslate(page, 'on', 'capitalize')
-    await expect(page.locator('.test-return-total-card', { hasText: onTrans + ' ' + cardTrans + ' : 0 ' + currencySymbol })).toBeVisible()
+    await expect(page.locator('.test-return-total-card', { hasText: onTrans + ' ' + cardTrans + ' : 0 ' + currencySymbolTrans })).toBeVisible()
 
     // TODO: à traduire "Aucune cotisation"
     await expect(page.locator('.test-return-contribution')).toHaveText('Aucune cotisation')
@@ -74,24 +84,23 @@ test.describe("Cashless, carte client 1", () => {
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // fond d'écran =  'rgb(51, 148, 72)'
-    const backGroundColor = await getBackGroundColor(page, '#popup-cashless')
+    const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
     expect(backGroundColor).toEqual('rgb(51, 148, 72)')
 
     // 'Transaction ok' est affiché
-    await expect(page.locator('.test-return-title-content', { hasText: transaction + ' ' + ok })).toBeVisible()
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
     // total cb
-    const monnaie = await getTranslate(page, 'cb')
-    await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${total}(${monnaie}) 40.00 ${currencySymbol}` })).toBeVisible()
+    await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 40.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // total crédité sur carte
-    await expect(page.locator('#popup-cashless .test-return-total-carte'), { hasText: `ROBOCOP - ${cardTrans} 50 ${currencySymbol}` }).toBeVisible()
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 50 ${currencySymbolTrans}` })).toBeVisible()
 
     // crédit du lieu
-    await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 40 ${currencySymbol}` })).toBeVisible()
+    await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 40 ${currencySymbolTrans}` })).toBeVisible()
 
     // crédit cadeau du lieu
-    await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbol}` })).toBeVisible()
+    await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbolTrans}` })).toBeVisible()
 
     // Clique bt "RETOUR"
     await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
@@ -105,69 +114,70 @@ test.describe("Cashless, carte client 1", () => {
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // fond d'écran =  'rgb(51, 148, 72)'
-    const backGroundColor = await getBackGroundColor(page, '#popup-cashless')
+    const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
     expect(backGroundColor).toEqual('rgb(51, 148, 72)')
 
     // 'Transaction ok' est affiché
-    await expect(page.locator('.test-return-title-content', { hasText: transaction + ' ' + ok })).toBeVisible()
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    await page.pause()
     // total espèce
-    const monnaie = await getTranslate(page, 'cash')
-    await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${total}(${monnaie}) 10.00 ${currencySymbol}` })).toBeVisible()
-
-
+    await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // total crédité sur carte
-    await expect(page.locator('.test-return-total-carte')).toHaveText('TEST - carte 60 €')
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 60 ${currencySymbolTrans}` })).toBeVisible()
 
-    // cadeau crédité
-    await expect(page.locator('.test-return-monnaie-lg')).toHaveText('- TestCoin Cadeau : 10 €')
+    // crédit du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 50 ${currencySymbolTrans}` })).toBeVisible()
 
-    // cashless crédité
-    await expect(page.locator('.test-return-monnaie-le')).toHaveText('- TestCoin : 50 €')
+    // crédit cadeau du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbolTrans}` })).toBeVisible()
 
     // somme donnée
-    await expect(page.locator('.test-return-given-sum')).toHaveText('somme donnée 10 €')
+    await expect(page.locator('.test-return-given-sum', { hasText: `${givenSumTrans} 10 ${currencySymbolTrans}` })).toBeVisible()
 
     // monnaie à rendre
-    await expect(page.locator('.test-return-change')).toHaveText('Monnaie à rendre 0 €')
+    await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
-    // Clique bouton "RETOUR"
-    await page.locator('#popup-retour div:has-text("RETOUR")').first().click()
+    // Clique bt "RETOUR"
+    await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
   })
 
   test("Retour carte client 1 crédité de 10 en espece: somme donnée 50", async () => {
     // 4 *10 +  0* 5 -- somme donné 10
-    await creditCardCashless(page, 'nfc-client1', 1, 0, 'espece', '50')
+    await creditCardCashless(page, 'nfc-client1', 1, 0, 'espece', 50)
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-    // Transaction OK !
-    await expect(page.locator('.test-return-title-content')).toHaveText('Transaction ok')
+    // fond d'écran =  'rgb(51, 148, 72)'
+    const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(51, 148, 72)')
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
     // total espèce
-    await expect(page.locator('.test-return-total-achats')).toHaveText('Total(espèce) 10.00 €')
+    await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // total crédité sur carte
-    await expect(page.locator('.test-return-total-carte')).toHaveText('TEST - carte 70 €')
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 70 ${currencySymbolTrans}` })).toBeVisible()
 
-    // cadeau crédité
-    await expect(page.locator('.test-return-monnaie-lg')).toHaveText('- TestCoin Cadeau : 10 €')
+    // crédit du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 60 ${currencySymbolTrans}` })).toBeVisible()
 
-    // cashless crédité
-    await expect(page.locator('.test-return-monnaie-le')).toHaveText('- TestCoin : 60 €')
+    // crédit cadeau du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbolTrans}` })).toBeVisible()
 
     // somme donnée
-    await expect(page.locator('.test-return-given-sum')).toHaveText('somme donnée 50 €')
+    await expect(page.locator('.test-return-given-sum', { hasText: `${givenSumTrans} 50 ${currencySymbolTrans}` })).toBeVisible()
 
     // monnaie à rendre
-    await expect(page.locator('.test-return-change')).toHaveText('Monnaie à rendre 40 €')
+    await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
 
-    // Clique bouton "RETOUR"
-    await page.locator('#popup-retour div:has-text("RETOUR")').first().click()
+    // Clique bt "RETOUR"
+    await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
 
     await page.close()
   })
+
 })

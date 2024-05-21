@@ -16,8 +16,19 @@ sudo xhost +local:docker
 
 ## Lancer le conteneur playwright
 ```
+cd playwright
 # launch container
 docker compose up -d
 # use container
 docker exec -ti playwright bash
+```
+
+## lancer un test
+```
+npx playwright test tests/cashless_sans_user_agent/0010-carte-nfc.test.js
+```
+
+Utiliser X11 de l'hote (npx ... --headed):
+```
+sudo xhost +local:docker
 ```

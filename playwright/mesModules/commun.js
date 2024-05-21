@@ -9,10 +9,10 @@ import * as IP from "ip"
 import Big from './big.js'
 
 /**
- * Connexion au serveur cashless
+ * Connexion laboutik, connexion admin + voir le site
  * @param {object} page page html en cours
  */
-export const connectionAdmin = async function (page) {
+export const connection = async function (page) {
   await test.step('Connexion admin', async () => {
     // await page.goto(env.domain + env.adminLink)
     await page.goto(env.domain)
@@ -190,6 +190,7 @@ export const resetCardCashless = async function (page, carte) {
 export const confirmation = async function (page, typePaiement, sommeDonnee, complementaire) {
   await test.step('confirm paiement' + typePaiement, async () => {
     let fonc, foncAttendue
+
     // popup de confirmation présent
     await expect(page.locator('#popup-cashless-confirm')).toBeVisible()
 
@@ -218,7 +219,7 @@ export const confirmation = async function (page, typePaiement, sommeDonnee, com
     // text contient "CB" + fonction attendue
     if (typePaiement === 'cb') {
       const paymentType = await getTranslate(page, 'cb')
-      await expect(page.locator('.test-return-payment-method')).toHaveText(paymentType)
+      await expect(page.locator('.test-return-payment-method', { hasText: paymentType })).toBeVisible()
 
       foncAttendue = 'vue_pv.obtenirIdentiteClientSiBesoin(\'carte_bancaire\')'
       if (complementaire === true) {
@@ -286,7 +287,7 @@ export const creditCardCashless = async function (page, carte, nbXCredit10, nbXC
     // attente affichage "Type(s) de paiement"
     const popupTitleTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
     await page.locator('#popup-cashless .selection-type-paiement', { hasText: popupTitleTrans }).waitFor({ state: 'visible' })
-    
+
     // payer en espèces + confirmation -- cash-uppercase
     if (paiement === undefined || paiement === 'espece') {
       const cashPaymentTrans = await getTranslate(page, 'cash', 'uppercase')
@@ -436,11 +437,7 @@ export const setPointSale = async function (pointSale, options) {
     // connexion admin
     const browser = await chromium.launch()
     page = await browser.newPage()
-    await page.goto(env.domain + env.adminLink)
-
-    await page.locator('#id_password').fill(env.adminPassword)
-    await page.locator('#id_username').fill(env.adminUser)
-    await page.locator('input[type="submit"]').click()
+    await page.goto(env.domain)
 
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
@@ -448,32 +445,7 @@ export const setPointSale = async function (pointSale, options) {
     // 2 cliques sur menu burger
     await page.locator('a[class="sidebar-header-menu sidebar-toggle"]').dblclick()
 
-    // attendre fin utilisation réseau    // moyen de paiement "CASHLESS" présent
-    await expect(page.locator('#popup-cashless bouton-basique >> text=CASHLESS')).toBeVisible()
-    // Total pour moyen de paiement "CASHLESS" 35.7 €
-    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CASHLESS' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 35.7 €')
-
-    // moyen de paiement "ESPECE" présent
-    await expect(page.locator('#popup-cashless bouton-basique >> text=ESPECE')).toBeVisible()
-    // Total pour moyen de paiement "ESPECE" 35.7 €
-    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'ESPECE' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 35.7 €')
-
-    // moyen de paiement "CB" présent
-    await expect(page.locator('#popup-cashless bouton-basique >> text=CB')).toBeVisible()
-    // Total pour moyen de paiement "CB" 35.7 €
-    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CB' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 35.7 €')
-
-    // bouton RETOUR présent
-    await expect(page.locator('#popup-cashless bouton-basique >> text=RETOUR')).toBeVisible()
-
-    // clique sur "ESPECE"
-    await page.locator('#popup-cashless bouton-basique >> text=ESPECE').click()
-
-    // confirmation espèce
-    await confirmation(page, 'espece')
-
-    // VALIDER
-    await page.locator('#popup-confirme-valider').click()
+    await page.locator('a[href="/adminstaff/APIcashless/pointdevente/"]').click()
 
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
@@ -524,15 +496,18 @@ export const setPointSale = async function (pointSale, options) {
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
 
-    // message de succès attendu
-    await expect(page.locator('.messagelist')).toHaveText(`L'objet Point de vente « ${pointSale} » a été modifié avec succès.`)
+    // message succès =  'rgb(196, 236, 197)'
+    const backGroundColor = await getStyleValue(page, '.messagelist .success', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(196, 236, 197)')
+    await page.close()
   })
 }
 
-export const getBackGroundColor = async function (page, selector) {
-  return await page.evaluate(async ([selector]) => {
-    return document.querySelector(selector).style.backgroundColor
-  }, [selector])
+export const getStyleValue = async function (page, selector, property) {
+  return await page.evaluate(async ([selector, property]) => {
+    const propertys = document.defaultView.getComputedStyle(document.querySelector(selector))
+    return propertys[property]
+  }, [selector, property])
 }
 
 export const getTranslate = async function (page, indexTrad, option) {

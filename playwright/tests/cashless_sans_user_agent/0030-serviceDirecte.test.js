@@ -5,7 +5,7 @@ import { connection, changeLanguage, goPointSale, getTranslate, selectArticles, 
 // attention la taille d'écran choisie affiche le menu burger
 let page, directServiceTrans, cashTrans, paiementTypeTrans, confirmPaymentTrans, transactionTrans, okTrans
 let totalTrans, givenSumTrans, changeTrans, currencySymbolTrans, returnTrans, cbTrans, prePurchaseCardTrans
-let postPurchaseCardTrans
+let postPurchaseCardTrans, onTrans, cardTrans
 const language = "en"
 
 test.use({
@@ -44,7 +44,8 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     cbTrans = await getTranslate(page, 'cb')
     prePurchaseCardTrans = await getTranslate(page, 'prePurchaseCard')
     postPurchaseCardTrans = await getTranslate(page, 'postPurchaseCard')
-
+    onTrans = await getTranslate(page, 'on', 'capitalize')
+    cardTrans = await getTranslate(page, 'card')
   })
 
   test("Achat 2 pression 33 + 1 pression 50 + paiement en espèce(30€) + confirmation + rendu", async () => {
@@ -232,8 +233,6 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
   })
 
   test("contexte: vider carte cahsless client 1 = 0€ et carte cashless client 2 = 40€", async () => {
-    await page.pause()
-    
     // vider carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
@@ -245,22 +244,20 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await creditCardCashless(page, 'nfc-client2', 4, 0, 'cb')
 
     // attente affichage "popup-cashless"
-    // await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-
-    
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // total cb
-    await expect(page.locator('.test-return-total-achats')).toHaveText('Total(cb) 40.00 €')
+    // 'Total(cb) 40.00 €' est affiché
+    await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 40.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // retour créditation
     await page.locator('#popup-retour').click()
 
     // --- carte client 1, cashless = 0 € ---
     // Clique sur le bouton "CHECK CARTE")
-    await page.locator('#page-commandes-footer div:has-text("CHECK CARTE")').first().click()
+    await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 
     // cliquer sur carte nfc simulée
     await page.locator('#nfc-client1').click()
@@ -269,7 +266,25 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // sur carte 0 €
-    await expect(page.locator('.test-return-total-card')).toHaveText('Sur carte : 0 €')
+    await expect(page.locator('.test-return-total-card', { hasText: `${onTrans} ${cardTrans} : 0 ${currencySymbolTrans}` })).toBeVisible()
+
+    // retour
+    await page.locator('#popup-retour').click()
+
+    await page.pause()
+
+    // --- carte client 2, cashless = 40 € ---
+    // Clique sur le bouton "CHECK CARTE")
+    await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
+
+    // cliquer sur carte nfc simulée
+    await page.locator('#nfc-client2').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // sur carte 40 €
+    await expect(page.locator('.test-return-total-card', { hasText: `${onTrans} ${cardTrans} : 40 ${currencySymbolTrans}` })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
@@ -535,15 +550,13 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
         // créditer de 10 €  et 0 cadeau
         // 1 * 10 + 0 * 5
         await creditCardCashless(page, 'nfc-client1', 1, 0, 'cb')
-    
+    await page.pause()
         // Transaction OK !
         await expect(page.locator('.test-return-title-content')).toHaveText('Transaction ok')
     
         // total cb de 10 €
         await expect(page.locator('.test-return-total-achats')).toHaveText('Total(cb) 10.00 €')
-    
-        // retour créditation
-        await page.locator('#popup-retour').click()
+    await page.pause()  await page.locator('#popup-retour').click()
       })
     
     

@@ -5,7 +5,7 @@ import { connection, changeLanguage, goPointSale, getTranslate, selectArticles, 
 // attention la taille d'écran choisie affiche le menu burger
 let page, directServiceTrans, cashTrans, paiementTypeTrans, confirmPaymentTrans, transactionTrans, okTrans
 let totalTrans, givenSumTrans, changeTrans, currencySymbolTrans, returnTrans, cbTrans, prePurchaseCardTrans
-let postPurchaseCardTrans, onTrans, cardTrans
+let postPurchaseCardTrans, onTrans, cardTrans, totalUppercaseTrans, insufficientFundsTrans
 const language = "en"
 
 test.use({
@@ -46,6 +46,8 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     postPurchaseCardTrans = await getTranslate(page, 'postPurchaseCard')
     onTrans = await getTranslate(page, 'on', 'capitalize')
     cardTrans = await getTranslate(page, 'card')
+    totalUppercaseTrans = await getTranslate(page, 'total', 'uppercase')
+    insufficientFundsTrans = await getTranslate(page, 'insufficientFunds', 'capitalize')
   })
 
   test("Achat 2 pression 33 + 1 pression 50 + paiement en espèce(30€) + confirmation + rendu", async () => {
@@ -271,8 +273,6 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // retour
     await page.locator('#popup-retour').click()
 
-    await page.pause()
-
     // --- carte client 2, cashless = 40 € ---
     // Clique sur le bouton "CHECK CARTE")
     await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
@@ -289,71 +289,79 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // retour
     await page.locator('#popup-retour').click()
   })
+
+  test("Achat 1 Guinness + 1 Soft P + paiement en cashless 0€ / cashless complémentaire client2 40€", async () => {
+    // aller au point de vente "BAR 1"
+    await goPointSale(page, 'Bar 1')
+
+    await page.pause()
+    // titre
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: directServiceTrans })).toBeVisible()
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: 'Bar 1' })).toBeVisible()
+
+    // sélection des articles
+    const listeArticles = [{ nom: "Guinness", nb: 1, prix: 4.99 }, { nom: "Soft P", nb: 1, prix: 1 }]
+    await selectArticles(page, listeArticles, "Bar 1")
+
+    // valider les achats
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // attendre moyens de paiement
+    await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
+
+    // "TOTAL 5.99 €"
+    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: `${totalUppercaseTrans} 5.99 ${totalUppercaseTrans}`})).toBeVisible()
+
+    // sélection cashless
+    page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+
+    // sélection client 1
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // il manque 5.99 €
+    await expect(page.locator('.message-fonds-insuffisants')).toContainText('manque 5.99 €')
+
+    // sélection 2ème carte cashless
+    await page.locator('#popup-cashless bouton-basique').getByText('AUTRE CARTE').click()
+
+    // sélection client 2 affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // sélection client 2
+    await page.locator('#nfc-client2').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
+
+    // total (moyen de paiement 1 / moyen de paiement 2) valeur €
+    // await expect(page.locator('.test-return-total-achats', { hasText: 'Total(cashless/cashless) 5.99 €' })).toBeVisible()
+    await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/cashless) 5.99 ${currencySymbolTrans}` })).toBeVisible()
+
+    // sur carte client 1 avant achats
+    // await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'TEST - carte avant achats 0 €' })).toBeVisible()
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+
+
+    // complémentaire  
+    await expect(page.locator('.test-return-additional', { hasText: 'Complémentaire 5.99 € en cashless' })).toBeVisible()
+
+    // sur carte client 1 après achats
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
+
+    // retour
+    await page.locator('#popup-retour').click()
+  })
+
   /*  
-      test("Achat 1 Guinness + 1 Soft P + paiement en cashless 0€ / cashless complémentaire client2 40€", async () => {
-        // aller au point de vente "BAR 1"
-        await goPointSale(page, 'Bar 1')
-    
-        // titre
-        await expect(page.locator('.titre-vue')).toHaveText('Service direct -  Bar 1')
-    
-        // bien sur "Bar 1"
-        await expect(page.locator('text=Service Direct - Bar 1')).toBeVisible()
-    
-        // sélection des articles
-        const listeArticles = [{ nom: "Guinness", nb: 1, prix: 4.99 }, { nom: "Soft P", nb: 1, prix: 1 }]
-        await selectArticles(page, listeArticles, "Bar 1")
-    
-        // valider les achats
-        await page.locator('#bt-valider').click()
-    
-        // attente affichage "Type(s) de paiement"
-        await page.locator('#popup-cashless', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
-    
-        // sélection cashless
-        await page.locator('#popup-cashless bouton-basique >> text=CASHLESS').click()
-    
-        // sélection client 1
-        await page.locator('#nfc-client1').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // il manque 5.99 €
-        await expect(page.locator('.message-fonds-insuffisants')).toContainText('manque 5.99 €')
-    
-        // sélection 2ème carte cashless
-        await page.locator('#popup-cashless bouton-basique').getByText('AUTRE CARTE').click()
-    
-        // sélection client 2 affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // sélection client 2
-        await page.locator('#nfc-client2').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // 'Transaction ok' est affiché
-        await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
-    
-        // total (moyen de paiement 1 / moyen de paiement 2) valeur €
-        await expect(page.locator('.test-return-total-achats', { hasText: 'Total(cashless/cashless) 5.99 €' })).toBeVisible()
-    
-        // sur carte client 1 avant achats
-        await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'TEST - carte avant achats 0 €' })).toBeVisible()
-    
-        // complémentaire  
-        await expect(page.locator('.test-return-additional', { hasText: 'Complémentaire 5.99 € en cashless' })).toBeVisible()
-    
-        // sur carte client 1 après achats
-        await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
-    
-        // retour
-        await page.locator('#popup-retour').click()
-      })
-    
-    
       test("contexte, complémentaire espèce : vider carte cahsless client 1 = 0€ ", async () => {
         // vider carte client 1
         await resetCardCashless(page, 'nfc-client1')

@@ -503,11 +503,19 @@ export const setPointSale = async function (pointSale, options) {
   })
 }
 
+
 export const getStyleValue = async function (page, selector, property) {
   return await page.evaluate(async ([selector, property]) => {
     const propertys = document.defaultView.getComputedStyle(document.querySelector(selector))
     return propertys[property]
   }, [selector, property])
+}
+
+export const getStyleValueFromLocator = async function (locator, property) {
+  return await locator.evaluate(async (element,[property]) => {
+    const propertys = document.defaultView.getComputedStyle(element)
+    return propertys[property]
+  }, [property])
 }
 
 export const getTranslate = async function (page, indexTrad, option) {

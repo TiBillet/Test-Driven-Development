@@ -3,13 +3,12 @@
 
 import { test, expect } from '@playwright/test'
 import {
-  connectionAdmin, goPointSale, selectArticles, checkListArticlesOk,
+  connection, goPointSale, selectArticles, checkListArticlesOk,
   changeLanguage, newOrderIsShow, getTranslate, articlesListNoVisible,
   checkBill, articlesListIsVisible, articleIsNotVisible, articleIsVisible
-} from '../../mesModules/commun_sua.js'
+} from '../../mesModules/commun.js'
 
 
-// attention la taille d'écran choisie affiche le menu burger
 let page
 // sélection des articles, total 5.8 €
 const listeArticles = [
@@ -26,7 +25,7 @@ test.use({
 test.describe("Commandes + aller page paiement", () => {
   test("Connexion", async ({ browser }) => {
     page = await browser.newPage()
-    await connectionAdmin(page)
+    await connection(page)
 
     // dev changer de langue
     await changeLanguage(page, language)

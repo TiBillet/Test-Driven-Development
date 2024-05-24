@@ -4,10 +4,10 @@
 
 import { test, expect } from '@playwright/test'
 import {
-  connectionAdmin, goPointSale, selectArticles, getBackGroundColor,
+  connection, goPointSale, selectArticles, getStyleValue,
   changeLanguage, newOrderIsShow, getTranslate, articlesListNoVisible,
   checkBill, checkAlreadyPaidBill, getStatePrepaByRoom
-} from '../../mesModules/commun_sua.js'
+} from '../../mesModules/commun.js'
 
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -29,7 +29,7 @@ test.use({
 test.describe('Envoyer en préparation et aller à la page de paiement, payer "Tout".', () => {
   test("Connexion", async ({ browser }) => {
     page = await browser.newPage()
-    await connectionAdmin(page)
+    await connection(page)
 
     // dev changer de langue
     await changeLanguage(page, language)
@@ -170,7 +170,7 @@ test.describe('Envoyer en préparation et aller à la page de paiement, payer "T
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // fond d'écran =  'rgb(51, 148, 72)'
-    const backGroundColor = await getBackGroundColor(page, '#popup-cashless')
+    const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
     expect(backGroundColor).toEqual('rgb(51, 148, 72)')
 
     // 'Transaction ok' est affiché
@@ -263,75 +263,7 @@ test.describe('Envoyer en préparation et aller à la page de paiement, payer "T
 
     // #popup-cashless éffacé
     await expect(page.locator('#popup-cashless')).toBeHidden()
-  })
-  //
-
-  test('Préparation table Ex05, status "Non Servie - Payée".', async () => {
-    // clique sur bouton Prépa
-    const prepa = await getTranslate(page, 'shortcutPreparation', 'capitalize')
-    await page.locator('#commandes-table-menu .categories-table-item .categories-table-nom', { hasText: prepa }).click()
-
-    // attendre préparations
-    const titre = await getTranslate(page, 'preparations', 'capitalize')
-    await page.locator('.navbar-horizontal .titre-vue', { hasText: titre }).waitFor({ state: 'visible' })
-
-    // informations provenant du front
-    const result = await getStatePrepaByRoom(page, 'Ex05')
-
-    // heure, lieu, table et status de la première et la deuxième préparation de la salle Ex05
-    for (let i = 0; i < result.locationId.length; i++) {
-      const id = result.locationId[i]
-
-      // heure affichée 12/24:0-59
-      const regexTime = new RegExp('^([0-1]?[0-9]|2?[0-3]|[0-9]):([0-5][0-9]|[0-9])$')
-      await expect(page.locator(`#${id} .test-ref-time-value`, { hasText: regexTime })).toBeVisible()
-
-      // lieu
-      const posNb = new RegExp('.+ [0-9]+')
-      await expect(page.locator(`#${id} .test-ref-location`, { hasText: posNb })).toBeVisible()
-
-      // table
-      await expect(page.locator(`#${id} .test-ref-table-name`, { hasText: 'Ex05' })).toBeVisible()
-
-      // status préparation
-      await expect(page.locator(`#${id} .test-ref-status-order`, { hasText: 'Not Served - paid' })).toBeVisible()
-    }
-
-    await page.pause()
-    // Tous les articles ne sont pas servi
-    for (let i = 0; i < listeArticles.length; i++) {
-      const article = listeArticles[i]
-      console.log('article =', article.nom)
-      const art = result.articles.find(item => item.nom === article.nom)
-      console.log('art =', art)
-      // div data-article-id
-    }
-
-    // status de la deuxième préparation de la salle Ex05
-    /*
-       // heure
-       obj['time'] = lieu.querySelector('.test-ref-time-value').innerText
-
-       // lieu
-       obj['location'] = lieu.querySelector('.test-ref-location').innerText
-
-       // salle 
-       obj['room'] = lieu.querySelector('.test-ref-table-name').innerText
-
-       // preparations status
-       obj['state'] = lieu.querySelector('.test-ref-status-order').innerText
-*/
-
-
-    // console.log('result =', JSON.stringify(result, null, 2))
-
-    // validation des 2 lieux de préparations
-  })
-
-  // test après validation des 2 lieux de préparations tous grisé / servie et payé / tous les articles présent (2 lieux)
-
-  test('Fin', async () => {
-    await page.pause()
+    
     await page.close()
   })
 })

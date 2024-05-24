@@ -1,35 +1,25 @@
 // cashless_demo1.env DEBUG=True / DEMO=True / language = fr
 import { test, expect } from '@playwright/test'
-import { connectionAdmin, goPointSale, selectArticles, resetCardCashless, creditCardCashless } from '../../mesModules/commun.js'
+import { connection, changeLanguage, goPointSale, selectArticles, resetCardCashless, creditCardCashless } from '../../mesModules/commun.js'
 
+let page
+const language = "fr"
 
 // attention la taille d'écran choisie affiche le menu burger
-let page
-
-test.use({
-  viewport: { width: 375, height: 800 },
-  deviceScaleFactor: 1,
-  ignoreHTTPSErrors: true
-})
+test.use({ viewport: { width: 550, height: 1000 }, ignoreHTTPSErrors: true })
 
 test.describe("Commandes, payer en une seule fois", () => {
   test("Contexte: aller point de vente 'RESTO'", async ({ browser }) => {
     page = await browser.newPage()
-    await connectionAdmin(page)
+    await connection(page)
+
+    // dev changer de langue
+    await changeLanguage(page, language)
   })
 
   test("contexte: vider carte client 1 et la crediter de 40€", async () => {
     // vider carte client 1
     await resetCardCashless(page, 'nfc-client1')
-
-    // attente affichage "popup-cashless"
-    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-
-    // vidage carte ok
-    await expect(page.locator('.test-return-reset')).toHaveText('Vidage carte ok')
-
-    // retour
-    await page.locator('#popup-retour').click()
 
     // créditer de 10 €  et 0 cadeau
     // 4 * 10 + 0 * 5
@@ -109,10 +99,10 @@ test.describe("Commandes, payer en une seule fois", () => {
     await expect(page.locator('.test-return-total-achats', { hasText: 'Total(cashless) 33.4 €' })).toBeVisible()
 
     // sur carte client 1 avant achats
-    await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'TEST - carte avant achats 40.00 €' })).toBeVisible()
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'ROBOCOP - carte avant achats 40.00 €' })).toBeVisible()
 
     // sur carte client 1 après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 6.60 €' })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'ROBOCOP - carte après achats 6.60 €' })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
@@ -122,29 +112,17 @@ test.describe("Commandes, payer en une seule fois", () => {
     // vidage carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
-    // Vidage carte OK !
-    await expect(page.locator('#popup-cashless .test-return-reset', { hasText: 'Vidage carte OK' })).toBeVisible()
-
-    // clique sur bouton "RETOUR"
-    await page.locator('#popup-retour').click()
-
     // vidage carte client 2
     await resetCardCashless(page, 'nfc-client2')
 
-    // clique sur bouton "RETOUR"
-    await page.locator('#popup-retour').click()
-
     // client 2 = 10 € (1 *10 + 0 * 5)
     await creditCardCashless(page, 'nfc-client2', 1, 0, 'cb')
-
-    // attente affichage "popup-cashless"
-    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // Transaction OK !
     await expect(page.locator('.test-return-title-content')).toHaveText('Transaction ok')
 
     // sur carte 10 €
-    await expect(page.locator('.test-return-total-carte')).toHaveText('ROBOCOP - carte 10 €')
+    await expect(page.locator('.test-return-total-carte')).toHaveText('--- - carte 10 €')
 
     // clique sur bouton "RETOUR"
     await page.locator('#popup-retour').click()
@@ -153,6 +131,7 @@ test.describe("Commandes, payer en une seule fois", () => {
     await expect(page.locator('#popup-cashless')).toBeHidden()
   })
 
+  
   test('Commande sur table 3, paiement en cashless, fonds insuffisant sur première carte', async () => {
     // aller au point de vente RESTO
     await goPointSale(page, 'RESTO')
@@ -237,33 +216,19 @@ test.describe("Commandes, payer en une seule fois", () => {
     await expect(page.locator('.test-return-purchase-cards', { hasText: 'Total des cartes 10.00 €' })).toBeVisible()
 
     // contenu 1ère carte cashless après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'ROBOCOP - carte après achats 0 €' })).toBeVisible()
 
     // clique sur bouton "RETOUR"
     await page.locator('#popup-retour').click()
   })
-
+  
   test("Contexte: 0 € sur première carte et 0 € pour la deuxième", async () => {
     // vidage carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
-    // Vidage carte OK !
-    await expect(page.locator('#popup-cashless .test-return-reset', { hasText: 'Vidage carte OK' })).toBeVisible()
-
-    // clique sur bouton "RETOUR"
-    await page.locator('#popup-retour').click()
-
     // vidage carte client 2
     await resetCardCashless(page, 'nfc-client2')
 
-    // Vidage carte OK !
-    await expect(page.locator('#popup-cashless .test-return-reset', { hasText: 'Vidage carte OK' })).toBeVisible()
-
-    // clique sur bouton "RETOUR"
-    await page.locator('#popup-retour').click()
-
-    // #popup-cashless éffacé
-    await expect(page.locator('#popup-cashless')).toBeHidden()
   })
 
   test('Commande sur table 4, paiement en cashless, fonds insuffisant sur première et deuxième carte', async () => {
@@ -442,7 +407,7 @@ test.describe("Commandes, payer en une seule fois", () => {
     await expect(page.locator('.test-return-total-achats', { hasText: 'Total(espèce) 8.00 €' })).toBeVisible()
 
     // première carte aprèss achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'ROBOCOP - carte après achats 0 €' })).toBeVisible()
 
     // somme donnée
     await expect(page.locator('.test-return-given-sum')).toHaveText('somme donnée 10 €')
@@ -626,12 +591,18 @@ test.describe("Commandes, payer en une seule fois", () => {
   })
 
   test('Commande sur table Ex03, paiement en cb', async () => {
+    // aller au point de vente RESTO
+    await goPointSale(page, 'RESTO')
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
     // table éphémère visible
     await expect(page.locator('#tables-liste .test-table-ephemere')).toBeVisible()
 
     // sélectionne la table Ex03
     await page.locator('#tables-liste .table-bouton', { hasText: 'Ex03' }).click()
-
+    
     // pv resto affiché
     await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table Ex03, PV Resto')).toBeVisible()
 

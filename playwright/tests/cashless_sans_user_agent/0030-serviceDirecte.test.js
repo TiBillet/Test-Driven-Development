@@ -1,11 +1,12 @@
 // cashless_demo1.env DEBUG=True / DEMO=True / language = fr
 import { test, expect } from '@playwright/test'
-import { connection, changeLanguage, goPointSale, getTranslate, selectArticles, checkBillDirectService, resetCardCashless, creditCardCashless } from '../../mesModules/commun.js'
+import { connection, changeLanguage, goPointSale, getTranslate, selectArticles, getStyleValue, checkBillDirectService, resetCardCashless, creditCardCashless } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
 let page, directServiceTrans, cashTrans, paiementTypeTrans, confirmPaymentTrans, transactionTrans, okTrans
 let totalTrans, givenSumTrans, changeTrans, currencySymbolTrans, returnTrans, cbTrans, prePurchaseCardTrans
-let postPurchaseCardTrans, onTrans, cardTrans, totalUppercaseTrans, insufficientFundsTrans
+let postPurchaseCardTrans, onTrans, cardTrans, totalUppercaseTrans, insufficientFundsTrans, isMissingTrans
+let hasTrans, possiblePurchaseByTrans, additionalTrans, inTrans, nameTrans, cashLowercaseTrans
 const language = "en"
 
 test.use({
@@ -48,6 +49,13 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     cardTrans = await getTranslate(page, 'card')
     totalUppercaseTrans = await getTranslate(page, 'total', 'uppercase')
     insufficientFundsTrans = await getTranslate(page, 'insufficientFunds', 'capitalize')
+    isMissingTrans = await getTranslate(page, 'isMissing', 'capitalize')
+    hasTrans = await getTranslate(page, 'has')
+    possiblePurchaseByTrans = await getTranslate(page, 'possiblePurchaseBy', 'capitalize')
+    additionalTrans = await getTranslate(page, 'additional', 'capitalize')
+    inTrans = await getTranslate(page, 'in')
+    nameTrans = await getTranslate(page, 'name', 'capitalize')
+    cashLowercaseTrans = await getTranslate(page, 'cash')
   })
 
   test("Achat 2 pression 33 + 1 pression 50 + paiement en espèce(30€) + confirmation + rendu", async () => {
@@ -72,7 +80,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélectionner espèce
-    page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]').click()
+    await page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -108,7 +116,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-retour', { hasText: returnTrans })).toBeVisible()
 
     // cliquer sur RETOUR
-    page.locator('#popup-retour').click()
+    await page.locator('#popup-retour').click()
 
     // titre visible
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
@@ -133,7 +141,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélectionner cb
-    page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]').click()
+    await page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -160,7 +168,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-retour', { hasText: returnTrans })).toBeVisible()
 
     // cliquer sur RETOUR
-    page.locator('#popup-retour').click()
+    await page.locator('#popup-retour').click()
 
     // titre visible
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
@@ -178,7 +186,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // 'Total(cb) 2.00 €' est affiché
+    // 'Total(cb) 10.00 €' est affiché
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // retour créditation
@@ -210,7 +218,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélection cashless
-    page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
 
     // sélection client 1
     await page.locator('#nfc-client1').click()
@@ -294,7 +302,6 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // aller au point de vente "BAR 1"
     await goPointSale(page, 'Bar 1')
 
-    await page.pause()
     // titre
     await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: directServiceTrans })).toBeVisible()
     await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: 'Bar 1' })).toBeVisible()
@@ -313,10 +320,10 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // "TOTAL 5.99 €"
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: `${totalUppercaseTrans} 5.99 ${totalUppercaseTrans}`})).toBeVisible()
+    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: `${totalUppercaseTrans} 5.99 ${currencySymbolTrans}` })).toBeVisible()
 
     // sélection cashless
-    page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
 
     // sélection client 1
     await page.locator('#nfc-client1').click()
@@ -324,11 +331,24 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
+    // fonds insuffisants; couleur du fond = 'rgb(114, 39, 39)'
+    const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(114, 39, 39)')
+
+    // message fonds insuffisants affiché
+    await expect(page.locator('.test-return-title', { hasText: insufficientFundsTrans })).toBeVisible()
+
     // il manque 5.99 €
-    await expect(page.locator('.message-fonds-insuffisants')).toContainText('manque 5.99 €')
+    await expect(page.locator('.test-return-missing-cash', { hasText: `${isMissingTrans} 5.99 ${currencySymbolTrans}` })).toBeVisible()
+
+    // contenu première carte
+    await expect(page.locator('.test-return-fisrt-card-content', { hasText: `ROBOCOP ${hasTrans} 0` })).toBeVisible()
+
+    // message 'Achat possible par' affiché
+    await expect(page.locator('.test-returm-possible-purchase', { hasText: possiblePurchaseByTrans })).toBeVisible()
 
     // sélection 2ème carte cashless
-    await page.locator('#popup-cashless bouton-basique').getByText('AUTRE CARTE').click()
+    await page.locator('#popup-cashless .test-fonds-insuffisants-nfc').click()
 
     // sélection client 2 affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -343,315 +363,307 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
     // total (moyen de paiement 1 / moyen de paiement 2) valeur €
-    // await expect(page.locator('.test-return-total-achats', { hasText: 'Total(cashless/cashless) 5.99 €' })).toBeVisible()
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/cashless) 5.99 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 avant achats
-    // await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'TEST - carte avant achats 0 €' })).toBeVisible()
     await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
-
-    // complémentaire  
-    await expect(page.locator('.test-return-additional', { hasText: 'Complémentaire 5.99 € en cashless' })).toBeVisible()
+    // complémentaire
+    await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 5.99 € ${inTrans} cashless` })).toBeVisible()
 
     // sur carte client 1 après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: `ROBOCOP - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+
+    // cliquer sur RETOUR
+    await page.locator('#popup-retour').click()
+
+    // titre visible
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
+  })
+
+  test("contexte, complémentaire espèce : vider carte cahsless client 1 = 0€ ", async () => {
+    // vider carte client 1
+    await resetCardCashless(page, 'nfc-client1')
+
+    // --- carte client 1, cashless = 0 € ---
+    // Clique sur le bouton "CHECK CARTE"
+    await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
+
+    // cliquer sur carte nfc simulée
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // "nom : ROBOVOP" affiché
+    await expect(page.locator('.test-return-name', { hasText: `${nameTrans} : ROBOCOP` })).toBeVisible()
+
+    // sur carte 0 €
+    await expect(page.locator('.test-return-total-card', { hasText: `${onTrans} ${cardTrans} : 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
   })
 
-  /*  
-      test("contexte, complémentaire espèce : vider carte cahsless client 1 = 0€ ", async () => {
-        // vider carte client 1
-        await resetCardCashless(page, 'nfc-client1')
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // vidage carte ok
-        await expect(page.locator('.test-return-reset')).toHaveText('Vidage carte ok')
-    
-        // retour
-        await page.locator('#popup-retour').click()
-    
-        // --- carte client 1, cashless = 0 € ---
-        // Clique sur le bouton "CHECK CARTE")
-        await page.locator('#page-commandes-footer div:has-text("CHECK CARTE")').first().click()
-    
-        // cliquer sur carte nfc simulée
-        await page.locator('#nfc-client1').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // sur carte 0 €
-        await expect(page.locator('.test-return-total-card')).toHaveText('Sur carte : 0 €')
-    
-        // retour
-        await page.locator('#popup-retour').click()
-      })
-    
-      test("Achat 1 Chimay Bleue + paiement en cashless 0€ / espèce somme donnée 50€", async () => {
-        // aller au point de vente "BAR 1"
-        await goPointSale(page, 'Bar 1')
-    
-        // titre
-        await expect(page.locator('.titre-vue')).toHaveText('Service direct -  Bar 1')
-    
-        // bien sur "Bar 1"
-        await expect(page.locator('text=Service Direct - Bar 1')).toBeVisible()
-    
-        // sélection des articles
-        const listeArticles = [{ nom: "Chimay Bleue", nb: 1, prix: 2.8 }]
-        await selectArticles(page, listeArticles, "Bar 1")
-    
-        // valider les achats
-        await page.locator('#bt-valider').click()
-    
-        // attente affichage "Type(s) de paiement"
-        await page.locator('#popup-cashless', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
-    
-        // sélection cashless
-        await page.locator('#popup-cashless bouton-basique').getByText('CASHLESS').click()
-    
-        // sélection client 1
-        await page.locator('#nfc-client1').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // Fonds insuffisants
-        await expect(page.locator('.message-fonds-insuffisants')).toContainText('Fonds insuffisants')
-    
-        // sélectionner espèce
-        await page.locator('#popup-cashless bouton-basique').getByText('ESPÈCE').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // Confirmez le paiement est affiché
-        await expect(page.locator('.test-return-confirm-payment', { hasText: 'Confirmez le paiement' })).toBeVisible()
-    
-        // espèce est affiché
-        await expect(page.locator('.test-return-payment-method', { hasText: 'espèce' })).toBeVisible()
-    
-        // input value = 50
-        await page.locator('#given-sum').fill('50')
-    
-        // valider
-        await page.locator('#popup-confirme-valider').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // 'Transaction ok' est affiché
-        await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
-    
-        // total en espèce
-        await expect(page.locator('.test-return-total-achats')).toHaveText('Total(cashless/espèce) 2.80 €')
-    
-        // sur carte client 1 avant achats
-        await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'TEST - carte avant achats 0 €' })).toBeVisible()
-    
-        // complémentaire  
-        await expect(page.locator('.test-return-additional', { hasText: 'Complémentaire 2.80 € en espèce' })).toBeVisible()
-    
-        // somme donnée
-        await expect(page.locator('.test-total-achats', { hasText: 'somme donnée 50 €' })).toBeVisible()
-    
-        // sur carte client 1 après achats
-        await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
-    
-        // monnaie à rendre
-        await expect(page.locator('.test-return-change', { hasText: 'Monnaie à rendre 47.2 €' })).toBeVisible()
-    
-        // retour
-        await page.locator('#popup-retour').click()
-      })
-    
-    
-      // context complémentaire cb : vider carte cahsless client 1 = 0€ est déjà fait 2 fois
-      test("Achat 1 Chimay Bleue + paiement en cashless/cb", async () => {
-        // aller au point de vente "BAR 1"
-        await goPointSale(page, 'Bar 1')
-    
-        // titre
-        await expect(page.locator('.titre-vue')).toHaveText('Service direct -  Bar 1')
-    
-        // bien sur "Bar 1"
-        await expect(page.locator('text=Service Direct - Bar 1')).toBeVisible()
-    
-        // sélection des articles
-        const listeArticles = [{ nom: "Chimay Bleue", nb: 1, prix: 2.8 }]
-        await selectArticles(page, listeArticles, "Bar 1")
-    
-        // valider les achats
-        await page.locator('#bt-valider').click()
-    
-        // attente affichage "Type(s) de paiement"
-        await page.locator('#popup-cashless', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
-    
-        // sélection cashless
-        await page.locator('#popup-cashless bouton-basique').getByText('CASHLESS').click()
-    
-        // sélection client 1
-        await page.locator('#nfc-client1').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // Fonds insuffisants
-        await expect(page.locator('.message-fonds-insuffisants')).toContainText('Fonds insuffisants')
-    
-        // sélectionner espèce
-        await page.locator('#popup-cashless bouton-basique  .sous-element-texte > div').getByText('CB').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // Confirmez le paiement est affiché
-        await expect(page.locator('.test-return-confirm-payment', { hasText: 'Confirmez le paiement' })).toBeVisible()
-    
-        // moyen de paiement cb
-        await expect(page.locator('.test-return-payment-method', { hasText: 'cb' })).toBeVisible()
-    
-        // valider/confirmer cb
-        await page.locator('#popup-confirme-valider').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // 'Transaction ok' est affiché
-        await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
-    
-        // total en espèce
-        await expect(page.locator('.test-return-total-achats')).toHaveText('Total(cashless/cb) 2.80 €')
-    
-        // sur carte client 1 avant achats
-        await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'TEST - carte avant achats 0 €' })).toBeVisible()
-    
-        // complémentaire  
-        await expect(page.locator('.test-return-additional', { hasText: 'Complémentaire 2.80 € en cb' })).toBeVisible()
-    
-        // sur carte client 1 après achats
-        await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
-    
-        // retour
-        await page.locator('#popup-retour').click()
-      })
-    
-    
-      test("contexte, complémentaire : vider carte client 1 et la crediter de 10€", async () => {
-        // vider carte client 1
-        await resetCardCashless(page, 'nfc-client1')
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // vidage carte ok
-        await expect(page.locator('.test-return-reset')).toHaveText('Vidage carte ok')
-    
-        // retour
-        await page.locator('#popup-retour').click()
-    
-        // créditer de 10 €  et 0 cadeau
-        // 1 * 10 + 0 * 5
-        await creditCardCashless(page, 'nfc-client1', 1, 0, 'cb')
-    await page.pause()
-        // Transaction OK !
-        await expect(page.locator('.test-return-title-content')).toHaveText('Transaction ok')
-    
-        // total cb de 10 €
-        await expect(page.locator('.test-return-total-achats')).toHaveText('Total(cb) 10.00 €')
-    await page.pause()  await page.locator('#popup-retour').click()
-      })
-    
-    
-      test("Achat 3 Gateau + paiement en cashless 10€ / espèce somme donnée 20€", async () => {
-        // aller au point de vente "BAR 1"
-        await goPointSale(page, 'Bar 1')
-    
-        // titre
-        await expect(page.locator('.titre-vue')).toHaveText('Service direct -  Bar 1')
-    
-        // bien sur "Bar 1"
-        await expect(page.locator('text=Service Direct - Bar 1')).toBeVisible()
-    
-        // sélection des articles
-        const listeArticles = [{ nom: "Gateau", nb: 3, prix: 8 }]
-        await selectArticles(page, listeArticles, "Bar 1")
-    
-        // valider les achats
-        await page.locator('#bt-valider').click()
-    
-        // attente affichage "Type(s) de paiement"
-        await page.locator('#popup-cashless', { hasText: 'Types de paiement' }).waitFor({ state: 'visible' })
-    
-        // sélection cashless
-        await page.locator('#popup-cashless bouton-basique').getByText('CASHLESS').click()
-    
-        // sélection client 1
-        await page.locator('#nfc-client1').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // Fonds insuffisants
-        await expect(page.locator('.message-fonds-insuffisants')).toContainText('Fonds insuffisants')
-    
-        // sélectionner espèce
-        await page.locator('#popup-cashless bouton-basique').getByText('ESPÈCE').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // Confirmez le paiement est affiché
-        await expect(page.locator('.test-return-confirm-payment', { hasText: 'Confirmez le paiement' })).toBeVisible()
-    
-        // espèce est affiché
-        await expect(page.locator('.test-return-payment-method', { hasText: 'espèce' })).toBeVisible()
-    
-        // input value = 20
-        await page.locator('#given-sum').fill('20')
-    
-        // valider
-        await page.locator('#popup-confirme-valider').click()
-    
-        // attente affichage "popup-cashless"
-        await page.locator('#popup-cashless').waitFor({ state: 'visible' })
-    
-        // 'Transaction ok' est affiché
-        await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
-    
-        // total en espèce
-        await expect(page.locator('.test-return-total-achats')).toHaveText('Total(cashless/espèce) 24.00 €')
-    
-        // sur carte client 1 avant achats
-        await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'TEST - carte avant achats 10 €' })).toBeVisible()
-    
-        // complémentaire  
-        await expect(page.locator('.test-return-additional', { hasText: 'Complémentaire 14.00 € en espèce' })).toBeVisible()
-    
-        // somme donnée
-        await expect(page.locator('.test-total-achats', { hasText: 'somme donnée 20 €' })).toBeVisible()
-    
-        // sur carte client 1 après achats
-        await expect(page.locator('.test-return-post-purchase-card', { hasText: 'TEST - carte après achats 0 €' })).toBeVisible()
-    
-        // monnaie à rendre
-        await expect(page.locator('.test-return-change', { hasText: 'Monnaie à rendre 6 €' })).toBeVisible()
-    
-        // retour
-        await page.locator('#popup-retour').click()
-    
-        // fermer navigateur / fin
-        await page.close()
-      })
-      */
+  test("Achat 1 Chimay Bleue + paiement en cashless 0€ / espèce somme donnée 50€", async () => {
+    // aller au point de vente "BAR 1"
+    await goPointSale(page, 'Bar 1')
 
-  test("Fin", async () => {
-    await page.pause()
+    // titre
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: directServiceTrans })).toBeVisible()
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: 'Bar 1' })).toBeVisible()
+
+    // sélection des articles
+    const listeArticles = [{ nom: "Chimay Bleue", nb: 1, prix: 2.8 }]
+    await selectArticles(page, listeArticles, "Bar 1")
+
+    // valider les achats
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // attendre moyens de paiement
+    await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
+
+    // sélection cashless
+    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+
+    // sélection client 1
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // message fonds insuffisants affiché
+    await expect(page.locator('.test-return-title', { hasText: insufficientFundsTrans })).toBeVisible()
+
+    // sélectionner espèce
+    await page.locator('#popup-cashless .test-fonds-insuffisants-espece').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // Confirmez le paiement est affiché
+    await expect(page.locator('.test-return-confirm-payment', { hasText: confirmPaymentTrans })).toBeVisible()
+
+    // espèce est affiché
+    await expect(page.locator('.test-return-payment-method', { hasText: cashTrans })).toBeVisible()
+
+    // input value = 50
+    await page.locator('#given-sum').fill('50')
+
+    // valider
+    await page.locator('#popup-confirme-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
+
+    // total en espèce
+    await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/${cashLowercaseTrans}) 2.80 ${currencySymbolTrans}` })).toBeVisible()
+
+    // sur carte client 1 avant achats
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+
+    // complémentaire  
+    await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 2.80 ${currencySymbolTrans} ${inTrans} ${cashLowercaseTrans}` })).toBeVisible()
+
+    // somme donnée
+    await expect(page.locator('.test-total-achats', { hasText: `${givenSumTrans} 50 ${currencySymbolTrans}` })).toBeVisible()
+
+    // sur carte client 1 après achats
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: `ROBOCOP - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+
+    // monnaie à rendre
+    await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 47.2 ${currencySymbolTrans}` })).toBeVisible()
+
+    // retour
+    await page.locator('#popup-retour').click()
+
+    // titre visible
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
+  })
+
+  // context complémentaire cb : vider carte cahsless client 1 = 0€ est déjà fait 2 fois
+  test("Achat 1 Chimay Bleue + paiement en cashless/cb", async () => {
+    // aller au point de vente "BAR 1"
+    await goPointSale(page, 'Bar 1')
+
+    // titre
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: directServiceTrans })).toBeVisible()
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: 'Bar 1' })).toBeVisible()
+
+    // sélection des articles
+    const listeArticles = [{ nom: "Chimay Bleue", nb: 1, prix: 2.8 }]
+    await selectArticles(page, listeArticles, "Bar 1")
+
+    // valider les achats
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // attendre moyens de paiement
+    await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
+
+    // sélection cashless
+    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+
+    // sélection client 1
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // message fonds insuffisants affiché
+    await expect(page.locator('.test-return-title', { hasText: insufficientFundsTrans })).toBeVisible()
+
+    // sélectionner cb
+    await page.locator('#popup-cashless bouton-basique[class="test-fonds-insuffisants-cb"]').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // Confirmez le paiement est affiché
+    await expect(page.locator('.test-return-confirm-payment', { hasText: confirmPaymentTrans })).toBeVisible()
+
+    // moyen de paiement cb
+    await expect(page.locator('.test-return-payment-method', { hasText: cbTrans })).toBeVisible()
+
+    // valider/confirmer cb
+    await page.locator('#popup-confirme-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
+
+    // total en espèce
+    await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/${cbTrans}) 2.80 ${currencySymbolTrans}` })).toBeVisible()
+
+    // sur carte client 1 avant achats
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+
+    // complémentaire  
+    await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 2.80 ${currencySymbolTrans} ${inTrans} ${cbTrans}` })).toBeVisible()
+
+    // sur carte client 1 après achats
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: `ROBOCOP - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+
+    // retour
+    await page.locator('#popup-retour').click()
+
+    // titre visible
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
+  })
+
+  test("contexte, complémentaire : vider carte client 1 et la crediter de 10€", async () => {
+    // vider carte client 1
+    await resetCardCashless(page, 'nfc-client1')
+
+    // créditer de 10 €  et 0 cadeau
+    // 1 * 10 + 0 * 5
+    await creditCardCashless(page, 'nfc-client1', 1, 0, 'cb')
+
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
+
+    // 'Total(cb) 10.00 €' est affiché
+    await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
+
+    await page.locator('#popup-retour').click()
+  })
+
+
+  test("Achat 3 Gateau + paiement en cashless 10€ / espèce somme donnée 20€", async () => {
+    // aller au point de vente "BAR 1"
+    await goPointSale(page, 'Bar 1')
+
+    // titre
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
+
+    // sélection des articles
+    const listeArticles = [{ nom: "Gateau", nb: 3, prix: 8 }]
+    await selectArticles(page, listeArticles, "Bar 1")
+
+    // valider les achats
+    await page.locator('#bt-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // attendre moyens de paiement
+    await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
+
+    // sélection cashless
+    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+
+    // sélection client 1
+    await page.locator('#nfc-client1').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // message fonds insuffisants affiché
+    await expect(page.locator('.test-return-title', { hasText: insufficientFundsTrans })).toBeVisible()
+
+    // sélectionner espèce
+    await page.locator('#popup-cashless .test-fonds-insuffisants-espece').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // Confirmez le paiement est affiché
+    await expect(page.locator('.test-return-confirm-payment', { hasText: confirmPaymentTrans })).toBeVisible()
+
+    // espèce est affiché
+    await expect(page.locator('.test-return-payment-method', { hasText: cashTrans })).toBeVisible()
+
+    // input value = 20
+    await page.locator('#given-sum').fill('20')
+
+    // valider
+    await page.locator('#popup-confirme-valider').click()
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
+
+    // total en espèce
+    await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/${cashLowercaseTrans}) 24.00 ${currencySymbolTrans}` })).toBeVisible()
+
+    // sur carte client 1 avant achats
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 10 ${currencySymbolTrans}` })).toBeVisible()
+
+    // complémentaire  
+    await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 14.00 ${currencySymbolTrans} ${inTrans} ${cashLowercaseTrans}` })).toBeVisible()
+
+    // somme donnée
+    await expect(page.locator('.test-total-achats', { hasText: `${givenSumTrans} 20 ${currencySymbolTrans}` })).toBeVisible()
+
+    // sur carte client 1 après achats
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: `ROBOCOP - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+
+    // monnaie à rendre
+    await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 6 ${currencySymbolTrans}` })).toBeVisible()
+
+    // retour
+    await page.locator('#popup-retour').click()
+
+    // titre visible
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
+    await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
+
+    // fermer navigateur / fin
     await page.close()
   })
 })

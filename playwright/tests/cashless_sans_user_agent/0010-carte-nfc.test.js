@@ -59,7 +59,7 @@ test.describe("Cashless, carte client 1", () => {
     // #popup-cashless éffacé
     await expect(page.locator('#popup-cashless')).toBeHidden()
 
-    // Clique sur le bouton "CHECK CARTE")
+    // Clique sur le bouton "CHECK CARTE"
     await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 
     // cliquer sur carte nfc simulée

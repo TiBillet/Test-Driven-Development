@@ -1,4 +1,4 @@
-// cashless_demo1.env DEBUG=True / DEMO=True / language = fr
+// cashless_demo1.env DEBUG=True / DEMO=True / language = en
 import { test, devices, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, selectArticles,
@@ -269,19 +269,18 @@ test.describe("Commandes", () => {
     ])
 
     // "locator" de la commande validé contenant 'CdBoeuf'
-    const loc = page.locator('.com-conteneur', { hasText: 'CdBoeuf' })
-
-    // fond grisé 'rgb(79, 80, 79)' pour la commande contenant  'CdBoeuf'
-    const backGroundColor = await getStyleValueFromLocator(loc, 'backgroundColor')
-    expect(backGroundColor).toEqual('rgb(79, 80, 79)')
-
+    const locCdBoeuf = page.locator('.com-conteneur', { hasText: 'CdBoeuf' })
+    // fond de la commande contenant 'CdBoeuf' grisé
+    await expect(locCdBoeuf).toHaveCSS('opacity', '0.5')
     // non servie - non payé pour la commande contenant  'CdBoeuf'
-    await expect(loc.locator('.test-ref-status-order', { hasText: transO })).toBeVisible()
-
-
+    await expect(locCdBoeuf.locator('.test-ref-status-order', { hasText: transO })).toBeVisible()
     // plus de bouton valider pour la commande contenant  'CdBoeuf'
-    await expect(loc.locator('.test-action-validate-prepa')).not.toBeVisible()
+    await expect(locCdBoeuf.locator('.test-action-validate-prepa')).not.toBeVisible()
 
+    // "locator" de la commande validé contenant 'Pression 33'
+    const locPression33 = page.locator('.com-conteneur', { hasText: 'Pression 33' })
+    // fond de la commande contenant 'Pression 33' non grisé
+    await expect(locPression33).not.toHaveCSS('opacity', '0.5')
   })
 
   test('Préparation table S01, 2 commandes, valider la  2ème commande(Pression 33); status: servie et non payé  ', async () => {
@@ -292,17 +291,16 @@ test.describe("Commandes", () => {
     ])
 
     // "locator" de la commande validé contenant 'Pression 33'
-    const loc = page.locator('.com-conteneur', { hasText: 'Pression 33' })
+    const locPression33 = page.locator('.com-conteneur', { hasText: 'Pression 33' })
 
-    // fond grisé 'rgb(79, 80, 79)' pour la commande contenant  'Pression 33'
-    const backGroundColor = await getStyleValueFromLocator(loc, 'backgroundColor')
-    expect(backGroundColor).toEqual('rgb(79, 80, 79)')
+    // fond de la commande contenant 'Pression 33' grisé
+    await expect(locPression33).toHaveCSS('opacity', '0.5')
 
-    // non servie - non payé pour la commande contenant  'CdBoeuf'
-    await expect(loc.locator('.test-ref-status-order', { hasText: transS })).toBeVisible()
+    // servie - non payé pour la commande contenant  'Pression 33'
+    await expect(locPression33.locator('.test-ref-status-order', { hasText: transS })).toBeVisible()
 
-    // plus de bouton valider pour la commande contenant  'CdBoeuf'
-    await expect(loc.locator('.test-action-validate-prepa')).not.toBeVisible()
+    // plus de bouton valider pour la commande contenant  'Pression 33'
+    await expect(locPression33.locator('.test-action-validate-prepa')).not.toBeVisible()
 
   })
 
@@ -312,7 +310,7 @@ test.describe("Commandes", () => {
     // sélectionner les 2 Pression 33
     await page.locator('.bouton-commande-article[data-nom="Pression 33"]').click({ clickCount: 2 })
 
-    // valider les achats
+    // valider commande
     await page.locator('#bt-valider-commande').click()
 
     // attente affichage "popup-cashless"
@@ -339,7 +337,7 @@ test.describe("Commandes", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // retour créditation
+    // retour
     await page.locator('#popup-retour').click()
 
     // clique bt "Adition" -> aller dans l'addition
@@ -348,6 +346,9 @@ test.describe("Commandes", () => {
     // 2 pression 33 bien présentes dans l'addition
     const listeArticlesDejaPayes = [{ nom: "Pression 33", nb: 2, prix: 2 }]
     await checkAlreadyPaidBill(page, listeArticlesDejaPayes)
+
+    // reste à payer 33€
+    await expect(page.locator('#addition-reste-a-payer', { hasText: `33${currencySymbolTrans}` })).toBeVisible()
   })
 
   test('Commande table S01, payer les 2 "Pression 33"; status: servie et non payé ', async () => {
@@ -363,22 +364,20 @@ test.describe("Commandes", () => {
     // "locator" de la commande validé contenant 'CdBoeuf'
     const locCdBoeuf = page.locator('.com-conteneur', { hasText: 'CdBoeuf' })
 
-    // non servie - non payé pour la commande contenant  'CdBoeuf'
+    // servie - non payé pour la commande contenant  'CdBoeuf'
     await expect(locCdBoeuf.locator('.test-ref-status-order', { hasText: transS })).toBeVisible()
 
-    // fond grisé 'rgb(79, 80, 79)' pour la commande contenant  'CdBoeuf'
-    const backGroundColor = await getStyleValueFromLocator(locCdBoeuf, 'backgroundColor')
-    expect(backGroundColor).toEqual('rgb(79, 80, 79)')
+    // fond de la commande contenant 'CdBoeuf' grisé
+    await expect(locCdBoeuf).toHaveCSS('opacity', '0.5')
 
     // "locator" de la commande validé contenant 'Pression 33'
     const locPression33 = page.locator('.com-conteneur', { hasText: 'Pression 33' })
 
-    // non servie - non payé pour la commande contenant  'Pression 33'
+    // servie - non payé pour la commande contenant  'Pression 33'
     await expect(locPression33.locator('.test-ref-status-order', { hasText: transS })).toBeVisible()
 
-    // fond grisé 'rgb(79, 80, 79)' pour la commande contenant  'Pression 33'
-    const backGroundColor1 = await getStyleValueFromLocator(locPression33, 'backgroundColor')
-    expect(backGroundColor1).toEqual('rgb(79, 80, 79)')
+    // fond de la commande contenant 'Pression 33' grisé
+    await expect(locPression33).toHaveCSS('opacity', '0.5')
   })
 
   test('Commande table S01, payer tout le reste', async () => {
@@ -387,7 +386,6 @@ test.describe("Commandes", () => {
 
     // clique bouton Tout, payer le reste
     await page.locator(`#commandes-table-menu div >> text=${allTrans}`).click()
-
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -430,13 +428,19 @@ test.describe("Commandes", () => {
 
     // "locator" de la commande validé contenant 'CdBoeuf'
     const locCdBoeuf = page.locator('.com-conteneur', { hasText: 'CdBoeuf' })
-    // non servie - non payé pour la commande contenant  'CdBoeuf'
+    // servie - payé pour la commande contenant  'CdBoeuf'
     await expect(locCdBoeuf.locator('.test-ref-status-order', { hasText: transSP })).toBeVisible()
+    // fond de la commande contenant 'CdBoeuf' grisé
+    await expect(locCdBoeuf).toHaveCSS('opacity', '0.5')
+
 
     // "locator" de la commande validé contenant 'Pression 33'
     const locPression33 = page.locator('.com-conteneur', { hasText: 'Pression 33' })
-    // non servie - non payé pour la commande contenant  'Pression 33'
+    // servie - payé pour la commande contenant  'Pression 33'
     await expect(locPression33.locator('.test-ref-status-order', { hasText: transSP })).toBeVisible()
+    // fond de la commande contenant 'Pression 33' grisé
+    await expect(locPression33).toHaveCSS('opacity', '0.5')
+
 
   })
 

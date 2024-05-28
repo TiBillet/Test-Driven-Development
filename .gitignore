@@ -129,4 +129,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 tempo/
+test-results/
 playwright-report/

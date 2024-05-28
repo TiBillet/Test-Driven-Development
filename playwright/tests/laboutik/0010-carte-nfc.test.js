@@ -1,4 +1,13 @@
-// cashless_demo1.env DEBUG=1 / DEMO=1 / language = fr
+/*
+Attention pour tous tets:
+DEBUG=1
+TEST=1
+DEMO=1
+DEMO_TAGID_CM='EE144CE8'
+DEMO_TAGID_CLIENT1='41726643' ROBOCOP
+DEMO_TAGID_CLIENT2='52BE6543' carte anonyme
+*/
+
 import { test, expect } from '@playwright/test'
 import { connection, changeLanguage, resetCardCashless, creditCardCashless, getTranslate, getStyleValue } from '../../mesModules/commun.js'
 import { env } from '../../mesModules/env.js'

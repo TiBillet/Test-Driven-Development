@@ -103,12 +103,12 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
     // moyen de paiement "ESPECE" présent
     await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]', { hasText: cashTrans })).toBeVisible()
     // Total pour moyen de paiement "ESPECE" 6.5 €|$
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
 
     // moyen de paiement "CB" présent
     await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: cbTrans })).toBeVisible()
     // Total pour moyen de paiement "CB" 6.5 €|$
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
 
     // bouton retour
     await expect(page.locator('#popup-cashless bouton-basique >> text=' + returnTrans)).toBeVisible()

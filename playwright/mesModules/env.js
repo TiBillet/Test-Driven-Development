@@ -4,6 +4,7 @@ export const env = {
   cashlessLink: 'wv/login_hardware',
   adminPassword: "mi5Iechi",
   adminUser: "TestAdmin",
-  pinCodeServer: 'https://discovery.tibillet.coop'
+  pinCodeServer: 'https://discovery.tibillet.coop',
+  tagIdClient22: '52BE6543'
 }
 

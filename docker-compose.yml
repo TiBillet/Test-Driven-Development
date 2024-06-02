@@ -25,15 +25,15 @@ services:
       file: ../Lespass/docker-compose.yml
       service: lespass_postgres
 
-  lespas_memcached:
+  lespass_memcached:
     extends:
       file: ../Lespass/docker-compose.yml
-      service: lespas_memcached
+      service: lespass_memcached
 
-  lespas_redis:
+  lespass_redis:
     extends:
       file: ../Lespass/docker-compose.yml
-      service: lespas_redis
+      service: lespass_redis
 
   lespass_django:
     extends:
@@ -45,7 +45,7 @@ services:
     extends:
       file: ../Lespass/docker-compose.yml
       service: lespass_celery
-#    command: "poetry run celery -A TiBillet worker -l INFO"
+    command: "poetry run celery -A TiBillet worker -l INFO"
 #    command: 'bash start_dev.sh'
 
   lespass_nginx:
@@ -61,6 +61,11 @@ services:
     extends:
       file: ../LaBoutik/docker-compose.yml
       service: laboutik_postgres
+
+  laboutik_memcached:
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_memcached
 
   laboutik_redis:
     extends:

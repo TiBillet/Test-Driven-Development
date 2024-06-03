@@ -51,19 +51,19 @@ test.describe("Adhesion suite test 0090-...", () => {
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
 
-    const locatorMembership1 = page.locator('.test-return-panier-amap-tibilletistan-4000')
+    const locatorMembership1 = page.locator('.test-return-panier-amap-demo-4000')
     // test la présence de la valeur de l'adhésion "panier amap tibilletistan" = "40,00"
     await expect(locatorMembership1.locator('.test-return-asset-value', {hasText: '40,00'})).toBeVisible()
 
     // test la présence du nom de l'adhésion "panier amap tibilletistan"
-    await expect(locatorMembership1.locator('.test-return-asset-name', {hasText: 'Panier AMAP TiBilletistan'})).toBeVisible()
+    await expect(locatorMembership1.locator('.test-return-asset-name', {hasText: 'Panier AMAP Demo'})).toBeVisible()
     
-    const locatorMembership2 = page.locator('.test-return-adhesion-associative-tibilletistan-2000')
+    const locatorMembership2 = page.locator('.test-return-adhesion-associative-demo-2000')
     // test la présence de la valeur de Adhésion associative TiBilletistan = "20,00"
     await expect(locatorMembership2.locator('.test-return-asset-value', {hasText: '20,00'})).toBeVisible()
 
     // test la présence du nom de "Adhésion associative TiBilletistan"
-    await expect(locatorMembership2.locator('.test-return-asset-name', {hasText: 'Adhésion associative TiBilletistan'})).toBeVisible()
+    await expect(locatorMembership2.locator('.test-return-asset-name', {hasText: 'Adhésion associative Demo'})).toBeVisible()
 
     await page.close()
   })

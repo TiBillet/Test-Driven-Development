@@ -20,7 +20,7 @@ test.describe("Prise de deux adhésions", () => {
     // changer de langue
     await changeLanguage(page, language)
 
-    await page.pause()    
+    // await page.pause()    
     await page.close()
   })
 })

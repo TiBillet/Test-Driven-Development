@@ -372,6 +372,9 @@ export const checkBill = async function (page, list) {
  */
 export const checkAlreadyPaidBill = async function (page, list) {
   await test.step('Sélectionner les articles.', async () => {
+     // monnaie
+     const monnaie = await getTranslate(page, 'currencySymbol')
+
     // nombre de ligne de l'addition
     await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb')).toHaveCount(list.length)
     // articles de l'addition identique à liste articles
@@ -379,7 +382,7 @@ export const checkAlreadyPaidBill = async function (page, list) {
       const article = list[listKey]
       await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: article.nom }).locator('.addition-col-qte')).toHaveText(article.nb.toString())
       await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: article.nom }).locator('.addition-col-produit div')).toHaveText(article.nom)
-      await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: article.nom }).locator('.addition-col-prix div')).toHaveText(article.prix.toString() + '€')
+      await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: article.nom }).locator('.addition-col-prix div')).toHaveText(article.prix.toString() + monnaie)
     }
   })
 }
@@ -661,4 +664,49 @@ export function totalListeArticles(list) {
     total = total.plus(new Big(article.prix).times(article.nb))
   }
   return parseFloat(total.valueOf())
+}
+
+/**
+ * Activation/Désactivation mode gérant
+ * @param {object} page page html en cours
+ * @param {string} status on/off
+ * @returns {Promise<void>}
+ */
+export const managerMode = async function (page, status) {
+  await test.step('Activation/Désactivation mode gérant.', async () => {
+    // attente affichage menu burger
+    await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
+    // Clique sur le menu burger
+    await page.locator('.menu-burger-icon').click()
+
+    const managerModeON = await page.evaluate(async () => {
+      if (document.querySelector('#conteneur-menu-mode-gerant i[class="fas fa-lock"]') !== null) {
+        return false
+      } else {
+        return true
+      }
+    })
+
+    if ((status === 'on' && managerModeON === false) || (status === 'off' && managerModeON === true)) {
+      // Clique sur mode gérant
+      await page.locator('#conteneur-menu-mode-gerant').click()
+    } else {
+      // clique sur le titre de la navbarre pour sortir du menu
+      await page.locator('.navbar-horizontal .titre-vue').click()
+    }
+  })
+}
+
+export const gridIsTestable = function (sites, ref) {
+  const site = sites.find(site => site.ref === ref)
+  if (site.articles.length > 1) {
+    return true
+  }
+  for (let i = 0; i < site.articles.length; i++) {
+    const article = site.articles[i];
+    if (article.nb > 1) {
+      return true
+    }
+  }
+  return false
 }

@@ -252,10 +252,10 @@ test.describe("Commandes", () => {
           }
 
           // présence du nombre d'article à servir
-          await expect(page.locator('.com-article-infos', { hasText: nomArticle }).locator('.test-rest-serve-qty', { hasText: nombreArticles })).toBeVisible()
+          await expect(page.locator('.com-article-infos', { hasText: nomArticle }).locator('.test-return-rest-serve-qty', { hasText: nombreArticles })).toBeVisible()
 
           // présence du nom de l'article
-          await expect(page.locator('.com-article-infos', { hasText: nomArticle }).locator('.test-rest-serve-name', { hasText: nomArticle })).toBeVisible()
+          await expect(page.locator('.com-article-infos', { hasText: nomArticle }).locator('.test-return-rest-serve-name', { hasText: nomArticle })).toBeVisible()
         }
       }
     }

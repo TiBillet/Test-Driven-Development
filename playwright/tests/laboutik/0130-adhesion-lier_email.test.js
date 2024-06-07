@@ -18,6 +18,7 @@ test.describe("Adhesion suite test 0090-...", () => {
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
 
+    await page.pause()
     // cliquer sur menu "Cartes cashless" 
     await page.locator('a[href="/adminstaff/APIcashless/cartecashless/"]').click()
 

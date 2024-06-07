@@ -1,6 +1,6 @@
 // cashless_demo1.env DEBUG=True / DEMO=True / language = fr
 import { test, expect } from '@playwright/test'
-import { connection, changeLanguage, goPointSale, getTranslate, selectArticles, getStyleValue, checkBillDirectService, resetCardCashless, creditCardCashless } from '../../mesModules/commun.js'
+import { connection, changeLanguage, goPointSale, getTranslate, selectArticles, getStyleValue, checkBillDirectService, resetCardCashless, creditMoneyOnCardCashless } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
 let page, directServiceTrans, cashTrans, paiementTypeTrans, confirmPaymentTrans, transactionTrans, okTrans
@@ -179,9 +179,8 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // vider carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
-    // créditer de 10 €  et 0 cadeau
-    // 1 * 10 + 0 * 5
-    await creditCardCashless(page, 'nfc-client1', 1, 0, 'cb')
+    // créditer monnaie : 1 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client1', 1, 'cb')
 
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
@@ -249,9 +248,8 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // vider carte client 2
     await resetCardCashless(page, 'nfc-client2')
 
-    // créditer car client 2 de 40 €  et 0 cadeau
-    // 4 *10 + 0 * 5
-    await creditCardCashless(page, 'nfc-client2', 4, 0, 'cb')
+    // client 2, créditer monnaie : 4 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client2', 4, 'cb')
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -568,9 +566,8 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // vider carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
-    // créditer de 10 €  et 0 cadeau
-    // 1 * 10 + 0 * 5
-    await creditCardCashless(page, 'nfc-client1', 1, 0, 'cb')
+    // créditer monnaie : 1 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client1', 1, 'cb')
 
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 

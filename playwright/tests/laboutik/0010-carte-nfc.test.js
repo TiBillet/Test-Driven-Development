@@ -9,7 +9,7 @@ DEMO_TAGID_CLIENT2='52BE6543' carte anonyme
 */
 
 import { test, expect } from '@playwright/test'
-import { connection, changeLanguage, resetCardCashless, creditCardCashless, getTranslate, getStyleValue } from '../../mesModules/commun.js'
+import { connection, changeLanguage, resetCardCashless, creditMoneyOnCardCashless, creditGiftMoneyOnCardCashless, getTranslate, getStyleValue } from '../../mesModules/commun.js'
 import { env } from '../../mesModules/env.js'
 
 
@@ -86,14 +86,14 @@ test.describe("Cashless, carte client 1", () => {
   })
 
   test("Retour carte client 1 crédité de 40 et 10 cadeaux en cb", async () => {
-    // 4 *10 + 2 * 5
-    await creditCardCashless(page, 'nfc-client1', 4, 2, 'cb')
+    // créditer monnaie : 4 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client1', 4, 'cb')
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // fond d'écran =  'rgb(51, 148, 72)'
-    const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    let backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
     expect(backGroundColor).toEqual('rgb(51, 148, 72)')
 
     // 'Transaction ok' est affiché
@@ -103,7 +103,26 @@ test.describe("Cashless, carte client 1", () => {
     await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 40.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // total crédité sur carte
-    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 50 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
+
+    // crédit du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 40 ${currencySymbolTrans}` })).toBeVisible()
+
+    // Clique bt "RETOUR"
+    await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
+
+    // créditer monnaie cadeau :  2 * 5
+    await creditGiftMoneyOnCardCashless(page, 'nfc-client1', 2)
+
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+
+    // fond d'écran =  'rgb(51, 148, 72)'
+    backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(51, 148, 72)')
+
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
     // crédit du lieu
     await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 40 ${currencySymbolTrans}` })).toBeVisible()
@@ -116,8 +135,8 @@ test.describe("Cashless, carte client 1", () => {
   })
 
   test("Retour carte client 1 crédité de 10 en espece: somme donnée 10", async () => {
-    // 4 *10 +  0* 5 -- somme donné 10
-    await creditCardCashless(page, 'nfc-client1', 1, 0, 'espece', 10)
+    // créditer monnaie : 1 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client1', 1, 'espece', 10)
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -152,8 +171,8 @@ test.describe("Cashless, carte client 1", () => {
   })
 
   test("Retour carte client 1 crédité de 10 en espece: somme donnée 50", async () => {
-    // 4 *10 +  0* 5 -- somme donné 10
-    await creditCardCashless(page, 'nfc-client1', 1, 0, 'espece', 50)
+    // créditer monnaie : 1 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client1', 1, 'espece', 50)
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })

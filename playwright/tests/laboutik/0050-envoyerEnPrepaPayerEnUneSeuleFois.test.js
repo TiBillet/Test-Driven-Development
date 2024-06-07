@@ -1,6 +1,6 @@
 // cashless_demo1.env DEBUG=True / DEMO=True / language = fr
 import { test, expect } from '@playwright/test'
-import { connection, changeLanguage, goPointSale, selectArticles, resetCardCashless, creditCardCashless } from '../../mesModules/commun.js'
+import { connection, changeLanguage, goPointSale, selectArticles, resetCardCashless, creditMoneyOnCardCashless } from '../../mesModules/commun.js'
 
 let page
 const language = "fr"
@@ -21,9 +21,8 @@ test.describe("Commandes, payer en une seule fois", () => {
     // vider carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
-    // créditer de 10 €  et 0 cadeau
-    // 4 * 10 + 0 * 5
-    await creditCardCashless(page, 'nfc-client1', 4, 0, 'cb')
+    // créditer monnaie : 4 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client1', 4, 'cb')
 
     // Transaction OK !
     await expect(page.locator('.test-return-title-content')).toHaveText('Transaction ok')
@@ -115,8 +114,8 @@ test.describe("Commandes, payer en une seule fois", () => {
     // vidage carte client 2
     await resetCardCashless(page, 'nfc-client2')
 
-    // client 2 = 10 € (1 *10 + 0 * 5)
-    await creditCardCashless(page, 'nfc-client2', 1, 0, 'cb')
+    // client 2, créditer monnaie : 1 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client2', 1, 'cb')
 
     // Transaction OK !
     await expect(page.locator('.test-return-title-content')).toHaveText('Transaction ok')
@@ -131,7 +130,7 @@ test.describe("Commandes, payer en une seule fois", () => {
     await expect(page.locator('#popup-cashless')).toBeHidden()
   })
 
-  
+
   test('Commande sur table 3, paiement en cashless, fonds insuffisant sur première carte', async () => {
     // aller au point de vente RESTO
     await goPointSale(page, 'RESTO')
@@ -221,7 +220,7 @@ test.describe("Commandes, payer en une seule fois", () => {
     // clique sur bouton "RETOUR"
     await page.locator('#popup-retour').click()
   })
-  
+
   test("Contexte: 0 € sur première carte et 0 € pour la deuxième", async () => {
     // vidage carte client 1
     await resetCardCashless(page, 'nfc-client1')
@@ -602,7 +601,7 @@ test.describe("Commandes, payer en une seule fois", () => {
 
     // sélectionne la table Ex03
     await page.locator('#tables-liste .table-bouton', { hasText: 'Ex03' }).click()
-    
+
     // pv resto affiché
     await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table Ex03, PV Resto')).toBeVisible()
 

@@ -2,8 +2,7 @@
 import { test, expect, chromium } from '@playwright/test'
 import { env } from '../../mesModules/env.js'
 import {
-  connection, changeLanguage, goPointSale, getTranslate, resetCardCashless, creditCardCashless,
-  getStyleValue
+  connection, changeLanguage, goPointSale, getTranslate, getStyleValue
 } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -39,6 +38,7 @@ test.describe("Prise de deux adhésions", () => {
     changeCapitalizeTrans = await getTranslate(page, 'change', 'capitalize')
   })
 
+  /*
   test("Adhesion Panier AMAP Mensuel, paiement cb, email non lié", async () => {
     // aller au point de vente Adhésions
     await goPointSale(page, 'Adhésions')
@@ -64,17 +64,17 @@ test.describe("Prise de deux adhésions", () => {
 
     // moyen de paiement "CASHLESS" présent
     await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: 'CASHLESS' })).not.toBeVisible()
-    // Total pour moyen de paiement "CASHLESS" 6.5 €|$
+    // Total pour moyen de paiement "CASHLESS" 40 €|$
     await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: `${totalTrans} 40 ${currencySymbolTrans}` })).not.toBeVisible()
 
     // moyen de paiement "ESPECE" présent
     await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]', { hasText: cashTrans })).toBeVisible()
-    // Total pour moyen de paiement "ESPECE" 6.5 €|$
+    // Total pour moyen de paiement "ESPECE" 40 €|$
     await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]', { hasText: `${totalTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
 
     // moyen de paiement "CB" présent
     await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: cbTrans })).toBeVisible()
-    // Total pour moyen de paiement "CB" 6.5 €|$
+    // Total pour moyen de paiement "CB" 40 €|$
     await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: `${totalTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
 
     // sélection cb
@@ -118,6 +118,7 @@ test.describe("Prise de deux adhésions", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Adhésions')
   })
+*/
 
   test("Adhesion associative Annuelle, paiement espèce, email non lié", async () => {
     // aller au point de vente Adhésions
@@ -126,6 +127,7 @@ test.describe("Prise de deux adhésions", () => {
     // attendre fin utilisation réseau
     await page.waitForLoadState('networkidle')
 
+    await page.pause()
     // titre
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Adhésions')

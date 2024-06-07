@@ -240,16 +240,15 @@ export const confirmation = async function (page, typePaiement, sommeDonnee, com
 
 
 /**
- * Créditer une carte de crédits et crédits cadeau
+ * Créditer de la monnaie sur une carte  cashless
  * @param {object} page page html en cours
  * @param {string} carte - '#id-carte-to-click' 
  * @param {number} nbXCredit10 - fois 10 credit
- * @param {number} nbXCreditCadeau5 - fois 5 credit cadeau
  * @param {string} paiement - le moyen de paiement
  * @param {string} sommeDonnee - somme donnée en liquide
  * @returns {Promise<void>}
  */
-export const creditCardCashless = async function (page, carte, nbXCredit10, nbXCreditCadeau5, paiement, sommeDonnee) {
+export const creditMoneyOnCardCashless = async function (page, carte, nbXCredit10, paiement, sommeDonnee) {
   await test.step('Crediter la carte cashless.', async () => {
     // attente affichage menu burger
     await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
@@ -269,17 +268,8 @@ export const creditCardCashless = async function (page, carte, nbXCredit10, nbXC
     await page.locator('.navbar-horizontal .titre-vue', { hasText: titre }).waitFor({ state: 'visible' })
     await page.locator('.navbar-horizontal .titre-vue', { hasText: 'Cashless' }).waitFor({ state: 'visible' })
 
-    // créditer credit, nbXCredit10 x 10 crédits
-    if (nbXCredit10 >= 1) {
-      // article 10 crédits
-      await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[nom="TestCoin +10"]').click({ clickCount: nbXCredit10 })
-    }
-
-    // créditer credit cadeau, nbXCreditCadeau5 x 5 crédits cadeau
-    if (nbXCreditCadeau5 >= 1) {
-      // article 5 crédits
-      await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[nom="TestCoin Cadeau +5"]').click({ clickCount: nbXCreditCadeau5 })
-    }
+    // article 10 crédits
+    await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[nom="TestCoin +10"]').click({ clickCount: nbXCredit10 })
 
     // cliquer sur bouton "VALIDER"
     await page.locator('#bt-valider').click()
@@ -312,6 +302,82 @@ export const creditCardCashless = async function (page, carte, nbXCredit10, nbXC
 
     // attendre fin utilisation réseau
     await page.waitForLoadState('networkidle')
+  })
+}
+
+/**
+ Créditer de la monnaie cadeau sur une carte  cashless
+ * @param {object} page page html en cours
+ * @param {string} carte - '#id-carte-to-click' 
+ * @param {number} nbXCreditCadeau5 - fois 5 credit cadeau
+ * @returns {Promise<void>}
+ */
+export const creditGiftMoneyOnCardCashless = async function (page, carte, nbXCreditCadeau5) {
+  await test.step('Crediter la carte cashless.', async () => {
+    // attente affichage menu burger
+    await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
+
+    // Clique sur le menu burger
+    await page.locator('.menu-burger-icon').click()
+
+    // Click text=POINTS DE VENTES
+    const psTrans = await getTranslate(page, 'pointOfSales', 'uppercase')
+    await page.locator('text=' + psTrans).click()
+
+    // Click "CASHLESS"
+    await page.locator('#menu-burger-conteneur >> text=CASHLESS').click()
+
+    // attendre point de ventes, le titre contient "service directe" et "cashless"
+    const titre = await getTranslate(page, 'directService', 'capitalize')
+    await page.locator('.navbar-horizontal .titre-vue', { hasText: titre }).waitFor({ state: 'visible' })
+    await page.locator('.navbar-horizontal .titre-vue', { hasText: 'Cashless' }).waitFor({ state: 'visible' })
+
+
+    // créditer credit cadeau, nbXCreditCadeau5 x 5 crédits cadeau
+    if (nbXCreditCadeau5 >= 1) {
+      // article 5 crédits
+      await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[nom="TestCoin Cadeau +5"]').click({ clickCount: nbXCreditCadeau5 })
+    }
+
+    // cliquer sur bouton "VALIDER"
+    await page.locator('#bt-valider').click()
+
+    // sélectionner la carte à créditer (simulation nfc)
+    await page.locator('#' + carte).click()
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
+    /*
+    // attente affichage "Type(s) de paiement"
+    const popupTitleTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
+    await page.locator('#popup-cashless .selection-type-paiement', { hasText: popupTitleTrans }).waitFor({ state: 'visible' })
+
+    // payer en espèces + confirmation -- cash-uppercase
+    if (paiement === undefined || paiement === 'espece') {
+      const cashPaymentTrans = await getTranslate(page, 'cash', 'uppercase')
+      await page.locator(`#popup-cashless bouton-basique >> text=${cashPaymentTrans}`).click()
+      // confirmer sans test le choix "espèce"
+      await confirmation(page, 'espece', sommeDonnee)
+    }
+
+    // payer par CB + confirmation -- cb-uppercase
+    if (paiement === 'cb') {
+      const creditCardPaymentTrans = await getTranslate(page, 'cb', 'uppercase')
+      await page.locator(`#popup-cashless bouton-basique >> text=${creditCardPaymentTrans}`).click()
+      // confirmer sans test le choix "cb"
+      await confirmation(page, 'cb')
+    }
+
+    // valider
+    await page.locator('#popup-confirme-valider').click()
+
+    // sélectionner la carte à créditer (simulation nfc)
+    await page.locator('#' + carte).click()
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+    */
   })
 }
 
@@ -372,8 +438,8 @@ export const checkBill = async function (page, list) {
  */
 export const checkAlreadyPaidBill = async function (page, list) {
   await test.step('Sélectionner les articles.', async () => {
-     // monnaie
-     const monnaie = await getTranslate(page, 'currencySymbol')
+    // monnaie
+    const monnaie = await getTranslate(page, 'currencySymbol')
 
     // nombre de ligne de l'addition
     await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb')).toHaveCount(list.length)
@@ -515,7 +581,7 @@ export const getStyleValue = async function (page, selector, property) {
 }
 
 export const getStyleValueFromLocator = async function (locator, property) {
-  return await locator.evaluate(async (element,[property]) => {
+  return await locator.evaluate(async (element, [property]) => {
     const propertys = document.defaultView.getComputedStyle(element)
     return propertys[property]
   }, [property])
@@ -703,7 +769,7 @@ export const gridIsTestable = function (sites, ref) {
     return true
   }
   for (let i = 0; i < site.articles.length; i++) {
-    const article = site.articles[i];
+    const article = site.articles[i]
     if (article.nb > 1) {
       return true
     }

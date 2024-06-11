@@ -92,6 +92,31 @@ services:
     labels:
       - traefik.http.routers.laboutik_nginx.rule=Host(`cashless.$DOMAIN`)
 
+### Playwright test container
+
+#https://www.baeldung.com/linux/docker-container-gui-applications
+  playwright:
+    build: playwright/PlaywrightDockerFile
+    container_name: playwright
+    environment:
+        - DISPLAY=${DISPLAY}
+#    network_mode: host
+#    privileged: true
+    volumes:
+      - ./playwright/tests:/home/docker_user/Playwright/tests
+      - ./playwright/mesModules:/home/docker_user/Playwright/mesModules
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    tty: true
+    command: "/bin/bash"
+    extra_hosts:
+      - "fedow.tibillet.localhost:172.17.0.1"
+      - "demo.tibillet.localhost:172.17.0.1"
+      - "billetistan.tibillet.localhost:172.17.0.1"
+      - "cashless.tibillet.localhost:172.17.0.1"
+    networks:
+      - frontend
+
+
 networks:
   frontend:
     external: true

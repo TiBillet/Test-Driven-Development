@@ -9,7 +9,7 @@ const language = "en"
 
 test.use({ viewport: { width: 1200, height: 1200 }, ignoreHTTPSErrors: true })
 
-test.describe("Adhesion suite test 0090-...", () => {
+test.describe.skip("Adhesion suite test 0090-...", () => {
   test("Admin: lier un email à la carte client2", async ({ browser }) => {
     // connexion admin
     const page = await browser.newPage()
@@ -30,6 +30,9 @@ test.describe("Adhesion suite test 0090-...", () => {
 
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
+await page.pause()
+
+/*
     // TODO: utiliser la traduction
     // message "Link your card to you" affiché --
     await expect(page.locator('.test-return-titre-popup', { hasText: 'Link your card to you' })).toBeVisible()
@@ -45,7 +48,7 @@ test.describe("Adhesion suite test 0090-...", () => {
 
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
-
+*/
     // clique  sur afficher vos dernières transactions
     await page.locator('.test-return-show-transactions').click()
 

@@ -13,7 +13,7 @@ const language = "en"
 
 test.use({ viewport: { width: 375, height: 800 }, ignoreHTTPSErrors: true })
 
-test.describe.skip("Prise de deux adhésions", () => {
+test.describe("Prise de deux adhésions", () => {
   test("Connection", async ({ browser }) => {
     page = await browser.newPage()
     await connection(page)

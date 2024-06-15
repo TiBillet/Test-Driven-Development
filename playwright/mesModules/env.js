@@ -1,5 +1,5 @@
 export const env = {
-  domain: 'https://cashless.tibillet.localhost',
+  domain: 'https://cashless.tibillet.localhost/',
   adminLink: 'adminstaff/',
   cashlessLink: 'wv/login_hardware',
   adminPassword: "mi5Iechi",

@@ -3,13 +3,12 @@ services:
   playwright:
     build: PlaywrightDockerFile
     container_name: playwright
-    environment:
-        - DISPLAY=${DISPLAY}
+    # environment:
+        # - DISPLAY=${DISPLAY}
     network_mode: host
-    privileged: true
+    # privileged: true
     volumes:
-      - ./tests:/home/docker_user/Playwright/tests
-      - ./mesModules:/home/docker_user/Playwright/mesModules
-      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./mesModules:/Playwright/mesModules
+      - ./tests:/Playwright/tests
     tty: true
     command: "/bin/bash"

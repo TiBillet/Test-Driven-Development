@@ -95,27 +95,28 @@ services:
 ### Playwright test container
 
 #https://www.baeldung.com/linux/docker-container-gui-applications
-  playwright:
-    build: playwright/PlaywrightDockerFile
-    container_name: playwright
-    environment:
-        - DISPLAY=${DISPLAY}
-#    network_mode: host
-#    privileged: true
-    volumes:
-      - ./playwright/tests:/home/docker_user/Playwright/tests
-      - ./playwright/mesModules:/home/docker_user/Playwright/mesModules
-      - /tmp/.X11-unix:/tmp/.X11-unix
-    tty: true
-    command: "/bin/bash"
-    extra_hosts:
-      - "fedow.tibillet.localhost:172.17.0.1"
-      - "demo.tibillet.localhost:172.17.0.1"
-      - "billetistan.tibillet.localhost:172.17.0.1"
-      - "cashless.tibillet.localhost:172.17.0.1"
-    networks:
-      - frontend
-
+  # playwright:
+  #   build: ./playwright/PlaywrightDockerFile
+  #   container_name: playwright
+  #   depends_on:
+  #     - laboutik_django
+  #   links:
+  #     - laboutik_django:laboutik_django
+  #   networks:
+  #     - frontend
+  #     - laboutik_backend
+  #   volumes:
+  #     - ./playwright:/Playwright
+  #     - ./playwright/mesModules:/Playwright/mesModules
+  #     - ./playwright/tests:/Playwright/tests
+  #     # - /tmp/.X11-unix:/tmp/.X11-unix
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.docker.network=frontend
+  #     - traefik.http.routers.playwright_nginx.tls.certresolver=myresolver
+  #     - traefik.http.routers.playwright_nginx.rule=Host(`playwright.tibillet.localhost`)
+  #   tty: true
+  #   command: "/bin/bash"
 
 networks:
   frontend:

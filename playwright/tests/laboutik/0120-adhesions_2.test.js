@@ -38,7 +38,7 @@ test.describe("Prise de deux adhésions", () => {
     changeCapitalizeTrans = await getTranslate(page, 'change', 'capitalize')
   })
 
-  /*
+  //
   test("Adhesion Panier AMAP Mensuel, paiement cb, email non lié", async () => {
     // aller au point de vente Adhésions
     await goPointSale(page, 'Adhésions')
@@ -118,7 +118,7 @@ test.describe("Prise de deux adhésions", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Adhésions')
   })
-*/
+//
 
   test("Adhesion associative Annuelle, paiement espèce, email non lié", async () => {
     // aller au point de vente Adhésions
@@ -127,7 +127,6 @@ test.describe("Prise de deux adhésions", () => {
     // attendre fin utilisation réseau
     await page.waitForLoadState('networkidle')
 
-    await page.pause()
     // titre
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Adhésions')

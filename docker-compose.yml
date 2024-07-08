@@ -100,8 +100,6 @@ services:
     network_mode: host
     volumes:
       - ./playwright:/playwright
-      # - "/etc/timezone:/etc/timezone:ro"
-      # - "/etc/localtime:/etc/localtime:ro"
     tty: true
     command: "/bin/bash"
 

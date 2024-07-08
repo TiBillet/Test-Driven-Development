@@ -1,10 +1,10 @@
 # Test-Driven-Development
 
-ToDo list for dev TiBillet with us !
+Dev environement installation
 
 ## Installation
 
-First, create a folder and clone this repos :
+### First, clone this repos in the same folder :
 
 - https://github.com/TiBillet/Lespass
 - https://github.com/TiBillet/Fedow
@@ -17,16 +17,44 @@ git clone git@github.com:TiBillet/Lespass.git
 git clone git@github.com:TiBillet/LaBoutik.git
 git clone git@github.com:TiBillet/Fedow.git
 ```
-
-Create the .env file with your own domain if needed :
+### Create and fill the .env file on each repo :
 
 ```bash
 cp env_example .env
 ```
-
-launch the rocket !
+### Go to Test Drived Development folder and run the main compose
 
 ```bash
 docker compose up -d
-docker compose logs -f
+docker compose logs -f # to see the logs
 ```
+
+### Manual start
+
+Enter on each django container to start the dev server
+exemple with Fedow :
+
+```bash
+# on host :
+docker exec -ti fedow_django bash
+# inside the containe :
+poetry shell # enter the python venv
+./flush.sh # to start from scratch with demo/test data
+# or
+rsp # alias for python manage.py runserver 0.0.0.0:8000, to start the server if you don't want to flush
+```
+
+You have to do the same with : `lespass_django` and `laboutik_django`
+
+
+### Test
+
+#### Playright test
+
+This is the end to end test, with a headless chrome.
+
+#TODO: Nico ? :)
+
+#### Python Test
+
+Flush the 3 container and run `./manage.py test` on the `laboutik_django` container

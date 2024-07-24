@@ -290,7 +290,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // sur carte 40 €
-    await expect(page.locator('.test-return-total-card', { hasText: `${onTrans} ${cardTrans} : 40 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-total-card', { hasText: `${onTrans} ${cardTrans} : 40.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()

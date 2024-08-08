@@ -64,7 +64,7 @@ services:
       file: ../Lespass/docker-compose.yml
       service: lespass_nginx
     labels:
-      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`festival.$DOMAIN`) || Host(`billetistan.$DOMAIN`) || Host(`demeter.tibillet.re`) || Host(`raffinerie.tibillet.re`)
+      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`festival.$DOMAIN`) || Host(`billetistan.$DOMAIN`)
 
   #### CASHLESS 1 ####
 

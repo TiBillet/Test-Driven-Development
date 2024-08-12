@@ -8,9 +8,10 @@ services:
       service: fedow_django
     command: 'bash start_dev.sh'
     extra_hosts:
-      - "fedow.tibillet.coop:172.17.0.1"
-      - "demo.tibillet.re:172.17.0.1"
-      - "cashless.cashless.tibillet.re:172.17.0.1"
+      - "fedow.tibillet.localhost:172.17.0.1"
+      - "lespass.tibillet.localhost:172.17.0.1"
+      - "laboutik.tibillet.localhost:172.17.0.1"
+
   fedow_memcached:
     extends:
       file: ../Fedow/docker-compose.yml
@@ -47,9 +48,9 @@ services:
       file: ../Lespass/docker-compose.yml
       service: lespass_django
     extra_hosts:
-      - "fedow.tibillet.coop:172.17.0.1"
-      - "demo.tibillet.re:172.17.0.1"
-      - "cashless.cashless.tibillet.re:172.17.0.1"
+      - "fedow.tibillet.localhost:172.17.0.1"
+      - "lespass.tibillet.localhost:172.17.0.1"
+      - "laboutik.tibillet.localhost:172.17.0.1"
     command: 'bash start_dev.sh'
 
   lespass_celery:
@@ -57,14 +58,14 @@ services:
       file: ../Lespass/docker-compose.yml
       service: lespass_celery
     command: "poetry run celery -A TiBillet worker -l INFO"
-#    command: 'bash start_dev.sh'
+  #    command: 'bash start_dev.sh'
 
   lespass_nginx:
     extends:
       file: ../Lespass/docker-compose.yml
       service: lespass_nginx
     labels:
-      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`festival.$DOMAIN`) || Host(`billetistan.$DOMAIN`)
+      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`billetistan.$DOMAIN`)
 
   #### CASHLESS 1 ####
 
@@ -91,24 +92,23 @@ services:
       service: laboutik_django
     command: 'bash start_dev.sh'
     extra_hosts:
-      - "fedow.tibillet.coop:172.17.0.1"
-      - "demo.tibillet.re:172.17.0.1"
-      - "cashless.cashless.tibillet.re:172.17.0.1"
+      - "fedow.tibillet.localhost:172.17.0.1"
+      - "lespass.tibillet.localhost:172.17.0.1"
+      - "laboutik.tibillet.localhost:172.17.0.1"
   laboutik_celery:
     extends:
       file: ../LaBoutik/docker-compose.yml
       service: laboutik_celery
-#    command: 'bash start_dev.sh'
+  #    command: 'bash start_dev.sh'
 
   laboutik_nginx:
     extends:
       file: ../LaBoutik/docker-compose.yml
       service: laboutik_nginx
-    #TODO: Mettre un nginx rule pour dev/prod
     labels:
-      - traefik.http.routers.laboutik_nginx.rule=Host(`cashless.$DOMAIN`) || Host(`demeter.cashless.tibillet.re`) || Host(`raffinerie.cashless.tibillet.re`)
+      - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.$DOMAIN`)
 
-### Playwright test container
+  ### Playwright test container
   playwright:
     build: playwright/PlaywrightDockerFile
     container_name: playwright
@@ -118,6 +118,10 @@ services:
       - ./playwright:/playwright
     tty: true
     command: "/bin/bash"
+    extra_hosts:
+      - "fedow.tibillet.localhost:172.17.0.1"
+      - "lespass.tibillet.localhost:172.17.0.1"
+      - "laboutik.tibillet.localhost:172.17.0.1"
 
 networks:
   frontend:

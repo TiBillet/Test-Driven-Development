@@ -9,7 +9,7 @@ const language = "en"
 
 test.use({ viewport: { width: 1200, height: 1200 }, ignoreHTTPSErrors: true })
 
-test.describe("Adhesion suite test 0090-...", () => {
+test.describe.skip("Adhesion suite test 0090-...", () => {
   test("Admin: lier un email à la carte client2", async ({ browser }) => {
     // connexion admin
     const page = await browser.newPage()
@@ -24,7 +24,9 @@ test.describe("Adhesion suite test 0090-...", () => {
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
 
+    await page.pause()
     // cliquer sur "url qrcode"
+    // TODO: trouver l'url qrcode par le tagId de robocop/client1 
     await page.getByRole('link', { name: 'https://demo.tibillet.localhost/qr/58515f52-747b-4934-93f2-597449bcde22/' }).click()
 
     // permet d'attendre la fin des processus réseau

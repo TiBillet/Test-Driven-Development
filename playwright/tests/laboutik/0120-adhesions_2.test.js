@@ -5,12 +5,12 @@ import {
   connection, changeLanguage, goPointSale, getTranslate, getStyleValue
 } from '../../mesModules/commun.js'
 
-// attention la taille d'écran choisie affiche le menu burger
 let page, directServiceTrans, transactionTrans, okTrans, totalTrans, currencySymbolTrans, cbTrans
 let paiementTypeTrans, confirmPaymentTrans, membershipTrans, cashTrans, returnTrans, cashLowercaseTrans
 let givenSumCapitalizeTrans, changeCapitalizeTrans
 const language = "en"
 
+// attention la taille d'écran choisie affiche le menu burger
 test.use({ viewport: { width: 375, height: 800 }, ignoreHTTPSErrors: true })
 
 test.describe("Prise de deux adhésions", () => {
@@ -118,7 +118,7 @@ test.describe("Prise de deux adhésions", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Adhésions')
   })
-//
+  //
 
   test("Adhesion associative Annuelle, paiement espèce, email non lié", async () => {
     // aller au point de vente Adhésions
@@ -154,7 +154,7 @@ test.describe("Prise de deux adhésions", () => {
 
     // espèce est affiché
     await expect(page.locator('.test-return-payment-method', { hasText: cashTrans })).toBeVisible()
-    
+
     // input value = 50
     await page.locator('#given-sum').fill('50')
 

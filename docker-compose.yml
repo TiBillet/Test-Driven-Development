@@ -11,6 +11,10 @@ services:
       - "fedow.tibillet.localhost:172.17.0.1"
       - "lespass.tibillet.localhost:172.17.0.1"
       - "laboutik.tibillet.localhost:172.17.0.1"
+      # For mock data :
+      - "fedow.tibillet.coop:172.17.0.1"
+      - "raffinerie.tibillet.re:172.17.0.1"
+      - "raffinerie.cashless.tibillet.re:172.17.0.1"
 
   fedow_memcached:
     extends:
@@ -22,7 +26,7 @@ services:
       file: ../Fedow/docker-compose.yml
       service: fedow_nginx
     labels:
-      - traefik.http.routers.fedow_nginx.rule=Host(`fedow.$DOMAIN`) || Host(`fedow.tibillet.coop`)
+      - traefik.http.routers.fedow_nginx.rule=Host(`fedow.$DOMAIN`)
 
   #### LESPASS ####
 
@@ -51,6 +55,10 @@ services:
       - "fedow.tibillet.localhost:172.17.0.1"
       - "lespass.tibillet.localhost:172.17.0.1"
       - "laboutik.tibillet.localhost:172.17.0.1"
+      # For mock data :
+      - "fedow.tibillet.coop:172.17.0.1"
+      - "raffinerie.tibillet.re:172.17.0.1"
+      - "raffinerie.cashless.tibillet.re:172.17.0.1"
     command: 'bash start_dev.sh'
 
   lespass_celery:
@@ -65,7 +73,7 @@ services:
       file: ../Lespass/docker-compose.yml
       service: lespass_nginx
     labels:
-      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`billetistan.$DOMAIN`)
+      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`demo.$DOMAIN`)
 
   #### CASHLESS 1 ####
 
@@ -95,6 +103,10 @@ services:
       - "fedow.tibillet.localhost:172.17.0.1"
       - "lespass.tibillet.localhost:172.17.0.1"
       - "laboutik.tibillet.localhost:172.17.0.1"
+      # For mock data :
+      - "fedow.tibillet.coop:172.17.0.1"
+      - "raffinerie.tibillet.re:172.17.0.1"
+      - "raffinerie.cashless.tibillet.re:172.17.0.1"
   laboutik_celery:
     extends:
       file: ../LaBoutik/docker-compose.yml
@@ -106,7 +118,7 @@ services:
       file: ../LaBoutik/docker-compose.yml
       service: laboutik_nginx
     labels:
-      - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.$DOMAIN`)
+      - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.$DOMAIN`) || Host(`cashless.$DOMAIN`)
 
   ### Playwright test container
   playwright:

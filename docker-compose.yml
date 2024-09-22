@@ -49,6 +49,8 @@ services:
       service: fedow_memcached
 
   fedow_nginx:
+    depends_on:
+      - traefik
     extends:
       file: ../Fedow/docker-compose.yml
       service: fedow_nginx
@@ -104,6 +106,8 @@ services:
       service: lespass_nginx
     labels:
       - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`m.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`bis.domainbis.localhost`) || Host(`domainbis.localhost`)
+    depends_on:
+      - traefik
 
   #### CASHLESS 1 ####
 
@@ -153,6 +157,8 @@ services:
       service: laboutik_nginx
     labels:
       - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.$DOMAIN`) || Host(`cashless.$DOMAIN`)
+    depends_on:
+      - traefik
 
 
   #### CASHLESS 2 ####

@@ -137,3 +137,6 @@ playwright/.cache/
 
 backup
 /backup/
+
+.idea
+.idea/

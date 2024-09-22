@@ -1,4 +1,28 @@
 services:
+  ### TRAEFIK PROXY ####
+  traefik:
+    image: "traefik:beaufort"
+    container_name: "traefik"
+    hostname: "traefik"
+    command:
+      - "--log.level=INFO"
+      - "--providers.docker=true"
+      - "--providers.docker.network=frontend"
+      - "--providers.docker.exposedbydefault=true"
+      - "--entrypoints.entrypoints-https.address=:443"
+      - "--entrypoints.entrypoints-http.address=:80"
+      - "--entrypoints.entrypoints-http.http.redirections.entryPoint.to=entrypoints-https"
+      - "--entrypoints.entrypoints-http.http.redirections.entryPoint.scheme=https"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    restart: always
+    networks:
+      - frontend
+
   #### FEDOW ####
   fedow_django:
     volumes:
@@ -11,10 +35,13 @@ services:
       - "fedow.tibillet.localhost:172.17.0.1"
       - "lespass.tibillet.localhost:172.17.0.1"
       - "laboutik.tibillet.localhost:172.17.0.1"
+      - "laboutik2.tibillet.localhost:172.17.0.1"
       # For mock data :
-      - "fedow.tibillet.coop:172.17.0.1"
-      - "raffinerie.tibillet.re:172.17.0.1"
-      - "raffinerie.cashless.tibillet.re:172.17.0.1"
+#      - "fedow.tibillet.coop:172.17.0.1"
+#      - "raffinerie.tibillet.re:172.17.0.1"
+#      - "raffinerie.cashless.tibillet.re:172.17.0.1"
+    ports:
+      - 8442:8000 # test stripe listen --forward-to http://127.0.0.1:8442/webhook_stripe/
 
   fedow_memcached:
     extends:
@@ -55,25 +82,28 @@ services:
       - "fedow.tibillet.localhost:172.17.0.1"
       - "lespass.tibillet.localhost:172.17.0.1"
       - "laboutik.tibillet.localhost:172.17.0.1"
-      # For mock data :
-      - "fedow.tibillet.coop:172.17.0.1"
-      - "raffinerie.tibillet.re:172.17.0.1"
-      - "raffinerie.cashless.tibillet.re:172.17.0.1"
+      - "laboutik2.tibillet.localhost:172.17.0.1"
+
     command: 'bash start_dev.sh'
 
   lespass_celery:
     extends:
       file: ../Lespass/docker-compose.yml
       service: lespass_celery
-    command: "poetry run celery -A TiBillet worker -l INFO"
-  #    command: 'bash start_dev.sh'
+    command: "poetry run celery -A TiBillet worker -l INFO -B"
+#    command: 'bash start_dev.sh'
+    extra_hosts:
+      - "fedow.tibillet.localhost:172.17.0.1"
+      - "lespass.tibillet.localhost:172.17.0.1"
+      - "laboutik.tibillet.localhost:172.17.0.1"
+      - "laboutik2.tibillet.localhost:172.17.0.1"
 
   lespass_nginx:
     extends:
       file: ../Lespass/docker-compose.yml
       service: lespass_nginx
     labels:
-      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`demo.$DOMAIN`)
+      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`m.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`bis.domainbis.localhost`) || Host(`domainbis.localhost`)
 
   #### CASHLESS 1 ####
 
@@ -103,15 +133,19 @@ services:
       - "fedow.tibillet.localhost:172.17.0.1"
       - "lespass.tibillet.localhost:172.17.0.1"
       - "laboutik.tibillet.localhost:172.17.0.1"
-      # For mock data :
-      - "fedow.tibillet.coop:172.17.0.1"
-      - "raffinerie.tibillet.re:172.17.0.1"
-      - "raffinerie.cashless.tibillet.re:172.17.0.1"
+      - "laboutik2.tibillet.localhost:172.17.0.1"
+
   laboutik_celery:
     extends:
       file: ../LaBoutik/docker-compose.yml
       service: laboutik_celery
-  #    command: 'bash start_dev.sh'
+#    command: 'bash start_dev.sh'
+    command: 'bash start_celery.sh'
+    extra_hosts:
+      - "fedow.tibillet.localhost:172.17.0.1"
+      - "lespass.tibillet.localhost:172.17.0.1"
+      - "laboutik.tibillet.localhost:172.17.0.1"
+      - "laboutik2.tibillet.localhost:172.17.0.1"
 
   laboutik_nginx:
     extends:
@@ -120,11 +154,87 @@ services:
     labels:
       - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.$DOMAIN`) || Host(`cashless.$DOMAIN`)
 
+
+  #### CASHLESS 2 ####
+#
+#  laboutik2_postgres:
+#    env_file: ../LaBoutik/env_test2
+#    hostname: laboutik2_postgres
+#    container_name: laboutik2_postgres
+#    volumes:
+#      - laboutik_postgres2_data:/var/lib/postgresql/data
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_postgres
+#
+#  laboutik2_memcached:
+#    hostname: laboutik2_memcached
+#    container_name: laboutik2_memcached
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_memcached
+#
+#  laboutik2_redis:
+#    hostname: laboutik2_redis
+#    container_name: laboutik2_redis
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_redis
+#
+#  laboutik2_django:
+#    hostname: laboutik2_django
+#    container_name: laboutik2_django
+#    volumes:
+#      - ./backup:/backup_tdd
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_django
+#    env_file: ../LaBoutik/env_test2
+#    links:
+#      - laboutik2_postgres:postgres
+#      - laboutik2_redis:redis
+#      - laboutik2_memcached:memcached
+#    extra_hosts:
+#      - "fedow.tibillet.localhost:172.17.0.1"
+#      - "lespass.tibillet.localhost:172.17.0.1"
+#      - "laboutik.tibillet.localhost:172.17.0.1"
+#      - "laboutik2.tibillet.localhost:172.17.0.1"
+#    command: 'bash start_dev.sh'
+#
+#  laboutik2_celery:
+#    hostname: laboutik2_celery
+#    container_name: laboutik2_celery
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_celery
+#    env_file: ../LaBoutik/env_test2
+#    links:
+#      - laboutik2_postgres:postgres
+#      - laboutik2_redis:redis
+#      - laboutik2_memcached:memcached
+#    extra_hosts:
+#      - "fedow.tibillet.localhost:172.17.0.1"
+#      - "lespass.tibillet.localhost:172.17.0.1"
+#      - "laboutik.tibillet.localhost:172.17.0.1"
+#      - "laboutik2.tibillet.localhost:172.17.0.1"
+##    command: 'bash start_dev.sh'
+#
+#  laboutik2_nginx:
+#    hostname: laboutik2_nginx
+#    container_name: laboutik2_nginx
+#    extends:
+#      file: ../LaBoutik/docker-compose.yml
+#      service: laboutik_nginx
+#    links:
+#      - laboutik2_django:laboutik_django
+#    labels:
+#      - traefik.http.routers.laboutik2_nginx.rule=Host(`laboutik2.$DOMAIN`)
+
   ### Playwright test container
   playwright:
-    build: playwright/PlaywrightDockerFile
-    container_name: playwright
     hostname: playwright
+    container_name: playwright
+    build: playwright/PlaywrightDockerFile
     network_mode: host
     volumes:
       - ./playwright:/playwright
@@ -134,6 +244,10 @@ services:
       - "fedow.tibillet.localhost:172.17.0.1"
       - "lespass.tibillet.localhost:172.17.0.1"
       - "laboutik.tibillet.localhost:172.17.0.1"
+      - "laboutik2.tibillet.localhost:172.17.0.1"
+
+# Pour test stripe :
+# stripe listen --forward-to https://fedow.tibillet.localhost/webhook_stripe/ --skip-verify
 
 networks:
   frontend:
@@ -145,4 +259,5 @@ networks:
 volumes:
   lespass_dev_db:
   laboutik_postgres_data:
+  laboutik_postgres2_data:
   fedow_database:

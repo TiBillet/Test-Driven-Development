@@ -10,8 +10,8 @@ DEMO_TAGID_CLIENT2='52BE6543' carte anonyme
 
 import { test, expect } from '@playwright/test'
 import {
-	connection, changeLanguage, resetCardCashless, creditMoneyOnCardCashless, creditGiftMoneyOnCardCashless,
-	getTranslate, getStyleValue, goPointSale, selectArticles
+  connection, changeLanguage, resetCardCashless, creditMoneyOnCardCashless, creditGiftMoneyOnCardCashless,
+  getTranslate, getStyleValue, goPointSale, selectArticles
 } from '../../mesModules/commun.js'
 import { env } from '../../mesModules/env.js'
 import { log } from 'console'
@@ -24,298 +24,291 @@ let paiementTypeTrans, confirmPaymentTrans
 const language = "en"
 
 test.use({
-	viewport: { width: 550, height: 1000 },
-	ignoreHTTPSErrors: true
+  viewport: { width: 550, height: 1000 },
+  ignoreHTTPSErrors: true
 })
 
 test.describe("Cashless, carte client 1", () => {
-	test("Connection", async ({ browser }) => {
-		page = await browser.newPage()
-		await connection(page)
-
-		// changer de langue
-		await changeLanguage(page, language)
-
-		// attente affichage menu burger
-		await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
-
-		// obtenir les traductions qui seront utilisées
-		currencySymbolTrans = await getTranslate(page, 'currencySymbol')
-		transactionTrans = await getTranslate(page, 'transaction', 'capitalize')
-		okTrans = await getTranslate(page, 'ok')
-		totalTrans = await getTranslate(page, 'total', 'capitalize')
-		cardTrans = await getTranslate(page, 'card')
-		returnTrans = await getTranslate(page, 'return', 'uppercase')
-		cashTrans = await getTranslate(page, 'cash')
-		cbTrans = await getTranslate(page, 'cb')
-		givenSumTrans = await getTranslate(page, 'givenSum')
-		changeTrans = await getTranslate(page, 'change', 'capitalize')
-		msgAwaitingCard = await getTranslate(page, 'awaitingCardReading', 'capitalize')
-		onTrans = await getTranslate(page, 'on', 'capitalize')
-		noContributionTrans = await getTranslate(page, 'noContribution', 'capitalize')
-		directServiceTrans = await getTranslate(page, 'directService', 'capitalize')
-		paiementTypeTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
-		confirmPaymentTrans = await getTranslate(page, 'confirmPayment', 'capitalize')
-	})
+  test("Connection", async ({ browser }) => {
+    page = await browser.newPage()
+    await connection(page)
 
-	test("Check carte client 1, tests : bouton retour + sur carte = 0 + cotisation", async () => {
-		// vidage carte client1
-		await resetCardCashless(page, 'nfc-client1')
+    // changer de langue
+    await changeLanguage(page, language)
 
-		// Clique sur le bouton "CHECK CARTE")
-		await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
+    // attente affichage menu burger
+    await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
 
-		// attente affichage "Attente lecture carte"
-		await expect(page.locator('#popup-cashless', { hasText: msgAwaitingCard })).toBeVisible()
+    // obtenir les traductions qui seront utilisées
+    currencySymbolTrans = await getTranslate(page, 'currencySymbol')
+    transactionTrans = await getTranslate(page, 'transaction', 'capitalize')
+    okTrans = await getTranslate(page, 'ok')
+    totalTrans = await getTranslate(page, 'total', 'capitalize')
+    cardTrans = await getTranslate(page, 'card')
+    returnTrans = await getTranslate(page, 'return', 'uppercase')
+    cashTrans = await getTranslate(page, 'cash')
+    cbTrans = await getTranslate(page, 'cb')
+    givenSumTrans = await getTranslate(page, 'givenSum')
+    changeTrans = await getTranslate(page, 'change', 'capitalize')
+    msgAwaitingCard = await getTranslate(page, 'awaitingCardReading', 'capitalize')
+    onTrans = await getTranslate(page, 'on', 'capitalize')
+    noContributionTrans = await getTranslate(page, 'noContribution', 'capitalize')
+    directServiceTrans = await getTranslate(page, 'directService', 'capitalize')
+    paiementTypeTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
+    confirmPaymentTrans = await getTranslate(page, 'confirmPayment', 'capitalize')
+  })
 
-		// #popup-retour visible
-		await expect(page.locator('#popup-retour', { hasText: returnTrans })).toBeVisible()
+  test("Check carte client 1, tests : bouton retour + sur carte = 0 + cotisation", async () => {
+    // vidage carte client1
+    await resetCardCashless(page, 'nfc-client1')
 
-		// Clique bt "RETOUR"
-		await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
+    // Clique sur le bouton "CHECK CARTE")
+    await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 
-		// #popup-cashless éffacé
-		await expect(page.locator('#popup-cashless')).toBeHidden()
+    // attente affichage "Attente lecture carte"
+    await expect(page.locator('#popup-cashless', { hasText: msgAwaitingCard })).toBeVisible()
 
-		// Clique sur le bouton "CHECK CARTE"
-		await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
+    // #popup-retour visible
+    await expect(page.locator('#popup-retour', { hasText: returnTrans })).toBeVisible()
 
-		// cliquer sur carte nfc simulée
-		await page.locator('#nfc-client1').click()
+    // Clique bt "RETOUR"
+    await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
 
-		// attente affichage "popup-cashless"
-		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // #popup-cashless éffacé
+    await expect(page.locator('#popup-cashless')).toBeHidden()
 
-		// fond d'écran =  'rgb(51, 148, 72)'
-		let backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
-		expect(backGroundColor).toEqual('rgb(51, 148, 72)')
+    // Clique sur le bouton "CHECK CARTE"
+    await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 
-		// 0 sur carte
-		await expect(page.locator('.test-return-total-card', { hasText: onTrans + ' ' + cardTrans + ' : 0 ' + currencySymbolTrans })).toBeVisible()
+    // cliquer sur carte nfc simulée
+    await page.locator('#nfc-client1').click()
 
-		// "Aucune cotisation"
-		await expect(page.locator('.test-return-contribution', { hasText: noContributionTrans })).toBeVisible()
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// assets = 0
-		const assets = [{ name: 'TestCoin', value: 0.00 }]
-		for (let index = 0; index < assets.length; index++) {
-			await expect(page.locator('.test-return-nom-monnaie-item' + (index + 1), { hasText: assets[index].name })).toBeVisible()
-			await expect(page.locator('.test-return-valeur-monnaie-item' + (index + 1), { hasText: assets[index].value })).toBeVisible()
-		}
+    // fond d'écran =  'rgb(184, 85, 33)'
+    let backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(184, 85, 33)')
 
-		// Clique bt "RETOUR"
-		await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
-	})
+    // 0 sur carte
+    await expect(page.locator('.test-return-total-card', { hasText: onTrans + ' ' + cardTrans + ' : 0 ' + currencySymbolTrans })).toBeVisible()
 
-	test("Retour carte client 1 crédité de 40 et 10 cadeaux en cb", async () => {
-		// créditer monnaie : 4 * 10
-		await creditMoneyOnCardCashless(page, 'nfc-client1', 4, 'cb')
+    // "Aucune cotisation"
+    await expect(page.locator('.test-return-contribution', { hasText: noContributionTrans })).toBeVisible()
 
-		// attente affichage "popup-cashless"
-		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // Clique bt "RETOUR"
+    await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
+  })
 
-		// fond d'écran =  'rgb(51, 148, 72)'
-		let backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
-		expect(backGroundColor).toEqual('rgb(51, 148, 72)')
+  test("Retour carte client 1 crédité de 40 et 10 cadeaux en cb", async () => {
+    // créditer monnaie : 4 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client1', 4, 'cb')
 
-		// 'Transaction ok' est affiché
-		await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// total cb
-		await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 40.00 ${currencySymbolTrans}` })).toBeVisible()
+    // fond d'écran =  'rgb(51, 148, 72)'
+    let backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(51, 148, 72)')
 
-		// total crédité sur carte
-		await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-		// crédit du lieu
-		await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 40 ${currencySymbolTrans}` })).toBeVisible()
+    // total cb
+    await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 40.00 ${currencySymbolTrans}` })).toBeVisible()
 
-		// Clique bt "RETOUR"
-		await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
+    // total crédité sur carte
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
 
-		// créditer monnaie cadeau :  2 * 5
-		await creditGiftMoneyOnCardCashless(page, 'nfc-client1', 2)
+    // crédit du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 40 ${currencySymbolTrans}` })).toBeVisible()
 
-		// attente affichage "popup-cashless"
-		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // Clique bt "RETOUR"
+    await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
 
-		// fond d'écran =  'rgb(51, 148, 72)'
-		backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
-		expect(backGroundColor).toEqual('rgb(51, 148, 72)')
+    // créditer monnaie cadeau :  2 * 5
+    await creditGiftMoneyOnCardCashless(page, 'nfc-client1', 2)
 
-		// 'Transaction ok' est affiché
-		await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// crédit du lieu
-		await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 40 ${currencySymbolTrans}` })).toBeVisible()
+    // fond d'écran =  'rgb(51, 148, 72)'
+    backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(51, 148, 72)')
 
-		// crédit cadeau du lieu
-		await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbolTrans}` })).toBeVisible()
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-		// Clique bt "RETOUR"
-		await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
-	})
+    // crédit du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 40 ${currencySymbolTrans}` })).toBeVisible()
 
-	test("Retour carte client 1 crédité de 10 en espece: somme donnée 10", async () => {
-		// créditer monnaie : 1 * 10
-		await creditMoneyOnCardCashless(page, 'nfc-client1', 1, 'espece', 10)
+    // crédit cadeau du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbolTrans}` })).toBeVisible()
 
-		// attente affichage "popup-cashless"
-		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // Clique bt "RETOUR"
+    await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
+  })
 
-		// fond d'écran =  'rgb(51, 148, 72)'
-		const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
-		expect(backGroundColor).toEqual('rgb(51, 148, 72)')
+  test("Retour carte client 1 crédité de 10 en espece: somme donnée 10", async () => {
+    // créditer monnaie : 1 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client1', 1, 'espece', 10)
 
-		// 'Transaction ok' est affiché
-		await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// total espèce
-		await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
+    // fond d'écran =  'rgb(51, 148, 72)'
+    const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(51, 148, 72)')
 
-		// total crédité sur carte
-		await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 60 ${currencySymbolTrans}` })).toBeVisible()
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-		// crédit du lieu
-		await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 50 ${currencySymbolTrans}` })).toBeVisible()
+    // total espèce
+    await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
-		// crédit cadeau du lieu
-		await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbolTrans}` })).toBeVisible()
+    // total crédité sur carte
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 60 ${currencySymbolTrans}` })).toBeVisible()
 
-		// somme donnée
-		await expect(page.locator('.test-return-given-sum', { hasText: `${givenSumTrans} 10 ${currencySymbolTrans}` })).toBeVisible()
+    // crédit du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 50 ${currencySymbolTrans}` })).toBeVisible()
 
-		// monnaie à rendre
-		await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+    // crédit cadeau du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbolTrans}` })).toBeVisible()
 
-		// Clique bt "RETOUR"
-		await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
-	})
+    // somme donnée
+    await expect(page.locator('.test-return-given-sum', { hasText: `${givenSumTrans} 10 ${currencySymbolTrans}` })).toBeVisible()
 
-	test("Retour carte client 1 crédité de 10 en espece: somme donnée 50", async () => {
-		// créditer monnaie : 1 * 10
-		await creditMoneyOnCardCashless(page, 'nfc-client1', 1, 'espece', 50)
+    // monnaie à rendre
+    await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
-		// attente affichage "popup-cashless"
-		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // Clique bt "RETOUR"
+    await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
+  })
 
-		// fond d'écran =  'rgb(51, 148, 72)'
-		const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
-		expect(backGroundColor).toEqual('rgb(51, 148, 72)')
+  test("Retour carte client 1 crédité de 10 en espece: somme donnée 50", async () => {
+    // créditer monnaie : 1 * 10
+    await creditMoneyOnCardCashless(page, 'nfc-client1', 1, 'espece', 50)
 
-		// 'Transaction ok' est affiché
-		await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// total espèce
-		await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
+    // fond d'écran =  'rgb(51, 148, 72)'
+    const backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(51, 148, 72)')
 
-		// total crédité sur carte
-		await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 70 ${currencySymbolTrans}` })).toBeVisible()
+    // 'Transaction ok' est affiché
+    await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-		// crédit du lieu
-		await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 60 ${currencySymbolTrans}` })).toBeVisible()
+    // total espèce
+    await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
-		// crédit cadeau du lieu
-		await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbolTrans}` })).toBeVisible()
+    // total crédité sur carte
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 70 ${currencySymbolTrans}` })).toBeVisible()
 
-		// somme donnée
-		await expect(page.locator('.test-return-given-sum', { hasText: `${givenSumTrans} 50 ${currencySymbolTrans}` })).toBeVisible()
-		// monnaie à rendre
-		await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
+    // crédit du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 60 ${currencySymbolTrans}` })).toBeVisible()
 
-		// Clique bt "RETOUR"
-		await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
+    // crédit cadeau du lieu
+    await expect(page.locator('#popup-cashless .test-return-monnaie-lg', { hasText: `- TestCoin Cadeau : 10 ${currencySymbolTrans}` })).toBeVisible()
 
-	})
+    // somme donnée
+    await expect(page.locator('.test-return-given-sum', { hasText: `${givenSumTrans} 50 ${currencySymbolTrans}` })).toBeVisible()
+    // monnaie à rendre
+    await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
 
-	test("Check carte client 1, prise de 2 adhésions et verification assets", async () => {
-		// aller au point de vente "BAR 1"
-		await goPointSale(page, 'Adhésions')
+    // Clique bt "RETOUR"
+    await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
 
-		// attendre fin utilisation réseau
-		await page.waitForLoadState('networkidle')
+  })
 
-		// titre
-		await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: directServiceTrans })).toBeVisible()
-		await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: 'Adhésions' })).toBeVisible()
+  test("Check carte client 1, prise de 2 adhésions et verification assets", async () => {
+    // aller au point de vente "BAR 1"
+    await goPointSale(page, 'Adhésions')
 
-		// sélection de 2 adhésions
-		const listeArticles = [{ nom: "Adhésion associative Annuelle", nb: 1, prix: 20 }, { nom: "Panier AMAP Annuel", nb: 1, prix: 400 }]
-		await selectArticles(page, listeArticles, "Adhésions")
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
 
-		// valider achats
-		await page.locator('#bt-valider').click()
+    // titre
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: directServiceTrans })).toBeVisible()
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: 'Adhésions' })).toBeVisible()
 
-		// attendre moyens de paiement
-		await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
+    // sélection de 2 adhésions
+    const listeArticles = [{ nom: "Adhésion associative Annuelle", nb: 1, prix: 20 }, { nom: "Panier AMAP Annuel", nb: 1, prix: 400 }]
+    await selectArticles(page, listeArticles, "Adhésions")
 
-		// paiement par cb
-		await page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: cbTrans }).click()
+    // valider achats
+    await page.locator('#bt-valider').click()
 
-		// attente affichage "popup-cashless"
-		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // attendre moyens de paiement
+    await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
-		// Confirmez le paiement est affiché
-		await expect(page.locator('.test-return-confirm-payment', { hasText: confirmPaymentTrans })).toBeVisible()
+    // paiement par cb
+    await page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: cbTrans }).click()
 
-		// cb est affiché
-		await expect(page.locator('.test-return-payment-method', { hasText: 'cb' })).toBeVisible()
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// valider
-		await page.locator('#popup-confirme-valider').click()
+    // Confirmez le paiement est affiché
+    await expect(page.locator('.test-return-confirm-payment', { hasText: confirmPaymentTrans })).toBeVisible()
 
-		// attente affichage "popup-cashless"
-		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // cb est affiché
+    await expect(page.locator('.test-return-payment-method', { hasText: 'cb' })).toBeVisible()
 
-		// cliquer sur carte nfc simulée
-		await page.locator('#nfc-client1').click()
+    // valider
+    await page.locator('#popup-confirme-valider').click()
 
-		// attente affichage "popup-cashless"
-		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// fond d'écran =  'rgb(51, 148, 72)'
-		let backGroundColorReturn = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
-		expect(backGroundColorReturn).toEqual('rgb(51, 148, 72)')
+    // cliquer sur carte nfc simulée
+    await page.locator('#nfc-client1').click()
 
-		// total cb
-		await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 420.00 ${currencySymbolTrans}` })).toBeVisible()
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// cliquer sur RETOUR
-		await page.locator('#popup-retour').click()
+    // fond d'écran =  'rgb(51, 148, 72)'
+    let backGroundColorReturn = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColorReturn).toEqual('rgb(51, 148, 72)')
 
-		// titre visible
-		await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: directServiceTrans })).toBeVisible()
-		await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: 'Adhésions' })).toBeVisible()
+    // total cb
+    await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 420.00 ${currencySymbolTrans}` })).toBeVisible()
 
-		// Clique sur le bouton "CHECK CARTE")
-		await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
+    // cliquer sur RETOUR
+    await page.locator('#popup-retour').click()
 
-		// attente affichage "Attente lecture carte"
-		await expect(page.locator('#popup-cashless', { hasText: msgAwaitingCard })).toBeVisible()
+    // titre visible
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: directServiceTrans })).toBeVisible()
+    await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: 'Adhésions' })).toBeVisible()
 
-		// cliquer sur carte nfc simulée
-		await page.locator('#nfc-client1').click()
+    // Clique sur le bouton "CHECK CARTE")
+    await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 
-		// attente affichage "popup-cashless"
-		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // attente affichage "Attente lecture carte"
+    await expect(page.locator('#popup-cashless', { hasText: msgAwaitingCard })).toBeVisible()
 
-		// fond d'écran =  'rgb(51, 148, 72)'
-		let backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
-		expect(backGroundColor).toEqual('rgb(51, 148, 72)')
+    // cliquer sur carte nfc simulée
+    await page.locator('#nfc-client1').click()
 
-		// 70 sur carte
-		await expect(page.locator('.test-return-total-card', { hasText: onTrans + ' ' + cardTrans + ' : 70.00 ' + currencySymbolTrans })).toBeVisible()
+    // attente affichage "popup-cashless"
+    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// "Aucune cotisation"
-		await expect(page.locator('.test-return-contribution', { hasText: noContributionTrans })).toBeVisible()
+    // fond d'écran =  'rgb(184, 85, 33)'
+    let backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
+    expect(backGroundColor).toEqual('rgb(184, 85, 33)')
 
-		// assets = 60 et 10 cadeau
-		const assets = [{ name: 'TestCoin', value: 60.00 }, { name: 'TestCoin Cadeau', value: 10.00 }]
-		for (let index = 0; index < assets.length; index++) {
-			await expect(page.locator('.test-return-nom-monnaie-item' + (index + 1), { hasText: assets[index].name })).toBeVisible()
-			await expect(page.locator('.test-return-valeur-monnaie-item' + (index + 1), { hasText: assets[index].value })).toBeVisible()
-		}
-		await page.close()
-	})
+    // 70 sur carte
+    await expect(page.locator('.test-return-total-card', { hasText: onTrans + ' ' + cardTrans + ' : 70.00 ' + currencySymbolTrans })).toBeVisible()
+
+    // "Aucune cotisation"
+    await expect(page.locator('.test-return-contribution', { hasText: noContributionTrans })).toBeVisible()
+
+    // assets = 60 et 10 cadeau
+    const assets = [{ name: 'TestCoin', value: 60.00 }, { name: 'TestCoin Cadeau', value: 10.00 }]
+    for (let index = 0; index < assets.length; index++) {
+      await expect(page.locator('.test-return-nom-monnaie-item' + (index + 1), { hasText: assets[index].name })).toBeVisible()
+      await expect(page.locator('.test-return-valeur-monnaie-item' + (index + 1), { hasText: assets[index].value })).toBeVisible()
+    }
+    await page.close()
+  })
 
 })

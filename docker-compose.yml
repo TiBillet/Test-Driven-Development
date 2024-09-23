@@ -36,14 +36,9 @@ services:
       service: fedow_django
     command: 'bash start_dev.sh'
     extra_hosts:
-      - "fedow.tibillet.localhost:172.17.0.1"
-      - "lespass.tibillet.localhost:172.17.0.1"
-      - "laboutik.tibillet.localhost:172.17.0.1"
-#      - "laboutik2.tibillet.localhost:172.17.0.1"
-      # For mock data :
-#      - "fedow.tibillet.coop:172.17.0.1"
-#      - "raffinerie.tibillet.re:172.17.0.1"
-#      - "raffinerie.cashless.tibillet.re:172.17.0.1"
+      - fedow.tibillet.localhost:172.17.0.1
+      - lespass.tibillet.localhost:172.17.0.1
+      - laboutik.tibillet.localhost:172.17.0.1
     ports:
       - 8442:8000 # test stripe listen --forward-to http://127.0.0.1:8442/webhook_stripe/
 
@@ -85,10 +80,9 @@ services:
       file: ../Lespass/docker-compose.yml
       service: lespass_django
     extra_hosts:
-      - "fedow.tibillet.localhost:172.17.0.1"
-      - "lespass.tibillet.localhost:172.17.0.1"
-      - "laboutik.tibillet.localhost:172.17.0.1"
-#      - "laboutik2.tibillet.localhost:172.17.0.1"
+      - fedow.tibillet.localhost:172.17.0.1
+      - lespass.tibillet.localhost:172.17.0.1
+      - laboutik.tibillet.localhost:172.17.0.1
 
     command: 'bash start_dev.sh'
 
@@ -138,10 +132,9 @@ services:
       service: laboutik_django
     command: 'bash start_dev.sh'
     extra_hosts:
-      - "fedow.tibillet.localhost:172.17.0.1"
-      - "lespass.tibillet.localhost:172.17.0.1"
-      - "laboutik.tibillet.localhost:172.17.0.1"
-#      - "laboutik2.tibillet.localhost:172.17.0.1"
+      - fedow.tibillet.localhost:172.17.0.1
+      - lespass.tibillet.localhost:172.17.0.1
+      - laboutik.tibillet.localhost:172.17.0.1
 
   laboutik_celery:
     extends:
@@ -150,10 +143,9 @@ services:
 #    command: 'bash start_dev.sh'
     command: 'bash start_celery.sh'
     extra_hosts:
-      - "fedow.tibillet.localhost:172.17.0.1"
-      - "lespass.tibillet.localhost:172.17.0.1"
-      - "laboutik.tibillet.localhost:172.17.0.1"
-#      - "laboutik2.tibillet.localhost:172.17.0.1"
+      - fedow.tibillet.localhost:172.17.0.1
+      - lespass.tibillet.localhost:172.17.0.1
+      - laboutik.tibillet.localhost:172.17.0.1
 
   laboutik_nginx:
     extends:
@@ -251,10 +243,9 @@ services:
     tty: true
     command: "/bin/bash"
     extra_hosts:
-      - "fedow.tibillet.localhost:172.17.0.1"
-      - "lespass.tibillet.localhost:172.17.0.1"
-      - "laboutik.tibillet.localhost:172.17.0.1"
-      - "laboutik2.tibillet.localhost:172.17.0.1"
+      - fedow.tibillet.localhost:172.17.0.1
+      - lespass.tibillet.localhost:172.17.0.1
+      - laboutik.tibillet.localhost:172.17.0.1
 
 # Pour test stripe :
 # stripe listen --forward-to https://fedow.tibillet.localhost/webhook_stripe/ --skip-verify

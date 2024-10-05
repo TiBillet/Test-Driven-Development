@@ -106,7 +106,7 @@ services:
       file: ../Lespass/docker-compose.yml
       service: lespass_nginx
     labels:
-      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`m.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`interupteur.$DOMAIN`)
+      - traefik.http.routers.lespass_nginx.rule=Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`m.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`interupteur.$DOMAIN`)
     depends_on:
       - lespass_django
 

@@ -6,7 +6,7 @@ POSTGRES_DB='laboutik'
 POSTGRES_PASSWORD='K4g8g73Zt2E0BDI2PPhqDwaot37adiREZOEmDbFeRr4='
 
 # The domain of this instance ex : 'laboutik.tibillet.localhost'
-DOMAIN='linterupteur.laboutik.demo.tibillet.org'
+DOMAIN='linterupteur_laboutik.demo.tibillet.org'
 # No Cashless if no Fedow nor Lespass tenant manager
 FEDOW_URL='https://fedow.demo.tibillet.org/' # ex : https://fedow.tibillet.localhost/
 LESPASS_TENANT_URL='https://linterupteur.demo.tibillet.org/' # ex : https://lespass.tibillet.localhost/

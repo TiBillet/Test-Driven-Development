@@ -182,7 +182,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.routers.laboutik2_nginx.tls.certresolver=myresolver
-      - traefik.http.routers.laboutik2_nginx.rule=Host(`linterupteur.laboutik.$DOMAIN`)
+      - traefik.http.routers.laboutik2_nginx.rule=Host(`linterupteur_laboutik.$DOMAIN`)
     networks:
       - frontend
       - laboutik_backend

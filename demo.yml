@@ -189,6 +189,7 @@ services:
 #      service: laboutik_redis
 
   laboutik2_django:
+    image: tibillet/laboutik:latest
     hostname: laboutik2_django
     container_name: laboutik2_django
     volumes:
@@ -202,6 +203,7 @@ services:
     command: 'bash start_dev.sh'
 
   laboutik2_celery:
+    image: tibillet/laboutik:latest
     hostname: laboutik2_celery
     container_name: laboutik2_celery
     extends:

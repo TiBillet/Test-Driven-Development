@@ -162,18 +162,18 @@ services:
       - laboutik_django
 
 
-  #### CASHLESS 2 ####
-#
-#  laboutik2_postgres:
-#    env_file: ../LaBoutik/env_test2
-#    hostname: laboutik2_postgres
-#    container_name: laboutik2_postgres
-#    volumes:
-#      - laboutik_postgres2_data:/var/lib/postgresql/data
-#    extends:
-#      file: ../LaBoutik/docker-compose.yml
-#      service: laboutik_postgres
-#
+  #### LABOUTIK 2 ####
+
+  laboutik2_postgres:
+    env_file: ./demo_env_laboutik2
+    hostname: laboutik2_postgres
+    container_name: laboutik2_postgres
+    volumes:
+      - laboutik_postgres2_data:/var/lib/postgresql/data
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_postgres
+
 #  laboutik2_memcached:
 #    hostname: laboutik2_memcached
 #    container_name: laboutik2_memcached
@@ -187,55 +187,43 @@ services:
 #    extends:
 #      file: ../LaBoutik/docker-compose.yml
 #      service: laboutik_redis
-#
-#  laboutik2_django:
-#    hostname: laboutik2_django
-#    container_name: laboutik2_django
-#    volumes:
-#      - ./backup:/backup_tdd
-#    extends:
-#      file: ../LaBoutik/docker-compose.yml
-#      service: laboutik_django
-#    env_file: ../LaBoutik/env_test2
-#    links:
-#      - laboutik2_postgres:postgres
+
+  laboutik2_django:
+    hostname: laboutik2_django
+    container_name: laboutik2_django
+    volumes:
+      - ./backup:/backup_tdd
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_django
+    env_file: ./demo_env_laboutik2
+    links:
+      - laboutik2_postgres:postgres
+    command: 'bash start_dev.sh'
+
+  laboutik2_celery:
+    hostname: laboutik2_celery
+    container_name: laboutik2_celery
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_celery
+    env_file: ./demo_env_laboutik2
+    links:
+      - laboutik2_postgres:postgres
 #      - laboutik2_redis:redis
 #      - laboutik2_memcached:memcached
-#    extra_hosts:
-#      - "fedow.tibillet.localhost:172.17.0.1"
-#      - "lespass.tibillet.localhost:172.17.0.1"
-#      - "laboutik.tibillet.localhost:172.17.0.1"
-#      - "laboutik2.tibillet.localhost:172.17.0.1"
 #    command: 'bash start_dev.sh'
-#
-#  laboutik2_celery:
-#    hostname: laboutik2_celery
-#    container_name: laboutik2_celery
-#    extends:
-#      file: ../LaBoutik/docker-compose.yml
-#      service: laboutik_celery
-#    env_file: ../LaBoutik/env_test2
-#    links:
-#      - laboutik2_postgres:postgres
-#      - laboutik2_redis:redis
-#      - laboutik2_memcached:memcached
-#    extra_hosts:
-#      - "fedow.tibillet.localhost:172.17.0.1"
-#      - "lespass.tibillet.localhost:172.17.0.1"
-#      - "laboutik.tibillet.localhost:172.17.0.1"
-#      - "laboutik2.tibillet.localhost:172.17.0.1"
-##    command: 'bash start_dev.sh'
-#
-#  laboutik2_nginx:
-#    hostname: laboutik2_nginx
-#    container_name: laboutik2_nginx
-#    extends:
-#      file: ../LaBoutik/docker-compose.yml
-#      service: laboutik_nginx
-#    links:
-#      - laboutik2_django:laboutik_django
-#    labels:
-#      - traefik.http.routers.laboutik2_nginx.rule=Host(`laboutik2.$DOMAIN`)
+
+  laboutik2_nginx:
+    hostname: laboutik2_nginx
+    container_name: laboutik2_nginx
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_nginx
+    links:
+      - laboutik2_django:laboutik_django
+    labels:
+      - traefik.http.routers.laboutik2_nginx.rule=Host(`linterupteur.laboutik.$DOMAIN`)
 
   ### Playwright test container
 #  playwright:

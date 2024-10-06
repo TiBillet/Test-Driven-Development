@@ -166,16 +166,31 @@ services:
 #    command: 'bash start_dev.sh'
 
   laboutik2_nginx:
-    hostname: laboutik2_nginx
+    image: nginx
+    restart: always
     container_name: laboutik2_nginx
-    extends:
-      file: ../../LaBoutik/docker-compose.yml
-      service: laboutik_nginx
+    hostname: laboutik2_nginx
+    depends_on:
+      - laboutik_django
     links:
       - laboutik2_django:laboutik_django
+    volumes:
+      - ../../www:/DjangoFiles/www
+      - ../../logs:/DjangoFiles/logs
+      - ../../nginx:/etc/nginx/conf.d
     labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      - traefik.http.routers.laboutik2_nginx.tls.certresolver=myresolver
       - traefik.http.routers.laboutik2_nginx.rule=Host(`linterupteur.laboutik.$DOMAIN`)
+    networks:
+      - frontend
+      - laboutik_backend
 
+#TODO: a automatiser :
+
+# Pour cashless, créer le tenant sur Lespass avant.
+# poetry run ./manage.py new_tenant --name "linterupteur" --email "jturbeaux@pm.me" --dns "demo.tibillet.org"
 
 # Pour test stripe :
 # stripe listen --forward-to https://fedow.tibillet.localhost/webhook_stripe/ --skip-verify

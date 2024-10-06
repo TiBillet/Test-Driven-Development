@@ -123,19 +123,19 @@ services:
       file: ../../LaBoutik/docker-compose.yml
       service: laboutik_postgres
 
-#  laboutik2_memcached:
-#    hostname: laboutik2_memcached
-#    container_name: laboutik2_memcached
-#    extends:
-#      file: ../../LaBoutik/docker-compose.yml
-#      service: laboutik_memcached
-#
-#  laboutik2_redis:
-#    hostname: laboutik2_redis
-#    container_name: laboutik2_redis
-#    extends:
-#      file: ../../LaBoutik/docker-compose.yml
-#      service: laboutik_redis
+  laboutik2_memcached:
+    hostname: laboutik2_memcached
+    container_name: laboutik2_memcached
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_memcached
+
+  laboutik2_redis:
+    hostname: laboutik2_redis
+    container_name: laboutik2_redis
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_redis
 
   laboutik2_django:
     image: tibillet/laboutik:latest
@@ -149,6 +149,8 @@ services:
     env_file: ./demo_env_laboutik2
     links:
       - laboutik2_postgres:postgres
+      - laboutik2_redis:redis
+      - laboutik2_memcached:memcached
     command: 'bash start_dev.sh'
 
   laboutik2_celery:
@@ -161,8 +163,8 @@ services:
     env_file: ./demo_env_laboutik2
     links:
       - laboutik2_postgres:postgres
-#      - laboutik2_redis:redis
-#      - laboutik2_memcached:memcached
+      - laboutik2_redis:redis
+      - laboutik2_memcached:memcached
 #    command: 'bash start_dev.sh'
 
   laboutik2_nginx:

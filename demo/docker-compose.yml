@@ -11,7 +11,7 @@ services:
 
   fedow_memcached:
     extends:
-      file: ../Fedow/docker-compose.yml
+      file: ../../Fedow/docker-compose.yml
       service: fedow_memcached
 
   fedow_nginx:

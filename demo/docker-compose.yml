@@ -175,14 +175,14 @@ services:
     links:
       - laboutik2_django:laboutik_django
     volumes:
-      - ../../www:/DjangoFiles/www
-      - ../../logs:/DjangoFiles/logs
-      - ../../nginx:/etc/nginx/conf.d
+      - ../../LaBoutik/www:/DjangoFiles/www
+      - ../../LaBoutik/logs:/DjangoFiles/logs
+      - ../../LaBoutik/nginx:/etc/nginx/conf.d
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.routers.laboutik2_nginx.tls.certresolver=myresolver
-      - traefik.http.routers.laboutik2_nginx.rule=Host(`linterupteur_laboutik.$DOMAIN`)
+      - traefik.http.routers.laboutik2_nginx.rule=Host(`linterupteur.laboutik.$DOMAIN`)
     networks:
       - frontend
       - laboutik_backend

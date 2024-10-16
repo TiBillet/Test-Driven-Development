@@ -98,10 +98,10 @@ test.describe("Commandes, payer en une seule fois", () => {
     await expect(page.locator('.test-return-total-achats', { hasText: 'Total(cashless) 33.4 €' })).toBeVisible()
 
     // sur carte client 1 avant achats
-    await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'ROBOCOP - carte avant achats 40.00 €' })).toBeVisible()
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: 'CLIENT 1 - carte avant achats 40.00 €' })).toBeVisible()
 
     // sur carte client 1 après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'ROBOCOP - carte après achats 6.60 €' })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'CLIENT 1 - carte après achats 6.60 €' })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
@@ -215,7 +215,7 @@ test.describe("Commandes, payer en une seule fois", () => {
     await expect(page.locator('.test-return-purchase-cards', { hasText: 'Total des cartes 10.00 €' })).toBeVisible()
 
     // contenu 1ère carte cashless après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'ROBOCOP - carte après achats 0 €' })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'CLIENT 1 - carte après achats 0 €' })).toBeVisible()
 
     // clique sur bouton "RETOUR"
     await page.locator('#popup-retour').click()
@@ -406,7 +406,7 @@ test.describe("Commandes, payer en une seule fois", () => {
     await expect(page.locator('.test-return-total-achats', { hasText: 'Total(espèce) 8.00 €' })).toBeVisible()
 
     // première carte aprèss achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'ROBOCOP - carte après achats 0 €' })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: 'CLIENT 1 - carte après achats 0 €' })).toBeVisible()
 
     // somme donnée
     await expect(page.locator('.test-return-given-sum')).toHaveText('somme donnée 10 €')

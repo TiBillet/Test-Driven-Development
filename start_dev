@@ -1,35 +1,36 @@
 #!/bin/bash
+SESSION_NAME="TEST-DRIVEN"
+ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
 
-SESSION_NAME="F_Testing"
-
-# Check if the session already exists
 if tmux has-session -t $SESSION_NAME 2>/dev/null; then
     echo "Session $SESSION_NAME already exists. Attaching to it."
     byobu attach -t "$SESSION_NAME"
 else
-    # Create a new session and name it
-    byobu new-session -d -s "$SESSION_NAME"
+    byobu new-session -d -s 'test'
+    byobu rename-window -t 'test':0 $SESSION_NAME
 
-    # terminal
+    #  # 3 terminaux
+    byobu split-window -v
+    byobu split-window -v
+    byobu split-window -v
+
+    # lancement containers et logs
     byobu select-pane -t 0
-    byobu send-keys "clear" Enter
-    byobu send-keys "cd /media/travail/developpement/gits/Test-Driven-Development/" Enter
-    byobu send-keys "docker compose down -v --remove-orphans && docker compose up -d && docker compose logs -f" Enter
+    byobu send-keys "cd $ROOT_PATH" Enter
+    byobu send-keys "./launch_containers $ROOT_PATH" Enter
 
-    # 2 terminaux
-    byobu split-window -v
-    byobu split-window -v
-    byobu split-window -v
-
+    # lancement fedow
     byobu select-pane -t 1
-    byobu send-keys "dexe fedow_django bash"
+    byobu send-keys "cd $ROOT_PATH" Enter
 
+    # lancement lespass
     byobu select-pane -t 2
-    byobu send-keys "dexe lespass_django bash"
+    byobu send-keys "cd $ROOT_PATH" Enter
 
+    # lancement laboutik
     byobu select-pane -t 3
-    byobu send-keys "dexe laboutik_django bash"
+    byobu send-keys "cd $ROOT_PATH" Enter
 
-    byobu attach -t "$SESSION_NAME"
-
+    # visualiser la session byobu dans la console
+    byobu attach-session -t "test"
 fi

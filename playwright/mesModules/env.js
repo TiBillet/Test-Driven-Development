@@ -5,6 +5,8 @@ export const env = {
   adminPassword: "mi5Iechi",
   adminUser: "TestAdmin",
   pinCodeServer: 'https://discovery.tibillet.coop',
-  tagIdClient22: '52BE6543'
+  tagIdClient2: '52BE6543',
+  tagIdCm: 'EE144CE8',
+  tagIdClient1: '41726643'
 }
 

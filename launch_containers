@@ -1,0 +1,10 @@
+ #!/bin/bash
+docker compose down -v --remove-orphans
+docker compose up -d
+docker compose logs -f | while read line; do
+  # Process the line here
+  echo $line
+  if [[ $line == *"lespass_celery      | INFO celery@lespass_celery ready."* ]]; then 
+    tmux send-keys -t 1 "./launch_fedow" Enter
+  fi
+done 

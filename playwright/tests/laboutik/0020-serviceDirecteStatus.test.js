@@ -7,7 +7,7 @@ import { connection, getTranslate, changeLanguage, goPointSale, selectArticles, 
 let page
 
 let directServiceTrans, cashTrans, cbTrans, paiementTypeTrans, returnTrans, currencySymbolTrans, totalTrans, selectTableTrans, validateTrans, nameTrans
-let onTrans, cardTrans, noContributionTrans
+let anonymousCardTrans
 const language = "en"
 
 test.use({
@@ -45,9 +45,7 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
 		selectTableTrans = await getTranslate(page, 'selectTable', 'capitalize')
 		validateTrans = await getTranslate(page, 'validate', 'uppercase')
 		nameTrans = await getTranslate(page, 'name', 'capitalize')
-		onTrans = await getTranslate(page, 'on', 'capitalize')
-		cardTrans = await getTranslate(page, 'card')
-		noContributionTrans = await getTranslate(page, 'noContribution', 'capitalize')
+		anonymousCardTrans = await getTranslate(page, 'anonymousCard', 'capitalize')
 
 		// page attendue "Direct service - icon Bar 1"
 		await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(selectTableTrans)
@@ -196,6 +194,7 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
 		await expect(page.locator('#bt-valider', { hasText: validateTrans })).toBeVisible()
 	})
 
+
 	test("Check carte, client 1 suite au test 0010-carte-nfc...(vérif. cumule de créditation)", async () => {
 		// clique bouton check carte
 		await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
@@ -206,20 +205,31 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
 		// attente affichage "popup-cashless"
 		await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-		// nom
-		await expect(page.locator('.test-return-name', { hasText: `${nameTrans} : ROBOCOP` })).toBeVisible()
+		// "type carte"
+		await expect(page.locator('.test-return-card-type', { hasText: anonymousCardTrans })).toBeVisible()
 
-		// Aucune cotisation
-		await expect(page.locator('.test-return-contribution', { hasText: noContributionTrans })).toBeVisible()
-
-		// total carte
-		await expect(page.locator('.test-return-total-card', { hasText: `${onTrans} ${cardTrans} : 70.00 ${currencySymbolTrans}` })).toBeVisible()
+		// 70 sur carte
+		await expect(page.locator('.test-return-total-card', { hasText: '70.00' })).toBeVisible()
 
 		// assets = 60 et 10 cadeau
-		const assets = [{ name: 'TestCoin', value: 60.00 }, { name: 'TestCoin Cadeau', value: 10.00 }]
+		const assets = [
+			{ name: 'TestCoin', value: 60.00, place: 'Lespass' },
+			{ name: 'TestCoin Cadeau', value: 10.00, place: 'Lespass' }
+		]
 		for (let index = 0; index < assets.length; index++) {
-			await expect(page.locator('.test-return-nom-monnaie-item' + (index + 1), { hasText: assets[index].name })).toBeVisible()
-			await expect(page.locator('.test-return-valeur-monnaie-item' + (index + 1), { hasText: assets[index].value })).toBeVisible()
+			await expect(page.locator('.test-return-monnaie-item-name' + (index + 1), { hasText: assets[index].name })).toBeVisible()
+			await expect(page.locator('.test-return-monnaie-item-value' + (index + 1), { hasText: assets[index].value })).toBeVisible()
+			await expect(page.locator('.test-return-monnaie-item-place' + (index + 1), { hasText: assets[index].place })).toBeVisible()
+		}
+
+		const adhesions = [
+			{ name: 'Adhésion associative L’interrupteur', activation: 'today', place: 'Lespass' },
+			{ name: 'Panier AMAP L’interrupteur', activation: 'today', place: 'Lespass' },
+		]
+		for (let index = 0; index < adhesions.length; index++) {
+			await expect(page.locator('.test-return-membership-item-name' + (index + 1), { hasText: adhesions[index].name })).toBeVisible()
+			await expect(page.locator('.test-return-membership-item-activation' + (index + 1), { hasText: adhesions[index].activation })).toBeVisible()
+			await expect(page.locator('.test-return-membership-item-place' + (index + 1), { hasText: adhesions[index].place })).toBeVisible()
 		}
 
 		// sortir de "popup-cashless"

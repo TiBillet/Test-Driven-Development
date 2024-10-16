@@ -4,7 +4,7 @@ DEBUG=1
 TEST=1
 DEMO=1
 DEMO_TAGID_CM='EE144CE8'
-DEMO_TAGID_CLIENT1='41726643' ROBOCOP
+DEMO_TAGID_CLIENT1='41726643' CLIENT 1
 DEMO_TAGID_CLIENT2='52BE6543' carte anonyme
 */
 
@@ -19,7 +19,7 @@ import { log } from 'console'
 
 // attention la taille d'écran choisie affiche le menu burger
 let page, currencySymbolTrans, transactionTrans, okTrans, totalTrans, cardTrans, returnTrans, cashTrans, cbTrans
-let givenSumTrans, changeTrans, msgAwaitingCard, onTrans, noContributionTrans, directServiceTrans
+let givenSumTrans, changeTrans, msgAwaitingCard, onTrans, anonymousCardTrans, directServiceTrans
 let paiementTypeTrans, confirmPaymentTrans
 const language = "en"
 
@@ -52,13 +52,15 @@ test.describe("Cashless, carte client 1", () => {
     changeTrans = await getTranslate(page, 'change', 'capitalize')
     msgAwaitingCard = await getTranslate(page, 'awaitingCardReading', 'capitalize')
     onTrans = await getTranslate(page, 'on', 'capitalize')
-    noContributionTrans = await getTranslate(page, 'noContribution', 'capitalize')
+    // noContributionTrans = await getTranslate(page, 'noContribution', 'capitalize')
+    anonymousCardTrans = await getTranslate(page, 'anonymousCard', 'capitalize')
     directServiceTrans = await getTranslate(page, 'directService', 'capitalize')
     paiementTypeTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
     confirmPaymentTrans = await getTranslate(page, 'confirmPayment', 'capitalize')
   })
 
   test("Check carte client 1, tests : bouton retour + sur carte = 0 + cotisation", async () => {
+
     // vidage carte client1
     await resetCardCashless(page, 'nfc-client1')
 
@@ -90,11 +92,11 @@ test.describe("Cashless, carte client 1", () => {
     let backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
     expect(backGroundColor).toEqual('rgb(184, 85, 33)')
 
-    // 0 sur carte
-    await expect(page.locator('.test-return-total-card', { hasText: onTrans + ' ' + cardTrans + ' : 0 ' + currencySymbolTrans })).toBeVisible()
+    // "type carte"
+    await expect(page.locator('.test-return-card-type', { hasText: anonymousCardTrans })).toBeVisible()
 
-    // "Aucune cotisation"
-    await expect(page.locator('.test-return-contribution', { hasText: noContributionTrans })).toBeVisible()
+    // 0 sur carte
+    await expect(page.locator('.test-return-total-card', { hasText: '0' })).toBeVisible()
 
     // Clique bt "RETOUR"
     await page.locator(`#popup-retour div:has-text("${returnTrans}")`).first().click()
@@ -118,7 +120,7 @@ test.describe("Cashless, carte client 1", () => {
     await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 40.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // total crédité sur carte
-    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `CLIENT 1 - ${cardTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
 
     // crédit du lieu
     await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 40 ${currencySymbolTrans}` })).toBeVisible()
@@ -167,7 +169,7 @@ test.describe("Cashless, carte client 1", () => {
     await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // total crédité sur carte
-    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 60 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `CLIENT 1 - ${cardTrans} 60 ${currencySymbolTrans}` })).toBeVisible()
 
     // crédit du lieu
     await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 50 ${currencySymbolTrans}` })).toBeVisible()
@@ -203,7 +205,7 @@ test.describe("Cashless, carte client 1", () => {
     await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // total crédité sur carte
-    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `ROBOCOP - ${cardTrans} 70 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('#popup-cashless .test-return-total-carte', { hasText: `CLIENT 1 - ${cardTrans} 70 ${currencySymbolTrans}` })).toBeVisible()
 
     // crédit du lieu
     await expect(page.locator('#popup-cashless .test-return-monnaie-le', { hasText: `- TestCoin : 60 ${currencySymbolTrans}` })).toBeVisible()
@@ -296,18 +298,33 @@ test.describe("Cashless, carte client 1", () => {
     let backGroundColor = await getStyleValue(page, '#popup-cashless', 'backgroundColor')
     expect(backGroundColor).toEqual('rgb(184, 85, 33)')
 
-    // 70 sur carte
-    await expect(page.locator('.test-return-total-card', { hasText: onTrans + ' ' + cardTrans + ' : 70.00 ' + currencySymbolTrans })).toBeVisible()
+    // "type carte"
+    await expect(page.locator('.test-return-card-type', { hasText: anonymousCardTrans })).toBeVisible()
 
-    // "Aucune cotisation"
-    await expect(page.locator('.test-return-contribution', { hasText: noContributionTrans })).toBeVisible()
+    // 70 sur carte
+    await expect(page.locator('.test-return-total-card', { hasText: '70.00' })).toBeVisible()
 
     // assets = 60 et 10 cadeau
-    const assets = [{ name: 'TestCoin', value: 60.00 }, { name: 'TestCoin Cadeau', value: 10.00 }]
+    const assets = [
+      { name: 'TestCoin', value: 60.00, place: 'Lespass' },
+      { name: 'TestCoin Cadeau', value: 10.00, place: 'Lespass' }
+    ]
     for (let index = 0; index < assets.length; index++) {
-      await expect(page.locator('.test-return-nom-monnaie-item' + (index + 1), { hasText: assets[index].name })).toBeVisible()
-      await expect(page.locator('.test-return-valeur-monnaie-item' + (index + 1), { hasText: assets[index].value })).toBeVisible()
+      await expect(page.locator('.test-return-monnaie-item-name' + (index + 1), { hasText: assets[index].name })).toBeVisible()
+      await expect(page.locator('.test-return-monnaie-item-value' + (index + 1), { hasText: assets[index].value })).toBeVisible()
+      await expect(page.locator('.test-return-monnaie-item-place' + (index + 1), { hasText: assets[index].place })).toBeVisible()
     }
+
+    const adhesions = [
+      { name: 'Adhésion associative L’interrupteur', activation: 'today', place: 'Lespass' },
+      { name: 'Panier AMAP L’interrupteur', activation: 'today', place: 'Lespass' },
+    ]
+    for (let index = 0; index < adhesions.length; index++) {
+      await expect(page.locator('.test-return-membership-item-name' + (index + 1), { hasText: adhesions[index].name })).toBeVisible()
+      await expect(page.locator('.test-return-membership-item-activation' + (index + 1), { hasText: adhesions[index].activation })).toBeVisible()
+      await expect(page.locator('.test-return-membership-item-place' + (index + 1), { hasText: adhesions[index].place })).toBeVisible()
+    }
+
     await page.close()
   })
 

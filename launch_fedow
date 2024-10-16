@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "launch fedow"
+
+docker exec -it fedow_django /bin/bash -c "./flush.sh" | while read line; do
+  echo $line
+   if [[ $line == *"Listening on TCP address 0.0.0.0:8000"* ]]; then 
+    tmux send-keys -t 2 "./launch_lespass" Enter
+  fi
+done

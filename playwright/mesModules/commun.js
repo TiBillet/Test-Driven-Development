@@ -498,7 +498,8 @@ export const setPointSale = async function (pointSale, options) {
     directService: boolean,
     acceptsCash: boolean,
     acceptsCb: boolean,
-    showPrices: boolean
+    showPrices: boolean,
+    acceptsCheque: boolean
   }*/
 
   let page
@@ -511,15 +512,16 @@ export const setPointSale = async function (pointSale, options) {
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
 
-    // 2 cliques sur menu burger
+    // cliques sur menu burger
     await page.locator('a[class="sidebar-header-menu sidebar-toggle"]').dblclick()
 
+    // aller menu points de ventes
     await page.locator('a[href="/adminstaff/APIcashless/pointdevente/"]').click()
 
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
 
-    // séléctionner le poit de ventes
+    // séléctionner le point de ventes
     await page.locator('.results tr th[class="field-name"]').getByText(pointSale).dblclick()
 
     // permet d'attendre la fin des processus réseau
@@ -530,7 +532,7 @@ export const setPointSale = async function (pointSale, options) {
       if (key === 'showPrices') {
         const showPricesIsChecked = await page.locator('#id_afficher_les_prix').isChecked()
         if (showPricesIsChecked !== options[key]) {
-          await page.getByText('Afficher les prix').click()
+          await page.locator('label[for="id_afficher_les_prix"]').click()
         }
       }
 
@@ -538,7 +540,7 @@ export const setPointSale = async function (pointSale, options) {
       if (key === 'acceptsCash') {
         const acceptsCashIsChecked = await page.locator('#id_accepte_especes').isChecked()
         if (acceptsCashIsChecked !== options[key]) {
-          await page.getByText('Accepte especes').click()
+          await page.locator('label[for="id_accepte_especes"]').click()
         }
       }
 
@@ -546,7 +548,15 @@ export const setPointSale = async function (pointSale, options) {
       if (key === 'acceptsCb') {
         const acceptsCbIsChecked = await page.locator('#id_accepte_carte_bancaire').isChecked()
         if (acceptsCbIsChecked !== options[key]) {
-          await page.getByText('Accepte carte bancaire').click()
+          await page.locator('label[for="id_accepte_carte_bancaire"]').click()
+        }
+      }
+
+      // Accepte chèque
+      if (key === 'acceptsCheque') {
+        const acceptsCChequeIsChecked = await page.locator('#id_accepte_cheque').isChecked()
+        if (acceptsCChequeIsChecked !== options[key]) {
+          await page.locator('label[for="id_accepte_cheque"]').click()
         }
       }
 
@@ -554,7 +564,7 @@ export const setPointSale = async function (pointSale, options) {
       if (key === 'directService') {
         const directServiceIsChecked = await page.locator('#id_service_direct').isChecked()
         if (directServiceIsChecked !== options[key]) {
-          await page.getByText('Service direct ( vente au comptoir )').click()
+          await page.locator('label[for="id_service_direct"]').click()
         }
       }
     }

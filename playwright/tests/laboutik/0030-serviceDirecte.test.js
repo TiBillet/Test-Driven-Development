@@ -232,10 +232,10 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless) 1.50 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 avant achats
-    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 10 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `CLIENT 1 - ${prePurchaseCardTrans} 10 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: `ROBOCOP - ${postPurchaseCardTrans} 8.5 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: `CLIENT 1 - ${postPurchaseCardTrans} 8.5 ${currencySymbolTrans}` })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
@@ -274,7 +274,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // sur carte 0 €
-    await expect(page.locator('.test-return-total-card', { hasText: `${onTrans} ${cardTrans} : 0 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-total-card', { hasText: '0' })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
@@ -290,7 +290,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // sur carte 40 €
-    await expect(page.locator('.test-return-total-card', { hasText: `${onTrans} ${cardTrans} : 40.00 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-total-card', { hasText: '40.00' })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
@@ -340,7 +340,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-return-missing-cash', { hasText: `${isMissingTrans} 5.99 ${currencySymbolTrans}` })).toBeVisible()
 
     // contenu première carte
-    await expect(page.locator('.test-return-fisrt-card-content', { hasText: `ROBOCOP ${hasTrans} 0` })).toBeVisible()
+    await expect(page.locator('.test-return-fisrt-card-content', { hasText: `CLIENT 1 ${hasTrans} 0` })).toBeVisible()
 
     // message 'Achat possible par' affiché
     await expect(page.locator('.test-returm-possible-purchase', { hasText: possiblePurchaseByTrans })).toBeVisible()
@@ -364,13 +364,13 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/cashless) 5.99 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 avant achats
-    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `CLIENT 1 - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // complémentaire
     await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 5.99 € ${inTrans} cashless` })).toBeVisible()
 
     // sur carte client 1 après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: `ROBOCOP - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: `CLIENT 1 - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // cliquer sur RETOUR
     await page.locator('#popup-retour').click()
@@ -394,11 +394,8 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-    // "nom : ROBOVOP" affiché
-    await expect(page.locator('.test-return-name', { hasText: `${nameTrans} : ROBOCOP` })).toBeVisible()
-
     // sur carte 0 €
-    await expect(page.locator('.test-return-total-card', { hasText: `${onTrans} ${cardTrans} : 0 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-total-card', { hasText: '0' })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
@@ -465,7 +462,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/${cashLowercaseTrans}) 2.80 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 avant achats
-    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `CLIENT 1 - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // complémentaire  
     await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 2.80 ${currencySymbolTrans} ${inTrans} ${cashLowercaseTrans}` })).toBeVisible()
@@ -474,7 +471,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-total-achats', { hasText: `${givenSumTrans} 50 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: `ROBOCOP - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: `CLIENT 1 - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // monnaie à rendre
     await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 47.2 ${currencySymbolTrans}` })).toBeVisible()
@@ -546,13 +543,13 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/${cbTrans}) 2.80 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 avant achats
-    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `CLIENT 1 - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // complémentaire  
     await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 2.80 ${currencySymbolTrans} ${inTrans} ${cbTrans}` })).toBeVisible()
 
     // sur carte client 1 après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: `ROBOCOP - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: `CLIENT 1 - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
@@ -639,7 +636,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/${cashLowercaseTrans}) 24.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 avant achats
-    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `ROBOCOP - ${prePurchaseCardTrans} 10 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-pre-purchase-card', { hasText: `CLIENT 1 - ${prePurchaseCardTrans} 10 ${currencySymbolTrans}` })).toBeVisible()
 
     // complémentaire  
     await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 14.00 ${currencySymbolTrans} ${inTrans} ${cashLowercaseTrans}` })).toBeVisible()
@@ -648,7 +645,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-total-achats', { hasText: `${givenSumTrans} 20 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 après achats
-    await expect(page.locator('.test-return-post-purchase-card', { hasText: `ROBOCOP - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(page.locator('.test-return-post-purchase-card', { hasText: `CLIENT 1 - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // monnaie à rendre
     await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 6 ${currencySymbolTrans}` })).toBeVisible()

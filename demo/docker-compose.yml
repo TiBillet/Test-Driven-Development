@@ -1,0 +1,211 @@
+services:
+  #### FEDOW ####
+  fedow_django:
+    image: tibillet/fedow:latest
+    volumes:
+      - ./backup:/backup_tdd
+    extends:
+      file: ../../Fedow/docker-compose.yml
+      service: fedow_django
+    command: 'bash start_dev.sh'
+
+  fedow_memcached:
+    extends:
+      file: ../../Fedow/docker-compose.yml
+      service: fedow_memcached
+
+  fedow_nginx:
+    depends_on:
+      - fedow_django
+    extends:
+      file: ../../Fedow/docker-compose.yml
+      service: fedow_nginx
+    labels:
+      - traefik.http.routers.fedow_nginx.rule=Host(`fedow.$DOMAIN`)
+
+  #### LESPASS ####
+
+  lespass_postgres:
+    extends:
+      file: ../../Lespass/docker-compose.yml
+      service: lespass_postgres
+
+  lespass_memcached:
+    extends:
+      file: ../../Lespass/docker-compose.yml
+      service: lespass_memcached
+
+  lespass_redis:
+    extends:
+      file: ../../Lespass/docker-compose.yml
+      service: lespass_redis
+
+  lespass_django:
+    image: tibillet/lespass:latest
+    volumes:
+      - ./backup:/backup_tdd
+    extends:
+      file: ../../Lespass/docker-compose.yml
+      service: lespass_django
+    command: 'bash start_dev.sh'
+
+  lespass_celery:
+    image: tibillet/lespass:latest
+    extends:
+      file: ../../Lespass/docker-compose.yml
+      service: lespass_celery
+    command: "poetry run celery -A TiBillet worker -l INFO -B"
+
+  lespass_nginx:
+    extends:
+      file: ../../Lespass/docker-compose.yml
+      service: lespass_nginx
+    labels:
+      - traefik.http.routers.lespass_nginx.rule=Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`m.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`linterupteur.$DOMAIN`)
+    depends_on:
+      - lespass_django
+
+  #### CASHLESS 1 ####
+
+  laboutik_postgres:
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_postgres
+
+  laboutik_memcached:
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_memcached
+
+  laboutik_redis:
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_redis
+
+  laboutik_django:
+    image: tibillet/laboutik:latest
+    volumes:
+      - ./backup:/backup_tdd
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_django
+    command: 'bash start_dev.sh'
+
+
+  laboutik_celery:
+    image: tibillet/laboutik:latest
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_celery
+#    command: 'bash start_dev.sh'
+    command: 'bash start_celery.sh'
+
+
+  laboutik_nginx:
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_nginx
+    labels:
+      - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.$DOMAIN`)
+    depends_on:
+      - laboutik_django
+
+
+  #### LABOUTIK 2 ####
+
+  laboutik2_postgres:
+    env_file: ./demo_env_laboutik2
+    hostname: laboutik2_postgres
+    container_name: laboutik2_postgres
+    volumes:
+      - laboutik_postgres2_data:/var/lib/postgresql/data
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_postgres
+
+  laboutik2_memcached:
+    hostname: laboutik2_memcached
+    container_name: laboutik2_memcached
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_memcached
+
+  laboutik2_redis:
+    hostname: laboutik2_redis
+    container_name: laboutik2_redis
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_redis
+
+  laboutik2_django:
+    image: tibillet/laboutik:latest
+    hostname: laboutik2_django
+    container_name: laboutik2_django
+    volumes:
+      - ./backup:/backup_tdd
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_django
+    env_file: ./demo_env_laboutik2
+    links:
+      - laboutik2_postgres:postgres
+      - laboutik2_redis:redis
+      - laboutik2_memcached:memcached
+    command: 'bash start_dev.sh'
+
+  laboutik2_celery:
+    image: tibillet/laboutik:latest
+    hostname: laboutik2_celery
+    container_name: laboutik2_celery
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_celery
+    env_file: ./demo_env_laboutik2
+    links:
+      - laboutik2_postgres:postgres
+      - laboutik2_redis:redis
+      - laboutik2_memcached:memcached
+#    command: 'bash start_dev.sh'
+
+  laboutik2_nginx:
+    image: nginx
+    restart: always
+    container_name: laboutik2_nginx
+    hostname: laboutik2_nginx
+    depends_on:
+      - laboutik2_django
+    links:
+      - laboutik2_django:laboutik_django
+    volumes:
+      - ../../LaBoutik/www:/DjangoFiles/www
+      - ../../LaBoutik/logs:/DjangoFiles/logs
+      - ../../LaBoutik/nginx:/etc/nginx/conf.d
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      - traefik.http.routers.laboutik2_nginx.tls.certresolver=myresolver
+      - traefik.http.routers.laboutik2_nginx.rule=Host(`linterupteur.laboutik.$DOMAIN`)
+    networks:
+      - frontend
+      - laboutik_backend
+
+#TODO: a automatiser :
+
+# Pour cashless, créer le tenant sur Lespass avant.
+# poetry run ./manage.py new_tenant --name "linterupteur" --email "jturbeaux@pm.me" --dns "demo.tibillet.org"
+
+# Pour test stripe :
+# stripe listen --forward-to https://fedow.tibillet.localhost/webhook_stripe/ --skip-verify
+
+networks:
+  frontend:
+    external: true
+  fedow_backend:
+  lespass_backend:
+  laboutik_backend:
+
+volumes:
+  lespass_dev_db:
+  laboutik_postgres_data:
+  laboutik_postgres2_data:
+  fedow_database:

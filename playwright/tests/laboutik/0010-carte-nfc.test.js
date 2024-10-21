@@ -60,7 +60,6 @@ test.describe("Cashless, carte client 1", () => {
   })
 
   test("Check carte client 1, tests : bouton retour + sur carte = 0 + cotisation", async () => {
-
     // vidage carte client1
     await resetCardCashless(page, 'nfc-client1')
 
@@ -316,8 +315,8 @@ test.describe("Cashless, carte client 1", () => {
     }
 
     const adhesions = [
-      { name: 'Adhésion associative L’interrupteur', activation: 'today', place: 'Lespass' },
-      { name: 'Panier AMAP L’interrupteur', activation: 'today', place: 'Lespass' },
+      { name: "Adhésion associative Lespas'", activation: 'today', place: 'Lespass' },
+      { name: "Panier AMAP Lespas'", activation: 'today', place: 'Lespass' },
     ]
     for (let index = 0; index < adhesions.length; index++) {
       await expect(page.locator('.test-return-membership-item-name' + (index + 1), { hasText: adhesions[index].name })).toBeVisible()

@@ -148,11 +148,13 @@ export const resetCardCashless = async function (page, carte) {
 
   // attendre point de ventes, le titre contient "service directe" et "cashless"
   const titre = await getTranslate(page, 'directService', 'capitalize')
+
   await page.locator('.navbar-horizontal .titre-vue', { hasText: titre }).waitFor({ state: 'visible' })
   await page.locator('.navbar-horizontal .titre-vue', { hasText: 'Cashless' }).waitFor({ state: 'visible' })
 
+  // ------------------ Attention "VIDER CARTE" et "VOID CARTE" ont la même méthode -------------------------
   // vider carte / clean card
-  await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[methode="ViderCarte"]').click()
+  await page.locator('#products div[data-name-pdv="Cashless"] bouton-article[methode="ViderCarte"]', { hasText: 'VIDER CARTE' }).click()
 
   // valider vider carte
   await page.locator('#bt-valider').click()

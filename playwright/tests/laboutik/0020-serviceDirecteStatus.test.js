@@ -223,9 +223,9 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
 		}
 
 		const adhesions = [
-			{ name: 'Adhésion associative L’interrupteur', activation: 'today', place: 'Lespass' },
-			{ name: 'Panier AMAP L’interrupteur', activation: 'today', place: 'Lespass' },
-		]
+      { name: "Adhésion associative Lespas'", activation: 'today', place: 'Lespass' },
+      { name: "Panier AMAP Lespas'", activation: 'today', place: 'Lespass' },
+    ]
 		for (let index = 0; index < adhesions.length; index++) {
 			await expect(page.locator('.test-return-membership-item-name' + (index + 1), { hasText: adhesions[index].name })).toBeVisible()
 			await expect(page.locator('.test-return-membership-item-activation' + (index + 1), { hasText: adhesions[index].activation })).toBeVisible()

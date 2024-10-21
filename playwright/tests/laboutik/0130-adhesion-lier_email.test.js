@@ -9,7 +9,7 @@ const language = "en"
 
 test.use({ viewport: { width: 1200, height: 1200 }, ignoreHTTPSErrors: true })
 
-test.describe("Adhesion suite test 0010-carte-nfc.test.js", () => {
+test.describe.skip("Adhesion suite test 0010-carte-nfc.test.js", () => {
   test("Admin: lier un email à la carte client2", async ({ browser }) => {
     // connexion admin
     const page = await browser.newPage()

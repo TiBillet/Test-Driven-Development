@@ -51,9 +51,21 @@ You have to do the same with : `lespass_django` and `laboutik_django`
 
 #### Playright test
 
-This is the end to end test, with a headless chrome.
+Automatic launch of the test environment by the "start_dev" script,
+Consider changing the "ROOT_PATH"
 
-#TODO: Nico ? :)
+This is the end to end test, with a headless chrome :
+```bash
+# in playwright container
+docker exec -ti playwright bash
+clear && npx playwright test tests/laboutik/
+# if error think install the requested dependencies
+```
+
+Reset all environment; in one container :
+- Ctrl + c
+- tmux kill-server
+- Automatic launch of the test environment by the "start_dev" script
 
 #### Python Test
 

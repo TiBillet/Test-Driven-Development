@@ -7,6 +7,7 @@ import { test, expect, chromium } from '@playwright/test'
 import { env } from './env.js'
 import * as IP from "ip"
 import Big from './big.js'
+import { log } from "console"
 
 /**
  * Connexion laboutik, connexion admin + voir le site
@@ -206,16 +207,18 @@ export const confirmation = async function (page, typePaiement, sommeDonnee, com
     // text contient "ESPECE" + fonction attendue
     if (typePaiement === 'espece') {
       const paymentType = await getTranslate(page, 'cash')
+      console.log('confirmation, paymentType =', paymentType)
+      
       await expect(page.locator('.test-return-payment-method')).toHaveText(paymentType)
 
       foncAttendue = 'validateGivenSum(\'vue_pv.obtenirIdentiteClientSiBesoin\')'
+      //foncAttendue = "keyboard.hide();validateGivenSum('vue_pv.obtenirIdentiteClientSiBesoin');"
       if (complementaire === true) {
         foncAttendue = 'vue_pv.validerEtapeMoyenComplementaire(\'espece\')'
       }
 
       // innsérer la valeur "sommeDonnee"
       await page.locator('#given-sum').fill(sommeDonnee.toString())
-
     }
 
     // text contient "CB" + fonction attendue
@@ -239,7 +242,6 @@ export const confirmation = async function (page, typePaiement, sommeDonnee, com
     await expect(page.locator('#popup-confirme-retour')).toBeVisible()
   })
 }
-
 
 /**
  * Créditer de la monnaie sur une carte  cashless

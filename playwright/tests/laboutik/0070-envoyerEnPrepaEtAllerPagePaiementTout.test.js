@@ -263,7 +263,7 @@ test.describe('Envoyer en préparation et aller à la page de paiement, payer "T
 
     // #popup-cashless éffacé
     await expect(page.locator('#popup-cashless')).toBeHidden()
-    
+
     await page.close()
   })
 })

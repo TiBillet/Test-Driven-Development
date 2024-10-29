@@ -1,4 +1,4 @@
-// cashless_demo1.env DEBUG=True / DEMO=True / language = fr
+// cashless_demo1.env DEBUG=True / DEMO=True / language = en
 import { test, expect } from '@playwright/test'
 import { connection, getTranslate, changeLanguage, goPointSale, selectArticles, checkBillDirectService, setPointSale } from '../../mesModules/commun.js'
 import { env } from '../../mesModules/env.js'

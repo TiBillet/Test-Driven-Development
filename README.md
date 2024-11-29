@@ -49,24 +49,46 @@ You have to do the same with : `lespass_django` and `laboutik_django`
 
 ### Test
 
+#### créer le réseau "frontend" pour l'environnement de dev
+```bash
+docker network create frontend
+```
+
+#### modifier la variable ROOT_PATH dans le script star_dev
+exemple: ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
+
+#### Vérifier que vos fichiers d'env sont correctes
+
+#### Supprimer les sessions byobu / tmux 
+```bash
+tmux kill-server
+```
+
+#### Lancer l'environnement de dev (dans le dossier Test-Driven-Development)
+```bash
+./start_dev
+```
+
 #### Playright test
-
-Automatic launch of the test environment by the "start_dev" script,
-Consider changing the "ROOT_PATH"
-
 This is the end to end test, with a headless chrome :
 ```bash
 # in playwright container
 docker exec -ti playwright bash
+npm i
 clear && npx playwright test tests/laboutik/
-# if error think install the requested dependencies
+# think install the requested dependencies and restart the previus command
 ```
 
-Reset all environment; in one container :
+#### Relancer l'environnement de dev
 - Ctrl + c
 - tmux kill-server
-- Automatic launch of the test environment by the "start_dev" script
+- ./start_dev
+
+#### Si problèmes docker (pour une nouvelle installation des containers de dev)
+```bash
+docker system prune -a
+```
+- Relancer l'étape Test
 
 #### Python Test
-
 Flush the 3 container and run `./manage.py test` on the `laboutik_django` container

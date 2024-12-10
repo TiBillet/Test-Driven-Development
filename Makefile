@@ -1,6 +1,6 @@
 # containers and app serving, preserving data
 
-up: traefik_check
+up:
 	@echo "📦 Starting containers…"
 	@docker compose up -d
 	@echo "🟢 Testing containers ready!"

@@ -192,7 +192,7 @@ services:
 #TODO: a automatiser :
 
 # Pour cashless, créer le tenant sur Lespass avant.
-# poetry run ./manage.py new_tenant --name "linterupteur" --email "jturbeaux@pm.me" --dns "demo.tibillet.org"
+# poetry run ./manage.py new_tenant --name "L'interupteur" --email "jturbeaux@pm.me" --dns "demo.tibillet.org"
 
 # Pour test stripe :
 # stripe listen --forward-to https://fedow.tibillet.localhost/webhook_stripe/ --skip-verify

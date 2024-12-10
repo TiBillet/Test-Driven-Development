@@ -49,19 +49,25 @@ You have to do the same with : `lespass_django` and `laboutik_django`
 
 ### Test
 
-#### créer le réseau "frontend" pour l'environnement de dev
+##### Prérequis
+###### créer le réseau "frontend" pour l'environnement de dev
 ```bash
 docker network create frontend
 ```
 
-#### modifier la variable ROOT_PATH dans le script star_dev
+###### modifier la variable ROOT_PATH dans le script star_dev
 exemple: ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
 
-#### Vérifier que vos fichiers d'env sont correctes
+###### Vérifier que vos fichiers d'env sont correctes
 
-#### Supprimer les sessions byobu / tmux 
+###### Supprimer les sessions byobu / tmux 
 ```bash
 tmux kill-server
+```
+
+#### Construire et arrêter les containers de chaque dépôts (Fedow, Lespass, LaBoutik)
+```bash
+docker compose up -d && docker compose down
 ```
 
 #### Lancer l'environnement de dev (dans le dossier Test-Driven-Development)

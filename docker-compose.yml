@@ -130,6 +130,8 @@ services:
     extends:
       file: ../LaBoutik/docker-compose.yml
       service: laboutik_django
+    ports:
+      - 8000:8000
     command: 'bash start_dev.sh'
     extra_hosts:
       - fedow.tibillet.localhost:172.17.0.1

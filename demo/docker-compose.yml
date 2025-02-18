@@ -112,82 +112,82 @@ services:
 
 
   #### LABOUTIK 2 ####
-#
-#  laboutik2_postgres:
-#    env_file: ./demo_env_laboutik2
-#    hostname: laboutik2_postgres
-#    container_name: laboutik2_postgres
-#    volumes:
-#      - laboutik_postgres2_data:/var/lib/postgresql/data
-#    extends:
-#      file: ../../LaBoutik/docker-compose.yml
-#      service: laboutik_postgres
-#
-#  laboutik2_memcached:
-#    hostname: laboutik2_memcached
-#    container_name: laboutik2_memcached
-#    extends:
-#      file: ../../LaBoutik/docker-compose.yml
-#      service: laboutik_memcached
-#
-#  laboutik2_redis:
-#    hostname: laboutik2_redis
-#    container_name: laboutik2_redis
-#    extends:
-#      file: ../../LaBoutik/docker-compose.yml
-#      service: laboutik_redis
-#
-#  laboutik2_django:
-#    image: tibillet/laboutik:latest
-#    hostname: laboutik2_django
-#    container_name: laboutik2_django
-#    volumes:
-#      - ./backup:/backup_tdd
-#    extends:
-#      file: ../../LaBoutik/docker-compose.yml
-#      service: laboutik_django
-#    env_file: ./demo_env_laboutik2
-#    links:
-#      - laboutik2_postgres:postgres
-#      - laboutik2_redis:redis
-#      - laboutik2_memcached:memcached
+
+  laboutik2_postgres:
+    env_file: ./demo_env_laboutik2
+    hostname: laboutik2_postgres
+    container_name: laboutik2_postgres
+    volumes:
+      - laboutik_postgres2_data:/var/lib/postgresql/data
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_postgres
+
+  laboutik2_memcached:
+    hostname: laboutik2_memcached
+    container_name: laboutik2_memcached
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_memcached
+
+  laboutik2_redis:
+    hostname: laboutik2_redis
+    container_name: laboutik2_redis
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_redis
+
+  laboutik2_django:
+    image: tibillet/laboutik:latest
+    hostname: laboutik2_django
+    container_name: laboutik2_django
+    volumes:
+      - ./backup:/backup_tdd
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_django
+    env_file: ./demo_env_laboutik2
+    links:
+      - laboutik2_postgres:postgres
+      - laboutik2_redis:redis
+      - laboutik2_memcached:memcached
+    command: 'bash start_dev.sh'
+
+  laboutik2_celery:
+    image: tibillet/laboutik:latest
+    hostname: laboutik2_celery
+    container_name: laboutik2_celery
+    extends:
+      file: ../../LaBoutik/docker-compose.yml
+      service: laboutik_celery
+    env_file: ./demo_env_laboutik2
+    links:
+      - laboutik2_postgres:postgres
+      - laboutik2_redis:redis
+      - laboutik2_memcached:memcached
 #    command: 'bash start_dev.sh'
-#
-#  laboutik2_celery:
-#    image: tibillet/laboutik:latest
-#    hostname: laboutik2_celery
-#    container_name: laboutik2_celery
-#    extends:
-#      file: ../../LaBoutik/docker-compose.yml
-#      service: laboutik_celery
-#    env_file: ./demo_env_laboutik2
-#    links:
-#      - laboutik2_postgres:postgres
-#      - laboutik2_redis:redis
-#      - laboutik2_memcached:memcached
-##    command: 'bash start_dev.sh'
-#
-#  laboutik2_nginx:
-#    image: nginx
-#    restart: always
-#    container_name: laboutik2_nginx
-#    hostname: laboutik2_nginx
-#    depends_on:
-#      - laboutik2_django
-#    links:
-#      - laboutik2_django:laboutik_django
-#    volumes:
-#      - ../../LaBoutik/www:/DjangoFiles/www
-#      - ../../LaBoutik/logs:/DjangoFiles/logs
-#      - ../../LaBoutik/nginx:/etc/nginx/conf.d
-#    labels:
-#      - traefik.enable=true
-#      - traefik.docker.network=frontend
-#      - traefik.http.routers.laboutik2_nginx.tls.certresolver=myresolver
-#      - traefik.http.routers.laboutik2_nginx.rule=Host(`linterupteur.laboutik.$DOMAIN`)
-#    networks:
-#      - frontend
-#      - laboutik_backend
+
+  laboutik2_nginx:
+    image: nginx
+    restart: always
+    container_name: laboutik2_nginx
+    hostname: laboutik2_nginx
+    depends_on:
+      - laboutik2_django
+    links:
+      - laboutik2_django:laboutik_django
+    volumes:
+      - ../../LaBoutik/www:/DjangoFiles/www
+      - ../../LaBoutik/logs:/DjangoFiles/logs
+      - ../../LaBoutik/nginx:/etc/nginx/conf.d
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      - traefik.http.routers.laboutik2_nginx.tls.certresolver=myresolver
+      - traefik.http.routers.laboutik2_nginx.rule=Host(`linterupteur.laboutik.$DOMAIN`)
+    networks:
+      - frontend
+      - laboutik_backend
 
 #TODO: a automatiser :
 

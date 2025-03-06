@@ -7,6 +7,7 @@ export const env = {
   pinCodeServer: 'https://discovery.tibillet.coop',
   tagIdClient2: '52BE6543',
   tagIdCm: 'EE144CE8',
-  tagIdClient1: '41726643'
+  tagIdClient1: '41726643',
+  
 }
 

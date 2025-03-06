@@ -20,3 +20,8 @@ docker exec -ti playwright bash
 ```
 npx playwright test tests/laboutik/
 ```
+
+## Lancer les tests "LesPass" avec le visuel du navigateur(sans docker/conteneur) 
+```
+npx playwright test tests/lespass/ --headed
+```

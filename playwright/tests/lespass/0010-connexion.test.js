@@ -20,11 +20,9 @@ test.describe("Lespass", () => {
     // aller web mail YOPmail.com avec compte testyoyo974
     await page.goto('https://yopmail.com/')
 
-await page.pause()
-
     // consentir
     await page.locator('button[aria-label="Consent"]').click()
-    
+
     // entrer email
     await page.locator('#login').fill(email)
 
@@ -40,7 +38,7 @@ await page.pause()
     // await page.goto(env.domain + env.adminLink)
     await page.goto(domain)
 
-    // clique bt "'Me connecter'"
+    // clique bt "Me connecter"
     await page.locator('nav button[aria-controls="loginPanel"]').click()
 
     const inputEmail = page.locator('#loginEmail')
@@ -75,6 +73,7 @@ await page.pause()
 
   test("Confirmer  email ", async ({ browser }) => {
     page = await browser.newPage()
+    await page.pause()
     // aller web mail YOPmail.com avec compte testyoyo974
     await page.goto('https://yopmail.com/')
 
@@ -94,7 +93,7 @@ await page.pause()
     await page.close()
   })
 
-  test("Test confirmation email ", async ({ browser }) => {
+  test("Test login email ", async ({ browser }) => {
     page = await browser.newPage()
     // go lespass avec url de confirmation
     await page.goto(urlConfirmation)

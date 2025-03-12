@@ -14,7 +14,7 @@ test.use({
   ignoreHTTPSErrors: true
 })
 
-
+// attention test ignorer 
 test.describe.skip("Admin tets", () => {
   test("Création d'un espace", async ({ browser }) => {
     const context = await browser.newContext()

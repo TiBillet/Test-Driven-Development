@@ -14,11 +14,11 @@ reload: down up
 
 serve: tibillet_check
 	@echo "🦄 Starting Fedow…"
-	@./timed_exec.sh fedow_django "poetry run ./manage.py runserver 0.0.0.0:8000" 10
+	@./timed_exec.sh fedow_django "poetry run ./manage.py runserver 0.0.0.0:8000" 15
 	@echo "🦄 Starting Lespass…"
 	@./timed_exec.sh lespass_django "poetry run ./manage.py runserver 0.0.0.0:8000" 10
 	@echo "🦄 Starting LaBoutik…"
-	@./timed_exec.sh laboutik_django "poetry run ./manage.py runserver 0.0.0.0:8000" 10
+	@./timed_exec.sh laboutik_django "poetry run ./manage.py runserver 0.0.0.0:8000" 15
 	@make -s ready_urls
 
 # hard initialisation and reset
@@ -44,6 +44,7 @@ reset: erase up flush
 ready_urls:
 	@echo "🟢 Federation app ready at http://fedow.tibillet.localhost/dashboard"
 	@echo "🟢 Ticketing app ready at http://lespass.tibillet.localhost"
+	@echo "└─ Or scan demo card at https://lespass.tibillet.localhost/qr/c2b2400c-1f7e-4305-b75e-8c1db3f8d113/"
 	@echo "🟢 Register app ready at http://laboutik.tibillet.localhost"
 
 traefik_check:

@@ -244,10 +244,10 @@ services:
       - ./playwright:/playwright
     tty: true
     command: "/bin/bash"
-    extra_hosts:
-      - fedow.tibillet.localhost:172.17.0.1
-      - lespass.tibillet.localhost:172.17.0.1
-      - laboutik.tibillet.localhost:172.17.0.1
+    # extra_hosts:
+    #   - fedow.tibillet.localhost:172.17.0.1
+    #   - lespass.tibillet.localhost:172.17.0.1
+    #   - laboutik.tibillet.localhost:172.17.0.1
 
 # Pour test stripe :
 # stripe listen --forward-to https://fedow.tibillet.localhost/webhook_stripe/ --skip-verify

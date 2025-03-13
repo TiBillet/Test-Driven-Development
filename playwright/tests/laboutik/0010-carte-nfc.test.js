@@ -13,9 +13,6 @@ import {
   connection, changeLanguage, resetCardCashless, creditMoneyOnCardCashless, creditGiftMoneyOnCardCashless,
   getTranslate, getStyleValue, goPointSale, selectArticles
 } from '../../mesModules/commun.js'
-import { env } from '../../mesModules/env.js'
-import { log } from 'console'
-
 
 // attention la taille d'écran choisie affiche le menu burger
 let page, currencySymbolTrans, transactionTrans, okTrans, totalTrans, cardTrans, returnTrans, cashTrans, cbTrans

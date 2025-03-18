@@ -312,12 +312,11 @@ test.describe("Cashless, carte client 1", () => {
       await expect(page.locator('.test-return-monnaie-item-place' + (index + 1), { hasText: assets[index].place })).toBeVisible()
     }
 
-    await page.pause()
-
-    // adhésions : ("Adhésion (Le Tiers-Lustre) Annuelle",prix: 20 ), ("Panier AMAP (Le Tiers-Lustre) Annuelle",  prix: 400 )
+    // TODO: pour dépanner, changera dans le futur
+    // attention pour activation: 'today' devra être une variable traduite 
     const adhesions = [
-      { name: "Adhésion associative Lespas'", activation: 'today', place: 'Lespass' },
-      { name: "Panier AMAP Lespas'", activation: 'today', place: 'Lespass' },
+      { name: "Adhésion (Le Tiers-Lustre) Le Tiers-Lustre", activation: 'today', place: 'Lespass' },
+      { name: "Panier AMAP (Le Tiers-Lustre) Le Tiers-Lustre", activation: 'today', place: 'Lespass' },
     ]
     for (let index = 0; index < adhesions.length; index++) {
       await expect(page.locator('.test-return-membership-item-name' + (index + 1), { hasText: adhesions[index].name })).toBeVisible()

@@ -11,7 +11,7 @@ DEMO_TAGID_CLIENT2='52BE6543' carte anonyme
 import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, resetCardCashless, creditMoneyOnCardCashless, creditGiftMoneyOnCardCashless,
-  getTranslate, getStyleValue, goPointSale, selectArticles
+  getTranslate, getStyleValue, goPointSale, selectArticles, getEntity
 } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -37,7 +37,8 @@ test.describe("Cashless, carte client 1", () => {
     await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
 
     // obtenir les traductions qui seront utilisées
-    currencySymbolTrans = await getTranslate(page, 'currencySymbol')
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
     transactionTrans = await getTranslate(page, 'transaction', 'capitalize')
     okTrans = await getTranslate(page, 'ok')
     totalTrans = await getTranslate(page, 'total', 'capitalize')
@@ -231,7 +232,7 @@ test.describe("Cashless, carte client 1", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: 'Adhésions' })).toBeVisible()
 
     // sélection de 2 adhésions
-    const listeArticles = [{ nom: "Adhésion associative Annuelle", nb: 1, prix: 20 }, { nom: "Panier AMAP Annuel", nb: 1, prix: 400 }]
+    const listeArticles = [{ nom: "Adhésion (Le Tiers-Lustre) Annuelle", nb: 1, prix: 20 }, { nom: "Panier AMAP (Le Tiers-Lustre) Annuelle", nb: 1, prix: 400 }]
     await selectArticles(page, listeArticles, "Adhésions")
 
     // valider achats
@@ -241,7 +242,7 @@ test.describe("Cashless, carte client 1", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // paiement par cb
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: cbTrans }).click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]', { hasText: cbTrans }).click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -311,6 +312,9 @@ test.describe("Cashless, carte client 1", () => {
       await expect(page.locator('.test-return-monnaie-item-place' + (index + 1), { hasText: assets[index].place })).toBeVisible()
     }
 
+    await page.pause()
+
+    // adhésions : ("Adhésion (Le Tiers-Lustre) Annuelle",prix: 20 ), ("Panier AMAP (Le Tiers-Lustre) Annuelle",  prix: 400 )
     const adhesions = [
       { name: "Adhésion associative Lespas'", activation: 'today', place: 'Lespass' },
       { name: "Panier AMAP Lespas'", activation: 'today', place: 'Lespass' },

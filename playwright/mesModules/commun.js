@@ -55,7 +55,7 @@ export const goPointSale = async function (page, menu) {
     // Clique sur le menu POINTS DE VENTES
     await page.locator('#menu-burger-conteneur div[data-i8n*="pointOfSales"]').click()
 
-    // Click #menu-burger-conteneur >> text=Bar 1
+    // Clique sur le point de vente donné
     await page.locator('#menu-burger-conteneur >> text=' + menu.toUpperCase()).click()
   })
 }
@@ -206,7 +206,7 @@ export const confirmation = async function (page, typePaiement, sommeDonnee, com
     if (typePaiement === 'espece') {
       const paymentType = await getTranslate(page, 'cash')
       console.log('confirmation, paymentType =', paymentType)
-      
+
       await expect(page.locator('.test-return-payment-method')).toHaveText(paymentType)
 
       foncAttendue = 'validateGivenSum(\'vue_pv.obtenirIdentiteClientSiBesoin\')'
@@ -283,7 +283,7 @@ export const creditMoneyOnCardCashless = async function (page, carte, nbXCredit1
     // payer en espèces + confirmation -- cash-uppercase
     if (paiement === undefined || paiement === 'espece') {
       const cashPaymentTrans = await getTranslate(page, 'cash', 'uppercase')
-      await page.locator(`#popup-cashless bouton-basique >> text=${cashPaymentTrans}`).click()
+      await page.locator(`#popup-cashless div[class="paiement-bt-container test-ref-cash"] >> text=${cashPaymentTrans}`).click()
       // confirmer sans test le choix "espèce"
       await confirmation(page, 'espece', sommeDonnee)
     }
@@ -291,7 +291,7 @@ export const creditMoneyOnCardCashless = async function (page, carte, nbXCredit1
     // payer par CB + confirmation -- cb-uppercase
     if (paiement === 'cb') {
       const creditCardPaymentTrans = await getTranslate(page, 'cb', 'uppercase')
-      await page.locator(`#popup-cashless bouton-basique >> text=${creditCardPaymentTrans}`).click()
+      await page.locator(`#popup-cashless div[class="paiement-bt-container test-ref-cb"] >> text=${creditCardPaymentTrans}`).click()
       // confirmer sans test le choix "cb"
       await confirmation(page, 'cb')
     }
@@ -584,7 +584,6 @@ export const setPointSale = async function (pointSale, options) {
   })
 }
 
-
 export const getStyleValue = async function (page, selector, property) {
   return await page.evaluate(async ([selector, property]) => {
     const propertys = document.defaultView.getComputedStyle(document.querySelector(selector))
@@ -599,13 +598,20 @@ export const getStyleValueFromLocator = async function (locator, property) {
   }, [property])
 }
 
-export const getTranslate = async function (page, indexTrad, option) {
-  return await page.evaluate(async ([indexTrad, option]) => {
+export const getTranslate = async function (page, indexTrad, option, method) {
+  return await page.evaluate(async ([indexTrad, option, method]) => {
     // attenttion supprimer tous les "\n"  de la traductuion
-    return getTranslate(indexTrad, option).replace(/\n/g, "")
-  }, [indexTrad, option])
+    return getTranslate(indexTrad, option, method).replace(/\n/g, "")
+  }, [indexTrad, option, method])
 }
 
+export const getEntity = async function (page, htmlEntity) {
+  return await page.evaluate(async ([htmlEntity]) => {
+    const ele = document.createElement("ele");
+    ele.innerHTML = htmlEntity;
+    return ele.textContent;
+  }, [htmlEntity])
+}
 
 export const getLocale = async function (page) {
   return await page.evaluate(async () => {

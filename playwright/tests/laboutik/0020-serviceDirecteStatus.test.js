@@ -1,6 +1,6 @@
 // cashless_demo1.env DEBUG=True / DEMO=True / language = fr
 import { test, expect } from '@playwright/test'
-import { connection, getTranslate, changeLanguage, goPointSale, selectArticles, checkBillDirectService, setPointSale } from '../../mesModules/commun.js'
+import { connection, getTranslate, changeLanguage, goPointSale, selectArticles, setPointSale, getEntity } from '../../mesModules/commun.js'
 
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -35,12 +35,13 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
 		await page.waitForLoadState('networkidle')
 
 		// obtenir les traductions pour ce test et tous les autres
+		const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+		currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
 		directServiceTrans = await getTranslate(page, 'directService', 'capitalize')
 		cashTrans = await getTranslate(page, 'cash', 'uppercase')
 		cbTrans = await getTranslate(page, 'cb', 'uppercase')
 		paiementTypeTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
 		returnTrans = await getTranslate(page, 'return', 'uppercase')
-		currencySymbolTrans = await getTranslate(page, 'currencySymbol')
 		totalTrans = await getTranslate(page, 'total', 'capitalize')
 		selectTableTrans = await getTranslate(page, 'selectTable', 'capitalize')
 		validateTrans = await getTranslate(page, 'validate', 'uppercase')
@@ -95,19 +96,20 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
 		await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
 		// moyen de paiement "CASHLESS" présent
-		await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: 'CASHLESS' })).toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]', { hasText: 'CASHLESS' })).toBeVisible()
+
 		// Total pour moyen de paiement "CASHLESS" 6.5 €|$
-		await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
 
 		// moyen de paiement "ESPECE" présent
-		await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]', { hasText: cashTrans })).toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]', { hasText: cashTrans })).toBeVisible()
 		// Total pour moyen de paiement "ESPECE" 6.5 €|$
-		await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
 
 		// moyen de paiement "CB" présent
-		await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: cbTrans })).toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]', { hasText: cbTrans })).toBeVisible()
 		// Total pour moyen de paiement "CB" 6.5 €|$
-		await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]', { hasText: `${totalTrans} 6.5 ${currencySymbolTrans}` })).toBeVisible()
 
 		// bouton retour
 		await expect(page.locator('#popup-cashless bouton-basique >> text=' + returnTrans)).toBeVisible()
@@ -151,9 +153,9 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
 		await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
 		// moyens de paiement présents
-		await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: 'CASHLESS' })).toBeVisible()
-		await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]', { hasText: cashTrans })).not.toBeVisible()
-		await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: cbTrans })).not.toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]', { hasText: 'CASHLESS' })).toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]', { hasText: cashTrans })).not.toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]', { hasText: cbTrans })).not.toBeVisible()
 
 		// bouton retour
 		await expect(page.locator('#popup-cashless bouton-basique >> text=' + returnTrans)).toBeVisible()
@@ -222,10 +224,12 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
 			await expect(page.locator('.test-return-monnaie-item-place' + (index + 1), { hasText: assets[index].place })).toBeVisible()
 		}
 
+		// TODO: pour dépanner, changera dans le futur
+		// attention pour activation: 'today' devra être une variable traduite 
 		const adhesions = [
-      { name: "Adhésion associative Lespas'", activation: 'today', place: 'Lespass' },
-      { name: "Panier AMAP Lespas'", activation: 'today', place: 'Lespass' },
-    ]
+			{ name: "Adhésion (Le Tiers-Lustre) Le Tiers-Lustre", activation: 'today', place: 'Lespass' },
+			{ name: "Panier AMAP (Le Tiers-Lustre) Le Tiers-Lustre", activation: 'today', place: 'Lespass' },
+		]
 		for (let index = 0; index < adhesions.length; index++) {
 			await expect(page.locator('.test-return-membership-item-name' + (index + 1), { hasText: adhesions[index].name })).toBeVisible()
 			await expect(page.locator('.test-return-membership-item-activation' + (index + 1), { hasText: adhesions[index].activation })).toBeVisible()
@@ -249,12 +253,12 @@ test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {
 		// pression 33
 		await expect(page.locator('#achats-liste .achats-ligne', { hasText: 'Pression 33' }).locator('.achats-col-qte')).toHaveText('2')
 		await expect(page.locator('#achats-liste .achats-ligne', { hasText: 'Pression 33' }).locator('.achats-ligne-produit-contenu')).toHaveText('Pression 33')
-		await expect(page.locator('#achats-liste .achats-ligne', { hasText: 'Pression 33' }).locator('.achats-col-prix-contenu')).toHaveText('2€')
+		await expect(page.locator('#achats-liste .achats-ligne', { hasText: 'Pression 33' }).locator('.achats-col-prix-contenu')).toHaveText('2'+ currencySymbolTrans)
 
 		// pression 50
 		await expect(page.locator('#achats-liste .achats-ligne', { hasText: 'Pression 50' }).locator('.achats-col-qte')).toHaveText('1')
 		await expect(page.locator('#achats-liste .achats-ligne', { hasText: 'Pression 50' }).locator('.achats-ligne-produit-contenu')).toHaveText('Pression 50')
-		await expect(page.locator('#achats-liste .achats-ligne', { hasText: 'Pression 50' }).locator('.achats-col-prix-contenu')).toHaveText('2.5€')
+		await expect(page.locator('#achats-liste .achats-ligne', { hasText: 'Pression 50' }).locator('.achats-col-prix-contenu')).toHaveText('2.5' + currencySymbolTrans)
 
 		// clique sur RESET
 		await page.locator('#page-commandes-footer div[onclick="vue_pv.rezet_commandes();"]').click()

@@ -1,11 +1,8 @@
 // cashless_demo1.env DEBUG=True / DEMO=True / language = en
 import { test, devices, expect } from '@playwright/test'
 import {
-  connection, changeLanguage, goPointSale, selectArticles,
-  checkBillDirectService, getStyleValue, getTranslate,
-  newOrderIsShow, goTableOrder, articlesListIsVisible,
-  bigToFloat, totalListeArticles, getLocale, getStyleValueFromLocator,
-  checkAlreadyPaidBill
+  connection, changeLanguage, goPointSale, selectArticles, checkBillDirectService, getStyleValue, getTranslate,
+  newOrderIsShow, goTableOrder, articlesListIsVisible, bigToFloat, totalListeArticles, checkAlreadyPaidBill, getEntity
 } from '../../mesModules/commun.js'
 import { env } from '../../mesModules/env.js'
 
@@ -31,9 +28,10 @@ test.describe("Commandes", () => {
     await changeLanguage(page, language)
 
     // obtenir les traductions pour ce test et tous les autres
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
     selTableTrans = await getTranslate(page, 'selectTable', 'capitalize')
     totalUppercaseTrans = await getTranslate(page, 'total', 'uppercase')
-    currencySymbolTrans = await getTranslate(page, 'currencySymbol')
     returnTrans = await getTranslate(page, 'return', 'uppercase')
     transactionTrans = await getTranslate(page, 'transaction', 'capitalize')
     okTrans = await getTranslate(page, 'ok')
@@ -154,7 +152,6 @@ test.describe("Commandes", () => {
     // visuel table1 à une commande/préparation = 'rgb(255, 0, 0)'
     backGroundColor = await getStyleValue(page, '#tables-liste div[data-id-table="1"] .table-etat', 'backgroundColor')
     expect(backGroundColor).toEqual('rgb(255, 0, 0)')
-
   })
 
   test('Etat commande table S01 (non payée).', async () => {
@@ -183,6 +180,7 @@ test.describe("Commandes", () => {
 
     // total de "reste à payer" = 37
     const resteApayer = bigToFloat(totalListeArticles(listeArticles)).toString() + currencySymbolTrans
+    console.log('resteApayer =', resteApayer);
     await expect(page.locator('#addition-reste-a-payer', { hasText: resteApayer })).toBeVisible()
   })
 
@@ -283,6 +281,7 @@ test.describe("Commandes", () => {
     await expect(locPression33).not.toHaveCSS('opacity', '0.5')
   })
 
+
   test('Préparation table S01, 2 commandes, valider la  2ème commande(Pression 33); status: servie et non payé  ', async () => {
     // valider la préparation de la commande contenant 'Pression 33' et attend le retour des préparations
     const [response] = await Promise.all([
@@ -320,7 +319,7 @@ test.describe("Commandes", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélectionner paiement cb
-    await page.locator('bouton-basique[class="test-ref-cb"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -342,6 +341,7 @@ test.describe("Commandes", () => {
 
     // clique bt "Adition" -> aller dans l'addition
     await page.locator(`#commandes-table-menu div >> text=${additionCapitalizeTrans}`).click()
+
 
     // 2 pression 33 bien présentes dans l'addition
     const listeArticlesDejaPayes = [{ nom: "Pression 33", nb: 2, prix: 2 }]
@@ -394,7 +394,7 @@ test.describe("Commandes", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélectionner paiement cb
-    await page.locator('bouton-basique[class="test-ref-cb"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -440,8 +440,6 @@ test.describe("Commandes", () => {
     await expect(locPression33.locator('.test-ref-status-order', { hasText: transSP })).toBeVisible()
     // fond de la commande contenant 'Pression 33' grisé
     await expect(locPression33).toHaveCSS('opacity', '0.5')
-
-
   })
 
   test('Table S01 libre', async () => {
@@ -460,4 +458,5 @@ test.describe("Commandes", () => {
 
     await page.close()
   })
+
 })

@@ -11,7 +11,8 @@ npm install @playwright/test
 
 ### Tests LaBoutik
 ```
- npx playwright test tests/laboutik/ --headed
+cd playwright
+npx playwright test tests/laboutik/ --headed
 
 ```
 

@@ -395,7 +395,8 @@ export const checkBillDirectService = async function (page, list) {
     await expect(page.locator('#achats-liste .achats-ligne')).toHaveCount(list.length)
 
     // monnaie
-    const monnaie = await getTranslate(page, 'currencySymbol')
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    const monnaie = await getEntity(page, currencySymbolTransTempo)
 
     // articles de l'addition identique à liste articles
     for (const listKey in list) {
@@ -420,7 +421,8 @@ export const checkBill = async function (page, list) {
     await expect(page.locator('#addition-liste .test-addition-article-ligne')).toHaveCount(list.length)
 
     // monnaie
-    const monnaie = await getTranslate(page, 'currencySymbol')
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    const monnaie = await getEntity(page, currencySymbolTransTempo)
 
     // articles de l'addition identique à liste articles
     for (const listKey in list) {
@@ -441,7 +443,8 @@ export const checkBill = async function (page, list) {
 export const checkAlreadyPaidBill = async function (page, list) {
   await test.step('Sélectionner les articles.', async () => {
     // monnaie
-    const monnaie = await getTranslate(page, 'currencySymbol')
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    const monnaie = await getEntity(page, currencySymbolTransTempo)
 
     // nombre de ligne de l'addition
     await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb')).toHaveCount(list.length)
@@ -450,7 +453,7 @@ export const checkAlreadyPaidBill = async function (page, list) {
       const article = list[listKey]
       await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: article.nom }).locator('.addition-col-qte')).toHaveText(article.nb.toString())
       await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: article.nom }).locator('.addition-col-produit div')).toHaveText(article.nom)
-      await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: article.nom }).locator('.addition-col-prix div')).toHaveText(article.prix.toString() + monnaie)
+      await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: article.nom }).locator('.addition-col-prix div')).toHaveText(article.prix.toString() + ' ' + monnaie)
     }
   })
 }

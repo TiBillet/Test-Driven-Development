@@ -1,6 +1,9 @@
 // cashless_demo1.env DEBUG=True / DEMO=True / language = fr
 import { test, expect } from '@playwright/test'
-import { connection, changeLanguage, goPointSale, getTranslate, selectArticles, getStyleValue, checkBillDirectService, resetCardCashless, creditMoneyOnCardCashless } from '../../mesModules/commun.js'
+import {
+  connection, changeLanguage, goPointSale, getTranslate, selectArticles, getStyleValue, checkBillDirectService,
+  resetCardCashless, creditMoneyOnCardCashless, getEntity
+} from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
 let page, directServiceTrans, cashTrans, paiementTypeTrans, confirmPaymentTrans, transactionTrans, okTrans
@@ -31,6 +34,8 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await page.waitForLoadState('networkidle')
 
     // obtenir les traductions pour ce test et tous les autres
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
     directServiceTrans = await getTranslate(page, 'directService', 'capitalize')
     cashTrans = await getTranslate(page, 'cash', 'uppercase')
     paiementTypeTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
@@ -40,7 +45,6 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     totalTrans = await getTranslate(page, 'total', 'capitalize')
     givenSumTrans = await getTranslate(page, 'givenSum')
     changeTrans = await getTranslate(page, 'change', 'capitalize')
-    currencySymbolTrans = await getTranslate(page, 'currencySymbol')
     returnTrans = await getTranslate(page, 'return', 'uppercase')
     cbTrans = await getTranslate(page, 'cb')
     prePurchaseCardTrans = await getTranslate(page, 'prePurchaseCard')
@@ -58,7 +62,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     cashLowercaseTrans = await getTranslate(page, 'cash')
   })
 
-  test("Achat 2 pression 33 + 1 pression 50 + paiement en espèce(30€) + confirmation + rendu", async () => {
+  test("Achat 2 pression 33 + 1 pression 50 + paiement en espèce(30Unités) + confirmation + rendu", async () => {
     // page attendue "Direct service - icon Bar 1"
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
@@ -80,7 +84,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélectionner espèce
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -103,13 +107,13 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // 'Total(espèce) 6.50 €' est affiché
+    // 'Total(espèce) 6.50 Unités' est affiché
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(${cashTrans}) 6.50 ${currencySymbolTrans}` })).toBeVisible()
 
-    // 'somme donnée 30 €' est affiché
+    // 'somme donnée 30 Unités' est affiché
     await expect(page.locator('.test-return-given-sum', { hasText: `${givenSumTrans} 30 ${currencySymbolTrans}` })).toBeVisible()
 
-    // 'Monnaie à rendre 23.5 €' est affiché
+    // 'Monnaie à rendre 23.5 Unités' est affiché
     await expect(page.locator('.test-return-change', { hasText: `${changeTrans} 23.5 ${currencySymbolTrans}` })).toBeVisible()
 
     // bouton retour présent
@@ -141,7 +145,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélectionner cb
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -161,7 +165,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // 'Total(cb) 2.00 €' est affiché
+    // 'Total(cb) 2.00 Unités' est affiché
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 2.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // bouton retour présent
@@ -175,7 +179,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
   })
 
-  test("contexte: vider carte client 1 et la crediter de 10€", async () => {
+  test("contexte: vider carte client 1 et la crediter de 10Unités", async () => {
     // vider carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
@@ -185,14 +189,14 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // 'Total(cb) 10.00 €' est affiché
+    // 'Total(cb) 10.00 Unités' est affiché
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // retour créditation
     await page.locator('#popup-retour').click()
   })
 
-  test("Achat 1 Soft G + paiement en cashless; carte cashless client 1 = 10€", async () => {
+  test("Achat 1 Soft G + paiement en cashless; carte cashless client 1 = 10Unités", async () => {
     // aller au point de vente "BAR 1"
     await goPointSale(page, 'Bar 1')
 
@@ -217,7 +221,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélection cashless
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]').click()
 
     // sélection client 1
     await page.locator('#nfc-client1').click()
@@ -228,7 +232,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // total (moyen de paiement 1 / moyen de paiement 2) valeur €
+    // total (moyen de paiement 1 / moyen de paiement 2) valeur Unités
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless) 1.50 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 avant achats
@@ -241,7 +245,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await page.locator('#popup-retour').click()
   })
 
-  test("contexte: vider carte cahsless client 1 = 0€ et carte cashless client 2 = 40€", async () => {
+  test("contexte: vider carte cahsless client 1 = 0Unité et carte cashless client 2 = 40Unités", async () => {
     // vider carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
@@ -257,13 +261,13 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // 'Total(cb) 40.00 €' est affiché
+    // 'Total(cb) 40.00 Unités' est affiché
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 40.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // retour créditation
     await page.locator('#popup-retour').click()
 
-    // --- carte client 1, cashless = 0 € ---
+    // --- carte client 1, cashless = 0 Unité ---
     // Clique sur le bouton "CHECK CARTE")
     await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 
@@ -273,13 +277,13 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-    // sur carte 0 €
+    // sur carte 0 Unité
     await expect(page.locator('.test-return-total-card', { hasText: '0' })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
 
-    // --- carte client 2, cashless = 40 € ---
+    // --- carte client 2, cashless = 40 Unités ---
     // Clique sur le bouton "CHECK CARTE")
     await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 
@@ -289,14 +293,14 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-    // sur carte 40 €
+    // sur carte 40 Unités
     await expect(page.locator('.test-return-total-card', { hasText: '40.00' })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
   })
 
-  test("Achat 1 Guinness + 1 Soft P + paiement en cashless 0€ / cashless complémentaire client2 40€", async () => {
+  test("Achat 1 Guinness + 1 Soft P + paiement en cashless 0Unité / cashless complémentaire client2 40Unités", async () => {
     // aller au point de vente "BAR 1"
     await goPointSale(page, 'Bar 1')
 
@@ -317,11 +321,11 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // attendre moyens de paiement
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
-    // "TOTAL 5.99 €"
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: `${totalUppercaseTrans} 5.99 ${currencySymbolTrans}` })).toBeVisible()
+    // "TOTAL 5.99 Unités"
+    await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]', { hasText: `${totalUppercaseTrans} 5.99 ${currencySymbolTrans}` })).toBeVisible()
 
     // sélection cashless
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]').click()
 
     // sélection client 1
     await page.locator('#nfc-client1').click()
@@ -336,7 +340,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // message fonds insuffisants affiché
     await expect(page.locator('.test-return-title', { hasText: insufficientFundsTrans })).toBeVisible()
 
-    // il manque 5.99 €
+    // il manque 5.99 Unités
     await expect(page.locator('.test-return-missing-cash', { hasText: `${isMissingTrans} 5.99 ${currencySymbolTrans}` })).toBeVisible()
 
     // contenu première carte
@@ -360,14 +364,14 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // total (moyen de paiement 1 / moyen de paiement 2) valeur €
+    // total (moyen de paiement 1 / moyen de paiement 2) valeur "symbole monnaie"
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(cashless/cashless) 5.99 ${currencySymbolTrans}` })).toBeVisible()
 
     // sur carte client 1 avant achats
     await expect(page.locator('.test-return-pre-purchase-card', { hasText: `CLIENT 1 - ${prePurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // complémentaire
-    await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 5.99 € ${inTrans} cashless` })).toBeVisible()
+    await expect(page.locator('.test-return-additional', { hasText: `${additionalTrans} 5.99 ${currencySymbolTrans} ${inTrans} cashless` })).toBeVisible()
 
     // sur carte client 1 après achats
     await expect(page.locator('.test-return-post-purchase-card', { hasText: `CLIENT 1 - ${postPurchaseCardTrans} 0 ${currencySymbolTrans}` })).toBeVisible()
@@ -380,11 +384,11 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
   })
 
-  test("contexte, complémentaire espèce : vider carte cahsless client 1 = 0€ ", async () => {
+  test("contexte, complémentaire espèce : vider carte cahsless client 1 = 0Unité", async () => {
     // vider carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
-    // --- carte client 1, cashless = 0 € ---
+    // --- carte client 1, cashless = 0 Unité ---
     // Clique sur le bouton "CHECK CARTE"
     await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 
@@ -394,14 +398,14 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
-    // sur carte 0 €
+    // sur carte 0 Unité
     await expect(page.locator('.test-return-total-card', { hasText: '0' })).toBeVisible()
 
     // retour
     await page.locator('#popup-retour').click()
   })
 
-  test("Achat 1 Chimay Bleue + paiement en cashless 0€ / espèce somme donnée 50€", async () => {
+  test("Achat 1 Chimay Bleue + paiement en cashless 0Unité / espèce somme donnée 50Unités", async () => {
     // aller au point de vente "BAR 1"
     await goPointSale(page, 'Bar 1')
 
@@ -423,7 +427,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélection cashless
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]').click()
 
     // sélection client 1
     await page.locator('#nfc-client1').click()
@@ -484,7 +488,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
   })
 
-  // context complémentaire cb : vider carte cahsless client 1 = 0€ est déjà fait 2 fois
+  // context complémentaire cb : vider carte cahsless client 1 = 0Unité est déjà fait 2 fois
   test("Achat 1 Chimay Bleue + paiement en cashless/cb", async () => {
     // aller au point de vente "BAR 1"
     await goPointSale(page, 'Bar 1')
@@ -507,7 +511,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélection cashless
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]').click()
 
     // sélection client 1
     await page.locator('#nfc-client1').click()
@@ -519,7 +523,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.test-return-title', { hasText: insufficientFundsTrans })).toBeVisible()
 
     // sélectionner cb
-    await page.locator('#popup-cashless bouton-basique[class="test-fonds-insuffisants-cb"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-fonds-insuffisants-cb"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -559,23 +563,23 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Bar 1')
   })
 
-  test("contexte, complémentaire : vider carte client 1 et la crediter de 10€", async () => {
+  test("contexte, complémentaire : vider carte client 1 et la crediter de 10", async () => {
     // vider carte client 1
     await resetCardCashless(page, 'nfc-client1')
 
-    // créditer monnaie : 1 * 10
+    // créditer monnaie : 1 * 10 unités
     await creditMoneyOnCardCashless(page, 'nfc-client1', 1, 'cb')
 
     await expect(page.locator('.test-return-title-content', { hasText: transactionTrans + ' ' + okTrans })).toBeVisible()
 
-    // 'Total(cb) 10.00 €' est affiché
+    // 'Total(cb) 10.00 "unités"' est affiché
     await expect(page.locator('.test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
     await page.locator('#popup-retour').click()
   })
 
 
-  test("Achat 3 Gateau + paiement en cashless 10€ / espèce somme donnée 20€", async () => {
+  test("Achat 3 Gateau + paiement en cashless 10Unités / espèce somme donnée 20Unités", async () => {
     // aller au point de vente "BAR 1"
     await goPointSale(page, 'Bar 1')
 
@@ -597,7 +601,7 @@ test.describe("Point de vente, service direct 'BAR 1'", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélection cashless
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]').click()
 
     // sélection client 1
     await page.locator('#nfc-client1').click()

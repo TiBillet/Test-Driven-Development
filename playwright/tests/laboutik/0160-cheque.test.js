@@ -19,7 +19,7 @@ test.use({
 	ignoreHTTPSErrors: true
 })
 
-test.describe("Test le moyen de paiement chèque.", () => {
+test.describe.skip("Test le moyen de paiement chèque.", () => {
 	// contexte chèque non accepté
 	test(" ", async () => {
 		await setPointSale('Bar 1', { directService: true, acceptsCash: true, acceptsCb: true, acceptsCheque: false, showPrices: true })

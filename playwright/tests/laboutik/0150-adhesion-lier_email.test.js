@@ -25,7 +25,7 @@ test.describe.skip("Adhesion suite test 0010-carte-nfc.test.js", () => {
     await page.waitForLoadState('networkidle')
 
     // cliquer sur "url qrcode"
-    await page.locator('tr[class="row1"]', { hasText: env.tagIdClient1 }).locator('td[class="field-url_qrcode"]').click()
+    await page.locator('tr[class="row1"]', { hasText: env.tagIdClient2 }).locator('td[class="field-url_qrcode"]').click()
 
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')

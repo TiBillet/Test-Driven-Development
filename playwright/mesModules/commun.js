@@ -205,7 +205,6 @@ export const confirmation = async function (page, typePaiement, sommeDonnee, com
     // text contient "ESPECE" + fonction attendue
     if (typePaiement === 'espece') {
       const paymentType = await getTranslate(page, 'cash')
-      console.log('confirmation, paymentType =', paymentType)
 
       await expect(page.locator('.test-return-payment-method')).toHaveText(paymentType)
 

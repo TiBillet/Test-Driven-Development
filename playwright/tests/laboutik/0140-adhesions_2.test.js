@@ -42,7 +42,7 @@ test.describe("Prise de deux adhésions", () => {
     changeCapitalizeTrans = await getTranslate(page, 'change', 'capitalize')
   })
 
-  // en cours
+
   test("Adhesion Panier AMAP Mensuel 40 Unités, paiement cb, email non lié", async () => {
     // aller au point de vente Adhésions
     await goPointSale(page, 'Adhésions')
@@ -54,9 +54,8 @@ test.describe("Prise de deux adhésions", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Adhésions')
 
-    await page.pause()
     // sélectionner adhésion "Panier AMAP Mensuel"
-    await page.locator(`#products div[data-name-pdv="Adhésions"] bouton-article[nom="Panier AMAP Mensuel"]`).click()
+    await page.locator(`#products div[data-name-pdv="Adhésions"] bouton-article[nom="Panier AMAP (Le Tiers-Lustre) Mensuelle"]`).click()
 
     // valider achats
     await page.locator('#bt-valider').click()
@@ -67,23 +66,25 @@ test.describe("Prise de deux adhésions", () => {
     // attendre moyens de paiement
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
-    // moyen de paiement "CASHLESS" présent
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: 'CASHLESS' })).not.toBeVisible()
-    // Total pour moyen de paiement "CASHLESS" 40 €|$
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]', { hasText: `${totalTrans} 40 ${currencySymbolTrans}` })).not.toBeVisible()
+    // moyen de paiement "CASHLESS" non présent
+    await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]')).not.toBeVisible()
 
+    // bouton paiement espèce
+    const btPaiementEspece = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]')
     // moyen de paiement "ESPECE" présent
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]', { hasText: cashTrans })).toBeVisible()
-    // Total pour moyen de paiement "ESPECE" 40 €|$
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]', { hasText: `${totalTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(btPaiementEspece).toBeVisible()
+    // Total pour moyen de paiement "ESPECE" 40 Unités
+    await expect(btPaiementEspece.locator('div[class="paiement-bt-total"]', { hasText: `${totalTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
 
+    // bouton paiement CB
+    const btPaiementCb = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]')
     // moyen de paiement "CB" présent
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: cbTrans })).toBeVisible()
-    // Total pour moyen de paiement "CB" 40 €|$
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]', { hasText: `${totalTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
+    await expect(btPaiementCb).toBeVisible()
+    // Total pour moyen de paiement "CB" 40 Unités
+    await expect(btPaiementCb.locator('div[class="paiement-bt-total"]', { hasText: `${totalTrans} 40 ${currencySymbolTrans}` })).toBeVisible()
 
     // sélection cb
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]').click()
+    await btPaiementCb.click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -110,7 +111,7 @@ test.describe("Prise de deux adhésions", () => {
     // nom du membre = "---" / anonyme
     await expect(page.locator('.test-return-membre-name', { hasText: '---' })).toBeVisible()
 
-    //  'Total(cb) 40.00 €' est affiché
+    //  Total(cb) 40.00 "Unités" est affiché
     await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 40.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // bouton retour présent
@@ -123,9 +124,9 @@ test.describe("Prise de deux adhésions", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Adhésions')
   })
-  //
 
-  test("Adhesion associative Annuelle, paiement espèce, email non lié", async () => {
+
+  test("Adhésion (Le Tiers-Lustre) Annuelle 20 Unités, paiement espèce, email non lié", async () => {
     // aller au point de vente Adhésions
     await goPointSale(page, 'Adhésions')
 
@@ -136,8 +137,8 @@ test.describe("Prise de deux adhésions", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Adhésions')
 
-    // sélectionner adhésion "Adhésion associative Annuelle" 20€
-    await page.locator(`#products div[data-name-pdv="Adhésions"] bouton-article[nom="Adhésion associative Annuelle"]`).click()
+    // sélectionner adhésion "Adhésion associative Annuelle" 20
+    await page.locator(`#products div[data-name-pdv="Adhésions"] bouton-article[nom="Adhésion (Le Tiers-Lustre) Annuelle"]`).click()
 
     // valider achats
     await page.locator('#bt-valider').click()
@@ -149,7 +150,7 @@ test.describe("Prise de deux adhésions", () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélection espèce
-    await page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -182,7 +183,7 @@ test.describe("Prise de deux adhésions", () => {
     // nom du membre = "---" / anonyme
     await expect(page.locator('.test-return-membre-name', { hasText: '---' })).toBeVisible()
 
-    //  'Total(espèce) 20.00 €' est affiché
+    //  Total(espèce) 20.00 Unités est affiché
     await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashLowercaseTrans}) 20.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // somme donnée

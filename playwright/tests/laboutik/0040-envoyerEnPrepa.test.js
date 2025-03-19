@@ -180,7 +180,6 @@ test.describe("Commandes", () => {
 
     // total de "reste à payer" = 37
     const resteApayer = bigToFloat(totalListeArticles(listeArticles)).toString() + currencySymbolTrans
-    console.log('resteApayer =', resteApayer);
     await expect(page.locator('#addition-reste-a-payer', { hasText: resteApayer })).toBeVisible()
   })
 

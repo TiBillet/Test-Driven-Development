@@ -624,6 +624,10 @@ export const getLocale = async function (page) {
 
 export const checkListArticlesOk = async function (page, list) {
   await test.step('List articles ok.', async () => {
+    // monnaie
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    const monnaie = await getEntity(page, currencySymbolTransTempo)
+
     const articles = page.locator('#commandes-table-articles bouton-commande-article .ele-conteneur')
     const count = await articles.count()
     let listArticlesOk
@@ -634,7 +638,7 @@ export const checkListArticlesOk = async function (page, list) {
       const articleNbRaw = await articles.nth(i).locator('.ele-nombre > span').textContent()
       const articleNb = parseInt(articleNbRaw.trim())
       const compListe = list.find(ele => ele.nom === articleNom)
-      if (compListe.nom === articleNom && compListe.nb === articleNb && (compListe.prix.toString() + ' €') === articlePrix) {
+      if (compListe.nom === articleNom && compListe.nb === articleNb && (compListe.prix.toString() + ' ' + monnaie) === articlePrix) {
         listArticlesOk = true
       }
     }

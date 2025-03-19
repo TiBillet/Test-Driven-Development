@@ -5,11 +5,11 @@ import { test, expect } from '@playwright/test'
 import {
   connection, goPointSale, selectArticles, checkListArticlesOk,
   changeLanguage, newOrderIsShow, getTranslate, articlesListNoVisible,
-  checkBill, articlesListIsVisible, articleIsNotVisible, articleIsVisible
+  checkBill, articlesListIsVisible, articleIsNotVisible, articleIsVisible, getEntity
 } from '../../mesModules/commun.js'
 
 
-let page
+let page, currencySymbolTrans
 // sélection des articles, total 5.8 €
 const listeArticles = [
   { nom: "Eau 1L", nb: 1, prix: 1.5 }, { nom: "CdBoeuf", nb: 2, prix: 25 },
@@ -29,9 +29,17 @@ test.describe("Commandes + aller page paiement", () => {
 
     // dev changer de langue
     await changeLanguage(page, language)
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
+    // traduction symbole monnaie
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
   })
 
   test("Commande sur table Ex04, pv 'RESTO'", async () => {
+    const table = 'Ex04'
     // aller au point de vente RESTO
     await goPointSale(page, 'RESTO')
 
@@ -41,17 +49,17 @@ test.describe("Commandes + aller page paiement", () => {
     // table éphémère visible
     await expect(page.locator('#tables-liste .test-table-ephemere')).toBeVisible()
 
-    // sélectionne la table Ex04
-    await page.locator('#tables-liste .table-bouton', { hasText: 'Ex04' }).click()
+    // sélectionne la table
+    await page.locator('#tables-liste .table-bouton', { hasText: table }).click()
 
-    // nouvelle commande de la salle Ex04 du point de vente RESTO est affichée
-    await newOrderIsShow(page, 'Ex04', 'Resto')
+    // nouvelle commande de la salle du point de vente RESTO est affichée
+    await newOrderIsShow(page, table, 'Resto')
 
     // addition vide
     await expect(page.locator('#achats-liste')).toBeEmpty()
 
     // total addition = 0
-    await expect(page.locator('#bt-valider-total')).toHaveText('TOTAL 0 €')
+    await expect(page.locator('#bt-valider-total')).toHaveText(`TOTAL 0 ${currencySymbolTrans}`)
 
     // sélection des articles
     await selectArticles(page, listeArticles, "Resto")
@@ -67,7 +75,7 @@ test.describe("Commandes + aller page paiement", () => {
 
     // attendre page de paiement
     const articles = await getTranslate(page, 'articles', 'capitalize')
-    await page.locator('.navbar-horizontal .titre-vue', { hasText: articles + ' Ex04' }).waitFor({ state: 'visible' })
+    await page.locator('.navbar-horizontal .titre-vue', { hasText: articles + ' ' + table }).waitFor({ state: 'visible' })
 
     // liste d'articles affichées est identique à la liste d'articles à acheter
     await checkListArticlesOk(page, listeArticles)
@@ -76,9 +84,9 @@ test.describe("Commandes + aller page paiement", () => {
     for (let i = 0; i < listeArticles.length; ++i) {
       total = total + (listeArticles[i].nb * listeArticles[i].prix)
     }
-    const typeMonnaie = await getTranslate(page, 'currencySymbol')
-    await expect(page.locator('#addition-reste-a-payer')).toHaveText(total.toString() + typeMonnaie)
-    await expect(page.locator('#addition-total-commandes')).toHaveText(total.toString() + typeMonnaie)
+    // const typeMonnaie = await getTranslate(page, 'currencySymbol')
+    await expect(page.locator('#addition-reste-a-payer')).toHaveText(total.toString() + currencySymbolTrans)
+    await expect(page.locator('#addition-total-commandes')).toHaveText(total.toString() + currencySymbolTrans)
 
     // déjà payé vide
     await expect(page.locator('#addition-liste-deja-paye')).toBeEmpty()
@@ -131,7 +139,7 @@ test.describe("Commandes + aller page paiement", () => {
 
     // clique sur Adittion
     await page.locator('#commandes-table-menu-commute-addition').click()
-
+    
     // article "CdBoeuf" visible dans la liste d'articles
     const articleVisible = await articleIsVisible(page, 'CdBoeuf')
     expect(articleVisible).toEqual(true)

@@ -3,12 +3,12 @@ import { test, devices, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, checkListArticlesOk,
   articlesListNoVisible, checkBill, newOrderIsShow, selectArticles,
-  getTranslate, goTableOrder, getStyleValueFromLocator
+  getTranslate, goTableOrder, getEntity
 } from '../../mesModules/commun.js'
 import { env } from '../../mesModules/env.js'
 
 let page, articlesTrans, additionCapitalizeTrans, paiementTypeTrans, confirmPaymentTrans, transactionTrans
-let okTrans, returnTrans, shortcutPrepaTrans, transP
+let okTrans, returnTrans, shortcutPrepaTrans, transP, currencySymbolTrans
 const language = "en"
 const listeArticles = [{ nom: "Pression 33", nb: 1, prix: 2 }, { nom: "CdBoeuf", nb: 1, prix: 25 },]
 
@@ -23,7 +23,12 @@ test.describe('Préparation: payée - non servie', () => {
     // dev changer de langue
     await changeLanguage(page, language)
 
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
     // obtenir les traductions pour ce test et tous les autres
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
     articlesTrans = await getTranslate(page, 'articles', 'capitalize')
     additionCapitalizeTrans = await getTranslate(page, 'addition', 'capitalize')
     paiementTypeTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
@@ -99,7 +104,7 @@ test.describe('Préparation: payée - non servie', () => {
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélectionner paiement cb
-    await page.locator('bouton-basique[class="test-ref-cb"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })

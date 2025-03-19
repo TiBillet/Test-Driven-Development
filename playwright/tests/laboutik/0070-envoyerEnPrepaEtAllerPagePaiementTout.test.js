@@ -6,12 +6,13 @@ import { test, expect } from '@playwright/test'
 import {
   connection, goPointSale, selectArticles, getStyleValue,
   changeLanguage, newOrderIsShow, getTranslate, articlesListNoVisible,
-  checkBill, checkAlreadyPaidBill, getStatePrepaByRoom
+  checkBill, checkAlreadyPaidBill, getEntity
 } from '../../mesModules/commun.js'
 
 
 // attention la taille d'écran choisie affiche le menu burger
-let page
+let page, currencySymbolTrans
+
 // sélection des articles, total 5.8 €
 const listeArticles = [
   { nom: "Eau 1L", nb: 1, prix: 1.5 }, { nom: "CdBoeuf", nb: 1, prix: 25 },
@@ -33,6 +34,13 @@ test.describe('Envoyer en préparation et aller à la page de paiement, payer "T
 
     // dev changer de langue
     await changeLanguage(page, language)
+
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
+    // traduction symbole monnaie
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
   })
 
   /*
@@ -77,7 +85,7 @@ test.describe('Envoyer en préparation et aller à la page de paiement, payer "T
     await expect(page.locator('#achats-liste')).toBeEmpty()
 
     // total addition = 0
-    await expect(page.locator('#bt-valider-total')).toHaveText('TOTAL 0 €')
+    await expect(page.locator('#bt-valider-total')).toHaveText(`TOTAL 0 ${currencySymbolTrans}`)
 
     // sélection des articles
     await selectArticles(page, listeArticles, "Resto")
@@ -97,7 +105,7 @@ test.describe('Envoyer en préparation et aller à la page de paiement, payer "T
     const articles = await getTranslate(page, 'articles', 'capitalize')
     await page.locator('.navbar-horizontal .titre-vue', { hasText: articles + ' Ex05' }).waitFor({ state: 'visible' })
 
-    // clique bouton "Tout" 35.7 €|$
+    // clique bouton "Tout" 35.7 
     await page.locator('#commandes-table-menu div[onclick="restau.ajouterTousArticlesAddition()"]').click()
 
     // liste articles cachée
@@ -115,33 +123,35 @@ test.describe('Envoyer en préparation et aller à la page de paiement, payer "T
     indexTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
     await page.locator('#popup-cashless .selection-type-paiement', { hasText: indexTrans }).waitFor({ state: 'visible' })
 
-    // monnaie
-    const monnaie = await getTranslate(page, 'currencySymbol')
     const totalTrans = await getTranslate(page, 'total', 'uppercase')
 
+    // bouton paiement cashless
+    const btPaiementCashless = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]')
     // moyen de paiement "CASHLESS" présent
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"] >> text=CASHLESS')).toBeVisible()
-    // Total pour moyen de paiement "CASHLESS" 35.7 €|$
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cashless"]').locator(`.sous-element-texte >> text=${totalTrans}`)).toHaveText(`${totalTrans} 35.7 ${monnaie}`)
+    await expect(btPaiementCashless).toBeVisible()
+    // Total pour moyen de paiement "CASHLESS" 35.7 Unités
+    await expect(btPaiementCashless.locator('div[class="paiement-bt-total"]', { hasText: `${totalTrans} 35.7 ${currencySymbolTrans}` })).toBeVisible()
 
+    // bouton paiement espèce
+    const btPaiementEspece = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]')
     // moyen de paiement "ESPECE" présent
-    const cashPaymentTrans = await getTranslate(page, 'cash', 'uppercase')
-    await expect(page.locator(`#popup-cashless bouton-basique[class="test-ref-cash"] >> text=${cashPaymentTrans}`)).toBeVisible()
-    // Total pour moyen de paiement "ESPECE" 35.7 €|$
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cash"]').locator(`.sous-element-texte >> text=${totalTrans}`)).toHaveText(`${totalTrans} 35.7 ${monnaie}`)
+    await expect(btPaiementEspece).toBeVisible()
+    // Total pour moyen de paiement "ESPECE" 35.7 Unités
+    await expect(btPaiementEspece.locator('div[class="paiement-bt-total"]', { hasText: `${totalTrans} 35.7 ${currencySymbolTrans}` })).toBeVisible()
 
+    // bouton paiement CB
+    const btPaiementCb = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]')
     // moyen de paiement "CB" présent
-    const creditCardPaymentTrans = await getTranslate(page, 'cb', 'uppercase')
-    await expect(page.locator(`#popup-cashless bouton-basique[class="test-ref-cb"] >> text=${creditCardPaymentTrans}`)).toBeVisible()
-    // Total pour moyen de paiement "CB" 35.7 €|$
-    await expect(page.locator('#popup-cashless bouton-basique[class="test-ref-cb"]').locator(`.sous-element-texte >> text=${totalTrans}`)).toHaveText(`${totalTrans} 35.7 ${monnaie}`)
+    await expect(btPaiementCb).toBeVisible()
+    // Total pour moyen de paiement "CB" 35.7 Unités
+    await expect(btPaiementCb.locator('div[class="paiement-bt-total"]', { hasText: `${totalTrans} 35.7 ${currencySymbolTrans}` })).toBeVisible()
 
     // bouton RETOUR présent
     indexTrans = await getTranslate(page, 'return', 'uppercase')
     await expect(page.locator(`#popup-cashless bouton-basique >> text=${indexTrans}`)).toBeVisible()
 
     // clique sur "ESPECE"
-    await page.locator(`#popup-cashless bouton-basique[class="test-ref-cash"] >> text=${cashPaymentTrans}`).click()
+    await btPaiementEspece.click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -181,16 +191,15 @@ test.describe('Envoyer en préparation et aller à la page de paiement, payer "T
     // total commande
     const total = await getTranslate(page, 'total', 'capitalize')
     const monnaie = await getTranslate(page, 'cash')
-    const typeMonnaie = await getTranslate(page, 'currencySymbol')
-    await expect(page.locator('#popup-cashless .test-total-achats', { hasText: total })).toHaveText(`${total} (${monnaie}) 35.70 ${typeMonnaie}`)
+    await expect(page.locator('#popup-cashless .test-total-achats', { hasText: total })).toHaveText(`${total} (${monnaie}) 35.70 ${currencySymbolTrans}`)
 
     // somme donnée
     const givenSum = await getTranslate(page, 'givenSum', 'capitalize')
-    await expect(page.locator('.test-return-given-sum', { hasText: `${givenSum} 50 ${typeMonnaie}` })).toBeVisible()
+    await expect(page.locator('.test-return-given-sum', { hasText: `${givenSum} 50 ${currencySymbolTrans}` })).toBeVisible()
 
     // à rendre
     const change = await getTranslate(page, 'change', 'capitalize')
-    await expect(page.locator('.test-return-change', { hasText: `${change} 14.3 ${typeMonnaie}` })).toBeVisible()
+    await expect(page.locator('.test-return-change', { hasText: `${change} 14.3 ${currencySymbolTrans}` })).toBeVisible()
 
     // bouton RETOUR présent
     const retour = await getTranslate(page, 'return', 'uppercase')
@@ -225,20 +234,19 @@ test.describe('Envoyer en préparation et aller à la page de paiement, payer "T
     // addition vide
     await expect(page.locator('#addition-liste')).toBeEmpty()
 
-    // reste à payer 0 €|$
-    const typeMonnaie = await getTranslate(page, 'currencySymbol')
-    await expect(page.locator('#addition-reste-a-payer')).toHaveText('0' + typeMonnaie)
+    // reste à payer 0 Unités
+    await expect(page.locator('#addition-reste-a-payer')).toHaveText('0' + currencySymbolTrans)
 
     // total addition
     let total = 0
     for (let i = 0; i < listeArticles.length; ++i) {
       total = total + (listeArticles[i].nb * listeArticles[i].prix)
     }
-    await expect(page.locator('#addition-total-commandes')).toHaveText(total.toString() + typeMonnaie)
+    await expect(page.locator('#addition-total-commandes')).toHaveText(total.toString() + currencySymbolTrans)
 
     // VALIDER, total = 0
     const totalTrans = await getTranslate(page, 'total', 'uppercase')
-    await expect(page.locator('#bt-valider-total-restau')).toHaveText(`${totalTrans} 0 ${typeMonnaie}`)
+    await expect(page.locator('#bt-valider-total-restau')).toHaveText(`${totalTrans} 0 ${currencySymbolTrans}`)
   })
 
   test('Bouton "VALIDER", total = 0.', async () => {

@@ -2,7 +2,7 @@
 import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, newOrderIsShow, selectArticles, getTranslate, managerMode,
-  goTableOrder
+  goTableOrder, getEntity
 } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -28,9 +28,10 @@ test.describe('Préparation: supprimer tous les articles en mode gérant, comman
     await changeLanguage(page, language)
 
     // obtenir les traductions pour ce test et tous les autres
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
     articles = await getTranslate(page, 'articles', 'capitalize')
     additionCapitalizeTrans = await getTranslate(page, 'addition', 'capitalize')
-    currencySymbolTrans = await getTranslate(page, 'currencySymbol')
     shortcutPrepaTrans = await getTranslate(page, 'shortcutPreparation', 'capitalize')
     preparationsCapitalizeTrans = await getTranslate(page, 'preparations', 'capitalize')
     transO = await getTranslate(page, 'notServedUnpaidOrder', 'capitalize')
@@ -77,10 +78,10 @@ test.describe('Préparation: supprimer tous les articles en mode gérant, comman
     // attendre page de paiement
     await page.locator('.navbar-horizontal .titre-vue', { hasText: articles + ' ephemere4' }).waitFor({ state: 'visible' })
 
-    // clique bt "Adition"
+    // clique bt "Addition"
     await page.locator(`#commandes-table-menu div >> text=${additionCapitalizeTrans}`).click()
 
-    // non payé - reste à payé = total commande = 58.2€
+    // non payé - reste à payé = total commande = 58.2Unités
     await expect(page.locator('#addition-reste-a-payer', { hasText: `58.2${currencySymbolTrans}` })).toBeVisible()
     await expect(page.locator('#addition-total-commandes', { hasText: `58.2${currencySymbolTrans}` })).toBeVisible()
 

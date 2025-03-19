@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { connection, changeLanguage, goPointSale, selectArticles, confirmation, articlesListNoVisible,
-  checkAlreadyPaidBill
+import {
+  connection, changeLanguage, goPointSale, selectArticles, confirmation, articlesListNoVisible,
+  checkAlreadyPaidBill, getTranslate, getEntity
 } from '../../mesModules/commun.js'
 
-let page
+let page, currencySymbolTrans
 const language = "fr"
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -21,6 +22,13 @@ test.describe('Envoyer en préparation et aller à la page de paiement, une "Val
     // changer de langue
     await changeLanguage(page, language)
 
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
+    // traduction symbole monnaie
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
+
     // attente affichage menu burger
     await page.locator('.navbar-menu i[class~="menu-burger-icon"]').waitFor({ state: 'visible' })
 
@@ -31,19 +39,19 @@ test.describe('Envoyer en préparation et aller à la page de paiement, une "Val
     await page.waitForLoadState('networkidle')
 
 
-     // clique table éphémère
-     await page.locator('#tables-liste .test-table-ephemere').click()
+    // clique table éphémère
+    await page.locator('#tables-liste .test-table-ephemere').click()
 
-     // entrer le nom de table "frac0"
-     await page.locator('#entree-nom-table').fill('frac0')
- 
-     // valider la création de la table éphémère
-     await page.locator('#test-valider-ephemere').click()
+    // entrer le nom de table "frac0"
+    await page.locator('#entree-nom-table').fill('frac0')
+
+    // valider la création de la table éphémère
+    await page.locator('#test-valider-ephemere').click()
 
     // pv resto affiché
     await expect(page.locator('.titre-vue >> text=Nouvelle commande sur table frac0, PV Resto')).toBeVisible()
 
-    // sélection des articles = 34.4€
+    // sélection des articles = 34.4
     const listeArticles = [{ nom: "Pression 33", nb: 1, prix: 2 }, { nom: "CdBoeuf", nb: 1, prix: 25 },
     { nom: "Despé", nb: 2, prix: 3.2 }, { nom: "Café", nb: 1, prix: 1 }]
     await selectArticles(page, listeArticles, "Resto")
@@ -213,20 +221,26 @@ test.describe('Envoyer en préparation et aller à la page de paiement, une "Val
     // titre popup-cashless "Types de paiement" présent
     await expect(page.locator('#popup-cashless', { hasText: 'Types de paiement' })).toBeVisible()
 
+    // bouton paiement cashless
+    const btPaiementCashless = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]')
     // moyen de paiement "CASHLESS" présent
-    await expect(page.locator('#popup-cashless bouton-basique >> text=CASHLESS')).toBeVisible()
-    // Total pour moyen de paiement "CASHLESS" 5 €
-    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CASHLESS' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 5 €')
+    await expect(btPaiementCashless).toBeVisible()
+    // Total pour moyen de paiement "CASHLESS" 5 Unités
+    await expect(btPaiementCashless.locator('div[class="paiement-bt-total"]', { hasText: `TOTAL 5 ${currencySymbolTrans}` })).toBeVisible()
 
+    // bouton paiement espèce
+    const btPaiementEspece = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]')
     // moyen de paiement "ESPECE" présent
-    await expect(page.locator('#popup-cashless bouton-basique >> text=ESPÈCE')).toBeVisible()
-    // Total pour moyen de paiement "ESPECE" 5 €
-    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'ESPÈCE' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 5 €')
+    await expect(btPaiementEspece).toBeVisible()
+    // Total pour moyen de paiement "ESPECE" 5 Unités
+    await expect(btPaiementEspece.locator('div[class="paiement-bt-total"]', { hasText: `TOTAL 5 ${currencySymbolTrans}` })).toBeVisible()
 
+    // bouton paiement CB
+    const btPaiementCb = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]')
     // moyen de paiement "CB" présent
-    await expect(page.locator('#popup-cashless bouton-basique >> text=CB')).toBeVisible()
-    // Total pour moyen de paiement "CB" 5 €
-    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CB' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 5 €')
+    await expect(btPaiementCb).toBeVisible()
+    // Total pour moyen de paiement "CB" 5 Unités
+    await expect(btPaiementCb.locator('div[class="paiement-bt-total"]', { hasText: `TOTAL 5 ${currencySymbolTrans}` })).toBeVisible()
 
     // bouton RETOUR présent
     await expect(page.locator('#popup-cashless bouton-basique >> text=RETOUR')).toBeVisible()
@@ -258,7 +272,7 @@ test.describe('Envoyer en préparation et aller à la page de paiement, une "Val
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
     // cliquer bouton "ESPÈCE"
-    await page.locator('#popup-cashless bouton-basique >> text=ESPÈCE').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]').click()
 
     // confirmation espèce
     await confirmation(page, 'espece', 5)
@@ -279,13 +293,13 @@ test.describe('Envoyer en préparation et aller à la page de paiement, une "Val
     await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
 
     // total commande
-    await expect(page.locator('#popup-cashless .popup-msg1', { hasText: 'Total' })).toHaveText('Total (espèce) 5.00 €')
+    await expect(page.locator('#popup-cashless .popup-msg1', { hasText: 'Total' })).toHaveText(`Total (espèce) 5.00 ${currencySymbolTrans}`)
 
-    // Somme donnée 5 €
-    await expect(page.locator('.test-return-given-sum', { hasText: 'Somme donnée 5 €' })).toBeVisible()
+    // Somme donnée 5 Unités
+    await expect(page.locator('.test-return-given-sum', { hasText: `Somme donnée 5 ${currencySymbolTrans}` })).toBeVisible()
 
     // monnaie à rendre 0
-    await expect(page.locator('.test-return-change', { hasText: 'Monnaie à rendre 0 €' })).toBeVisible()
+    await expect(page.locator('.test-return-change', { hasText: `Monnaie à rendre 0 ${currencySymbolTrans}` })).toBeVisible()
 
     // bouton "RETOUR" présent
     await expect(page.locator('#popup-cashless #popup-retour')).toBeVisible()
@@ -307,14 +321,14 @@ test.describe('Envoyer en préparation et aller à la page de paiement, une "Val
     // vérification de la "valeur partielle" déjà payée
     await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: 'Paiement Fractionné' }).locator('.addition-col-qte')).toHaveText('1')
     await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: 'Paiement Fractionné' }).locator('.addition-col-produit div')).toHaveText('Paiement Fractionné')
-    await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: 'Paiement Fractionné' }).locator('.addition-col-prix div')).toHaveText('5€')
+    await expect(page.locator('#addition-liste-deja-paye .BF-ligne-deb', { hasText: 'Paiement Fractionné' }).locator('.addition-col-prix div')).toHaveText('5' + currencySymbolTrans)
 
     // total de "reste à payer" et "commandes" ok
-    await expect(page.locator('#addition-reste-a-payer')).toHaveText('29.4€')
-    await expect(page.locator('#addition-total-commandes')).toHaveText('34.4€')
+    await expect(page.locator('#addition-reste-a-payer')).toHaveText('29.4' + currencySymbolTrans)
+    await expect(page.locator('#addition-total-commandes')).toHaveText('34.4' + currencySymbolTrans)
 
     // VALIDER, total = 0
-    await expect(page.locator('#bt-valider-total-restau')).toHaveText('TOTAL 0 €')
+    await expect(page.locator('#bt-valider-total-restau')).toHaveText(`TOTAL 0 ${currencySymbolTrans}`)
   })
 
   test(`Valeur partielle, payer le reste de l'addition, bouton "Tout".`, async () => {
@@ -327,13 +341,21 @@ test.describe('Envoyer en préparation et aller à la page de paiement, une "Val
     // titre popup-cashless "Types de paiement" présent
     await expect(page.locator('#popup-cashless', { hasText: 'Types de paiement' })).toBeVisible()
 
-    // vérification de la valeur du reste "29.4 €" sur les boutons de paiement
-    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CASHLESS' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 29.4 €')
-    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'ESPÈCE' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 29.4 €')
-    await expect(page.locator('#popup-cashless bouton-basique', { hasText: 'CB' }).locator('.sous-element-texte >> text=TOTAL')).toHaveText('TOTAL 29.4 €')
+    // --- vérification de la valeur du reste 29.4 Unités sur les boutons de paiement ---
+    // bouton paiement cashless
+    const btPaiementCashless = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cashless"]')
+    await expect(btPaiementCashless.locator('div[class="paiement-bt-total"]', { hasText: `TOTAL 29.4 ${currencySymbolTrans}` })).toBeVisible()
+
+    // bouton paiement espèce
+    const btPaiementEspece = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]')
+    await expect(btPaiementEspece.locator('div[class="paiement-bt-total"]', { hasText: `TOTAL 29.4 ${currencySymbolTrans}` })).toBeVisible()
+
+    // bouton paiement CB
+    const btPaiementCb = page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]')
+    await expect(btPaiementCb.locator('div[class="paiement-bt-total"]', { hasText: `TOTAL 29.4 ${currencySymbolTrans}` })).toBeVisible()
 
     // cliquer bouton "CB"
-    await page.locator('#popup-cashless bouton-basique >> text=CB').click()
+    await btPaiementCb.click()
 
     // confirmation cb
     await confirmation(page, 'cb')
@@ -353,7 +375,7 @@ test.describe('Envoyer en préparation et aller à la page de paiement, une "Val
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
     // total commande
-    await expect(page.locator('#popup-cashless .popup-msg1', { hasText: 'Total' })).toHaveText('Total (cb) 29.40 €')
+    await expect(page.locator('#popup-cashless .popup-msg1', { hasText: 'Total' })).toHaveText(`Total (cb) 29.40 ${currencySymbolTrans}`)
 
     // bouton "RETOUR" présent
     await expect(page.locator('#popup-cashless #popup-retour')).toBeVisible()
@@ -388,7 +410,7 @@ test.describe('Envoyer en préparation et aller à la page de paiement, une "Val
     await checkAlreadyPaidBill(page, listeArticles)
 
     // total de "reste à payer" ok
-    await expect(page.locator('#addition-reste-a-payer')).toHaveText('0€')
+    await expect(page.locator('#addition-reste-a-payer')).toHaveText('0' + currencySymbolTrans)
 
     await page.close()
   })

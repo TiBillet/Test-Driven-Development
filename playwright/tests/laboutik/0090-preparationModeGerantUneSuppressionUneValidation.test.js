@@ -2,7 +2,7 @@
 import { test, expect, chromium } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, newOrderIsShow, selectArticles, checkBill,
-  getTranslate, managerMode, goTableOrder, checkAlreadyPaidBill, gridIsTestable
+  getTranslate, managerMode, goTableOrder, checkAlreadyPaidBill, gridIsTestable, getEntity
 } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -26,6 +26,8 @@ test.describe('Préparation "Non Servie - Payée": une suppression et une valida
     await changeLanguage(page, language)
 
     // obtenir les traductions pour ce test et tous les autres
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
     additionCapitalizeTrans = await getTranslate(page, 'addition', 'capitalize')
     paiementTypeTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
     confirmPaymentTrans = await getTranslate(page, 'confirmPayment', 'capitalize')
@@ -33,7 +35,6 @@ test.describe('Préparation "Non Servie - Payée": une suppression et une valida
     okTrans = await getTranslate(page, 'ok')
     returnTrans = await getTranslate(page, 'return', 'uppercase')
     articles = await getTranslate(page, 'articles', 'capitalize')
-    currencySymbolTrans = await getTranslate(page, 'currencySymbol')
     shortcutPrepaTrans = await getTranslate(page, 'shortcutPreparation', 'capitalize')
     transP = await getTranslate(page, 'notServedPaidOrder', 'capitalize')
     transSP = await getTranslate(page, 'servedPaidOrder', 'capitalize')
@@ -101,7 +102,7 @@ test.describe('Préparation "Non Servie - Payée": une suppression et une valida
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
     // sélectionner paiement cb
-    await page.locator('bouton-basique[class="test-ref-cb"]').click()
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })

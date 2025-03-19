@@ -9,6 +9,7 @@ const language = "en"
 
 test.use({ viewport: { width: 1200, height: 1200 }, ignoreHTTPSErrors: true })
 
+// TODO: test Affiliation carte nfc avec un user de lespass à faire
 test.describe.skip("Affiliation carte nfc avec un user de lespass", () => {
   // 
 })

@@ -1,13 +1,14 @@
 // DEBUG=True / DEMO=True / language = en
 import { test, expect } from '@playwright/test'
 import {
-  connection, getTranslate, changeLanguage, goPointSale, newOrderIsShow, getStyleValue, confirmation
+  connection, getTranslate, changeLanguage, goPointSale, newOrderIsShow, getStyleValue, confirmation,
+  getEntity
 } from '../../mesModules/commun.js'
 import { env } from '../../mesModules/env.js'
 
 let page
 let transactionTrans, okTrans, articlesTrans, sumTrans, validateTrans, cashTrans, paiementTypeTrans
-let totalUppercaseTrans, cashLowerTrans
+let totalUppercaseTrans, cashLowerTrans, currencySymbolTrans
 const language = "en"
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -25,7 +26,12 @@ test.describe("Test valeur fractionnée", () => {
     // changer de langue
     await changeLanguage(page, language)
 
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
     // obtenir les traductions pour ce test et tous les autres
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
     transactionTrans = await getTranslate(page, 'transaction', 'capitalize')
     okTrans = await getTranslate(page, 'ok')
     articlesTrans = await getTranslate(page, 'articles', 'capitalize')
@@ -130,8 +136,8 @@ test.describe("Test valeur fractionnée", () => {
     // moyens de paiement visible
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
-    // paiement en espèces 'CASH TOTAL 10 €'
-    await page.locator('#popup-cashless bouton-basique', { hasText: `${cashLowerTrans} ${totalUppercaseTrans} 10 €` }).click()
+    // paiement en espèces - CASH TOTAL 10 Unités
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cash"]').click()
 
     // confirmation espèce
     await confirmation(page, 'espece', 10)
@@ -151,8 +157,8 @@ test.describe("Test valeur fractionnée", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
 
-    // total commande "cash" 10.00 €
-    await expect(page.locator('#popup-cashless .popup-msg1', { hasText: `Total (${cashTrans}) 10.00 €` })).toBeVisible()
+    // total commande "cash" 10.00 Unités
+    await expect(page.locator('#popup-cashless .popup-msg1', { hasText: `Total (${cashTrans}) 10.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // cliquer bouton "RETOUR"
     await page.locator('#popup-cashless #popup-retour').click()
@@ -166,8 +172,8 @@ test.describe("Test valeur fractionnée", () => {
     // moyens de paiement visible
     await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
-    // paiement en espèces 'CB TOTAL 6 €'
-    await page.locator('#popup-cashless bouton-basique', { hasText: 'CB TOTAL 6 €' }).click()
+    // paiement CB TOTAL 6 Unités
+    await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-cb"]').click()
 
     // confirmation espèce
     await confirmation(page, 'cb')
@@ -187,8 +193,8 @@ test.describe("Test valeur fractionnée", () => {
     // 'Transaction ok' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: 'Transaction ok' })).toBeVisible()
 
-    // total commande "cb" 6.00 €
-    await expect(page.locator('#popup-cashless .popup-msg1', { hasText: `Total (cb) 6.00 €` })).toBeVisible()
+    // total commande cb 6.00 Unités
+    await expect(page.locator('#popup-cashless .popup-msg1', { hasText: `Total (cb) 6.00 ${currencySymbolTrans}` })).toBeVisible()
 
     // cliquer bouton "RETOUR"
     await page.locator('#popup-cashless #popup-retour').click()
@@ -197,7 +203,7 @@ test.describe("Test valeur fractionnée", () => {
     await expect(page.locator('#popup-cashless')).toBeHidden()
 
     // total de "reste à payer"
-    await expect(page.locator('#addition-reste-a-payer')).toHaveText('0€')
+    await expect(page.locator('#addition-reste-a-payer')).toHaveText('0' + currencySymbolTrans)
 
     await page.close()
   })
@@ -221,7 +227,7 @@ test.describe("Test valeur fractionnée", () => {
     // attendre fin utilisation réseau
     await page.waitForLoadState('networkidle')
 
-    // le paiement fractionné de 10,00€ est en espèce et celui de 6,00€ est en cb
+    // le paiement fractionné de 10,00 est en espèce et celui de 6,00 est en cb
     const tests = [{ paiementType: 'Carte bancaire', qty: '6,00' }, { paiementType: 'Espece', qty: '10,00' }]
     const list = page.locator('tr', { hasText: 'Paiement Fractionné' })
     for (let i = 0; i < tests.length; i++) {

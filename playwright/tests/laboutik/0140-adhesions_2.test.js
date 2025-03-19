@@ -2,7 +2,7 @@
 import { test, expect, chromium } from '@playwright/test'
 import { env } from '../../mesModules/env.js'
 import {
-  connection, changeLanguage, goPointSale, getTranslate, getStyleValue
+  connection, changeLanguage, goPointSale, getTranslate, getStyleValue, getEntity
 } from '../../mesModules/commun.js'
 
 let page, directServiceTrans, transactionTrans, okTrans, totalTrans, currencySymbolTrans, cbTrans
@@ -21,12 +21,16 @@ test.describe("Prise de deux adhésions", () => {
     // changer de langue
     await changeLanguage(page, language)
 
+    // attendre fin utilisation réseau
+    await page.waitForLoadState('networkidle')
+
     // obtenir les traductions pour ce test et tous les autres
+    const currencySymbolTransTempo = await getTranslate(page, 'currencySymbol', null, 'methodCurrency')
+    currencySymbolTrans = await getEntity(page, currencySymbolTransTempo)
     directServiceTrans = await getTranslate(page, 'directService', 'capitalize')
     transactionTrans = await getTranslate(page, 'transaction', 'capitalize')
     okTrans = await getTranslate(page, 'ok')
     totalTrans = await getTranslate(page, 'total', 'capitalize')
-    currencySymbolTrans = await getTranslate(page, 'currencySymbol')
     cbTrans = await getTranslate(page, 'cb')
     paiementTypeTrans = await getTranslate(page, 'paymentTypes', 'capitalize')
     confirmPaymentTrans = await getTranslate(page, 'confirmPayment', 'capitalize')
@@ -38,8 +42,8 @@ test.describe("Prise de deux adhésions", () => {
     changeCapitalizeTrans = await getTranslate(page, 'change', 'capitalize')
   })
 
-  //
-  test("Adhesion Panier AMAP Mensuel, paiement cb, email non lié", async () => {
+  // en cours
+  test("Adhesion Panier AMAP Mensuel 40 Unités, paiement cb, email non lié", async () => {
     // aller au point de vente Adhésions
     await goPointSale(page, 'Adhésions')
 
@@ -50,6 +54,7 @@ test.describe("Prise de deux adhésions", () => {
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText(directServiceTrans)
     await expect(page.locator('.navbar-horizontal .titre-vue')).toContainText('Adhésions')
 
+    await page.pause()
     // sélectionner adhésion "Panier AMAP Mensuel"
     await page.locator(`#products div[data-name-pdv="Adhésions"] bouton-article[nom="Panier AMAP Mensuel"]`).click()
 

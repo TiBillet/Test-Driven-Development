@@ -4,7 +4,6 @@ nom monnaie, valeur des articles: 5, 10, ...
 
 import { test, expect, chromium } from '@playwright/test'
 import { env } from './env.js'
-import * as IP from "ip"
 import Big from './big.js'
 
 /**

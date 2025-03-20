@@ -1,18 +1,26 @@
+// https://trycatchdebug.net/news/1209805/playwright-yopmail-email-testing
 // LaBoutik: DEBUG=1 / DEMO=1; language = en
 import { test, expect } from '@playwright/test'
 import { env } from '../../mesModules/env.js'
+import * as dotenv from 'dotenv'
+import { detectLespassLanguage, lespassTranslate } from '../../mesModules/communLespass.js'
+
+let lespassLanguage 
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
+
+const email = process.env.EMAILTESTLOGIN
 
 // attention la taille d'écran choisie affiche le menu burger
-let page, directServiceTrans, transactionTrans, okTrans, totalTrans, currencySymbolTrans, cbTrans
-let paiementTypeTrans, confirmPaymentTrans, membershipTrans, cashTrans, returnTrans
-const language = "en"
-
 test.use({ viewport: { width: 1200, height: 1200 }, ignoreHTTPSErrors: true })
 
-test.describe.skip("Adhesion suite test 0010-carte-nfc.test.js", () => {
+test.describe("Adhesion suite test 0010-carte-nfc.test.js", () => {
   test("Admin: lier un email à la carte client2", async ({ browser }) => {
     // connexion admin
     const page = await browser.newPage()
+    const pageUrl = 'https://laboutik.' + process.env.DOMAIN 
+    console.log('pageUrl =', pageUrl);
+    
     await page.goto(env.domain)
 
     // permet d'attendre la fin des processus réseau
@@ -25,28 +33,37 @@ test.describe.skip("Adhesion suite test 0010-carte-nfc.test.js", () => {
     await page.waitForLoadState('networkidle')
 
     // cliquer sur "url qrcode"
-    await page.locator('tr[class="row1"]', { hasText: env.tagIdClient2 }).locator('td[class="field-url_qrcode"]').click()
+    await page.locator('#result_list tr', { hasText: env.tagIdClient2 }).locator('td[class="field-url_qrcode"]').click()
 
-    // permet d'attendre la fin des processus réseau
-    await page.waitForLoadState('networkidle')
+    // attendre menu visible donc la fin du chargement de l'url qrcode
+    await page.locator('#mainMenu').waitFor()
 
-//
-    // TODO: utiliser la traduction
-    // message "Link your card to you" affiché --
-    await expect(page.locator('.test-return-titre-popup', { hasText: 'Link your card to you' })).toBeVisible()
+    await page.pause()
+
+    // détecte la langue 'fr' or 'en' 
+    lespassLanguage = await detectLespassLanguage(page)
+
+    // message "Linking my Pass card"ou "Liaison de ma carte Pass" affiché --
+    const titleTrans = lespassTranslate('LinkingPassCard', lespassLanguage)
+    await expect(page.locator('h1', { hasText: titleTrans })).toBeVisible()
+
+    await page.pause()
 
     // entrer l'email
-    await page.locator('.test-return-email-link-card').fill('filaos974+lespass@hotmail.com')
+    await page.locator('#linkform input[name="email"]').fill(email)
+
+    // entrer l'email de confirmation
+    await page.locator('#linkform input[name="emailConfirmation"]').fill(email)
 
     // cocher l'accord
-    await page.locator('.test-return-agree-link-card').click()
+    await page.locator('#cgu').click()
 
     // valider le popup
-    await page.locator('.test-return-validate-link-card').click()
+    await page.locator('#linkform button[hx-post="/qr/link/"]').click()
 
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
-//
+    //
     // clique  sur afficher vos dernières transactions
     await page.locator('.test-return-show-transactions').click()
     // permet d'attendre la fin des processus réseau

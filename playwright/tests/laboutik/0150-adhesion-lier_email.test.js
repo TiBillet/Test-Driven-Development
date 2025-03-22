@@ -3,13 +3,13 @@
 import { test, expect } from '@playwright/test'
 import { env } from '../../mesModules/env.js'
 import * as dotenv from 'dotenv'
-import { detectLespassLanguage, lespassTranslate } from '../../mesModules/communLespass.js'
+import { detectLanguage, lespassTranslate } from '../../mesModules/communLespass.js'
 
 let lespassLanguage 
 const root = process.cwd()
 dotenv.config({ path: root + '/../.env' })
 
-const email = process.env.EMAILTESTLOGIN
+const email = process.env.TEST_EMAIL
 
 // attention la taille d'écran choisie affiche le menu burger
 test.use({ viewport: { width: 1200, height: 1200 }, ignoreHTTPSErrors: true })
@@ -41,13 +41,12 @@ test.describe("Adhesion suite test 0010-carte-nfc.test.js", () => {
     await page.pause()
 
     // détecte la langue 'fr' or 'en' 
-    lespassLanguage = await detectLespassLanguage(page)
+    lespassLanguage = await detectLanguage(page)
 
     // message "Linking my Pass card"ou "Liaison de ma carte Pass" affiché --
     const titleTrans = lespassTranslate('LinkingPassCard', lespassLanguage)
     await expect(page.locator('h1', { hasText: titleTrans })).toBeVisible()
 
-    await page.pause()
 
     // entrer l'email
     await page.locator('#linkform input[name="email"]').fill(email)
@@ -58,12 +57,21 @@ test.describe("Adhesion suite test 0010-carte-nfc.test.js", () => {
     // cocher l'accord
     await page.locator('#cgu').click()
 
+    // url à attendre
+    const response = page.waitForRequest('**/qr/link/')
+
+    await page.pause()
+
     // valider le popup
     await page.locator('#linkform button[hx-post="/qr/link/"]').click()
 
     // permet d'attendre la fin des processus réseau
-    await page.waitForLoadState('networkidle')
-    //
+    //await page.waitForLoadState('networkidle')
+
+     // attend la fin du chargement de l'url
+     await response
+    
+
     // clique  sur afficher vos dernières transactions
     await page.locator('.test-return-show-transactions').click()
     // permet d'attendre la fin des processus réseau

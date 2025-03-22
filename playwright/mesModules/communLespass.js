@@ -3,13 +3,14 @@
  * @param {*} page 
  * @returns {String} - 'fr' or 'en'
  */
-export const detectLespassLanguage = async function (page) {
+export const detectLanguage = async function (page) {
   return await page.evaluate(async () => {
     let retour = 'fr'
-    const loginString = document.querySelector('#mainMenu button[data-bs-target="#loginPanel"]').textContent.replaceAll('\n', '').trim().toLowerCase()
-    // Log in / Connexion
-    if (loginString === 'log in') {
-      retour = 'en'
+    try {
+      retour = document.querySelector('html').getAttribute('lang')
+    } catch (error) {
+      retour = "???"
+      console.log('Language = ???')
     }
     return retour
   })
@@ -31,7 +32,7 @@ const lespassTransList = [
  */
 export function lespassTranslate(key, language) {
   try {
-    const trans  = lespassTransList.find(item => item.key === key)
+    const trans = lespassTransList.find(item => item.key === key)
     return trans[language]
   } catch (error) {
     console.log('-> lespassTranslate : unknown key')

@@ -1,11 +1,16 @@
-// cashless_demo1.env DEBUG=True / DEMO=True / language = en
-import { test, devices, expect } from '@playwright/test'
+// chargement des variables d'environnement (.env)
+import * as dotenv from 'dotenv'
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
+
+// DEBUG=1 / DEMO=1 / language = en
+import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, checkListArticlesOk,
   articlesListNoVisible, checkBill, newOrderIsShow, selectArticles,
   getTranslate, goTableOrder, getEntity
 } from '../../mesModules/commun.js'
-import { env } from '../../mesModules/env.js'
+
 
 let page, articlesTrans, additionCapitalizeTrans, paiementTypeTrans, confirmPaymentTrans, transactionTrans
 let okTrans, returnTrans, shortcutPrepaTrans, transP, currencySymbolTrans

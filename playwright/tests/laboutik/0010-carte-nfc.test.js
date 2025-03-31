@@ -3,10 +3,12 @@ Attention pour tous tets:
 DEBUG=1
 TEST=1
 DEMO=1
-DEMO_TAGID_CM='EE144CE8'
-DEMO_TAGID_CLIENT1='41726643' CLIENT 1
-DEMO_TAGID_CLIENT2='52BE6543' carte anonyme
 */
+
+// chargement des variables d'environnement (.env)
+import * as dotenv from 'dotenv'
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
 
 import { test, expect } from '@playwright/test'
 import {

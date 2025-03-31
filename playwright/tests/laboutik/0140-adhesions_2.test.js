@@ -1,6 +1,10 @@
+// chargement des variables d'environnement (.env)
+import * as dotenv from 'dotenv'
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
+
 // LaBoutik: DEBUG=1 / DEMO=1; language = en
 import { test, expect, chromium } from '@playwright/test'
-import { env } from '../../mesModules/env.js'
 import {
   connection, changeLanguage, goPointSale, getTranslate, getStyleValue, getEntity
 } from '../../mesModules/commun.js'

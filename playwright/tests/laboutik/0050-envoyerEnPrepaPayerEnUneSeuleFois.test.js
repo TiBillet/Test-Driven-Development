@@ -1,4 +1,9 @@
-// cashless_demo1.env DEBUG=True / DEMO=True / language = fr
+// chargement des variables d'environnement (.env)
+import * as dotenv from 'dotenv'
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
+
+// DEBUG=1 / DEMO=1 / language = fr
 import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, selectArticles, resetCardCashless, creditMoneyOnCardCashless,

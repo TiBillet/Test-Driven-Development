@@ -21,6 +21,16 @@ const lespassTransList = [
     key: 'LinkingPassCard',
     fr: 'Liaison de ma carte Pass',
     en: 'Linking my Pass card'
+  },
+  {
+    key: 'validateEmailForAccessprofile',
+    fr: 'Merci de valider votre adresse mail pour accéder à toutes les fonctionnalités de votre compte.',
+    en: 'Please validate your email to access all the features of your profile area.'
+  },
+  {
+    key: 'fullyLoggedIn',
+    fr: 'Vous êtes correctement identifié·e. Bienvenue !',
+    en: 'You are fully logged in. Welcome!'
   }
 ]
 

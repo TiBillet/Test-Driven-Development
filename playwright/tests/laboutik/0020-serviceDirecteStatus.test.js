@@ -1,7 +1,11 @@
+// chargement des variables d'environnement (.env)
+import * as dotenv from 'dotenv'
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
+
 // cashless_demo1.env DEBUG=True / DEMO=True / language = fr
 import { test, expect } from '@playwright/test'
 import { connection, getTranslate, changeLanguage, goPointSale, selectArticles, setPointSale, getEntity } from '../../mesModules/commun.js'
-
 
 // attention la taille d'écran choisie affiche le menu burger
 let page

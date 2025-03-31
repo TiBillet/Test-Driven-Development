@@ -1,25 +1,26 @@
-// cashless_demo1.env DEBUG=True / DEMO=True / language = en
+// chargement des variables d'environnement (.env)
+import * as dotenv from 'dotenv'
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
+
+// DEBUG=1 / DEMO=1 / language = en
 import { test, expect } from '@playwright/test'
 import { connection, getTranslate, changeLanguage, goPointSale, selectArticles, checkBillDirectService, setPointSale } from '../../mesModules/commun.js'
-import { env } from '../../mesModules/env.js'
 
-// attention la taille d'écran choisie affiche le menu burger
-let page
-
-let paiementTypeTrans, chequeTrans, transactionTrans, okTrans, confirmPaymentTrans
+let page, paiementTypeTrans, chequeTrans, transactionTrans, okTrans, confirmPaymentTrans
 const language = "en"
 const listeArticles = [
 	{ nom: "Pression 33", nb: 2, prix: 2 },
 	{ nom: "CdBoeuf", nb: 1, prix: 25 }
 ]
 
-
+// attention la taille d'écran choisie affiche le menu burger
 test.use({
 	viewport: { width: 550, height: 1000 },
 	ignoreHTTPSErrors: true
 })
 
-test.describe.skip("Test le moyen de paiement chèque.", () => {
+test.describe("Test le moyen de paiement chèque.", () => {
 	// contexte chèque non accepté
 	test(" ", async () => {
 		await setPointSale('Bar 1', { directService: true, acceptsCash: true, acceptsCb: true, acceptsCheque: false, showPrices: true })
@@ -59,7 +60,7 @@ test.describe.skip("Test le moyen de paiement chèque.", () => {
 		await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
 		// moyen de paiement "chèque" non visible
-		await expect(page.locator('bouton-basique[class="test-ref-ch"]', { hasText: chequeTrans })).not.toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-ch"]', { hasText: chequeTrans })).not.toBeVisible()
 
 		await page.close()
 	})
@@ -95,10 +96,10 @@ test.describe.skip("Test le moyen de paiement chèque.", () => {
 		await expect(page.locator('#popup-cashless .selection-type-paiement', { hasText: paiementTypeTrans })).toBeVisible()
 
 		// moyen de paiement "chèque" visible
-		await expect(page.locator('bouton-basique[class="test-ref-ch"]', { hasText: chequeTrans })).toBeVisible()
+		await expect(page.locator('#popup-cashless div[class="paiement-bt-container test-ref-ch"]', { hasText: chequeTrans })).toBeVisible()
 
 		// sélectionner moyen de paiement chèque
-		await page.locator('bouton-basique[class="test-ref-ch"]').click()
+		await page.locator('#popup-cashless div[class="paiement-bt-container test-ref-ch"]').click()
 
 		 // attente affichage "popup-cashless"
 		 await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -121,7 +122,7 @@ test.describe.skip("Test le moyen de paiement chèque.", () => {
 	test("Moyen de paiement chèque est présent lors validation achats.", async ({ browser }) => {
 		// connexion admin
 		page = await browser.newPage()
-		await page.goto(env.domain)
+		await page.goto(process.env.LABOUTIK_URL)
 
 		// permet d'attendre la fin des processus réseau
 		await page.waitForLoadState('networkidle')

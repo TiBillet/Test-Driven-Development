@@ -3,8 +3,35 @@ nom monnaie, valeur des articles: 5, 10, ...
 */
 
 import { test, expect, chromium } from '@playwright/test'
-import { env } from './env.js'
+// import { env } from './env.js'
 import Big from './big.js'
+
+/**
+ * Clients list object 
+ */
+export const clients = {
+  primaire: {
+    id: 'nfc-primaire',
+    tagId: process.env.DEMO_TAGID_CM 
+  },
+  client1: {
+    id: 'nfc-client1',
+    tagId: process.env.DEMO_TAGID_CLIENT1 
+  },
+  client2: {
+    id: 'nfc-client2',
+    tagId: process.env.DEMO_TAGID_CLIENT2
+  },
+  client3: {
+    id: 'nfc-client3',
+    tagId: process.env.DEMO_TAGID_CLIENT3 
+  },
+  unknown: {
+    id: 'nfc-unknown',
+    tagId: 'XXXXXXXX' 
+  }
+  
+}
 
 /**
  * Connexion laboutik, connexion admin + voir le site
@@ -12,11 +39,16 @@ import Big from './big.js'
  */
 export const connection = async function (page) {
   await test.step('Connexion admin', async () => {
-    // await page.goto(env.domain + env.adminLink)
-    await page.goto(env.domain)
+    // pour être sûre d'avoir l'icon hamburger
+    await page.setViewportSize({ width: 550, height: 1000 });
 
+    // go site laboutik
+    await page.goto(process.env.LABOUTIK_URL)
+
+    await page.locator('#site-name', {hasText: 'TiBillet Staff Admin'}).waitFor()
+    
     // permet d'attendre une fin de redirection
-    await page.waitForLoadState('networkidle')
+    // await page.waitForLoadState('networkidle')
 
     // 2 cliques sur menu burger
     await page.locator('a[class="sidebar-header-menu sidebar-toggle"]').dblclick()
@@ -510,7 +542,7 @@ export const setPointSale = async function (pointSale, options) {
     // connexion admin
     const browser = await chromium.launch()
     page = await browser.newPage()
-    await page.goto(env.domain)
+    await page.goto(process.env.LABOUTIK_URL)
 
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')

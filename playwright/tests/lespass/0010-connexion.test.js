@@ -32,7 +32,6 @@ test.describe("Lespass", () => {
     await page.close()
   })
 
-
   test("Connexion - sans email ", async ({ browser }) => {
     page = await browser.newPage()
     // await page.goto(env.domain + env.adminLink)

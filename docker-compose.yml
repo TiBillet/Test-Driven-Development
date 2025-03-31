@@ -240,6 +240,7 @@ services:
     container_name: playwright
     build: playwright/PlaywrightDockerFile
     network_mode: host
+    env_file: ".env"
     volumes:
       - ./playwright:/playwright
     tty: true

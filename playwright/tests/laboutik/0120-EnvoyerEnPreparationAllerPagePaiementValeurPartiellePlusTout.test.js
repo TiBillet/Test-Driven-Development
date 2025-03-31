@@ -1,3 +1,8 @@
+// chargement des variables d'environnement (.env)
+import * as dotenv from 'dotenv'
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
+
 import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, selectArticles, confirmation, articlesListNoVisible,

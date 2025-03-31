@@ -1,10 +1,14 @@
-// DEBUG=True / DEMO=True / language = en
+// chargement des variables d'environnement (.env)
+import * as dotenv from 'dotenv'
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
+
+// DEBUG=1 / DEMO=1 / language = en
 import { test, expect } from '@playwright/test'
 import {
   connection, getTranslate, changeLanguage, goPointSale, newOrderIsShow, getStyleValue, confirmation,
   getEntity
 } from '../../mesModules/commun.js'
-import { env } from '../../mesModules/env.js'
 
 let page
 let transactionTrans, okTrans, articlesTrans, sumTrans, validateTrans, cashTrans, paiementTypeTrans
@@ -210,7 +214,7 @@ test.describe("Test valeur fractionnée", () => {
 
   test("Même salle, 2 commandes, paiement fractionné 10=cash/6=cb.", async ({ browser }) => {
     page = await browser.newPage()
-    await page.goto(env.domain)
+    await page.goto(process.env.LABOUTIK_URL)
 
     // permet d'attendre une fin de redirection
     await page.waitForLoadState('networkidle')

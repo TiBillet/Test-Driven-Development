@@ -33,6 +33,7 @@ cd playwright
 docker compose up -d
 # use container
 docker exec -ti playwright bash
+npx playwright install
 ```
 
 ### lancer les tests
@@ -54,3 +55,7 @@ projet configurer pour chromium / project configure for chromium
 npx playwright test tests/lespass/ --headed
 
 ```
+
+## docker mailcatcher
+- lien: https://hub.docker.com/r/dockage/mailcatcher
+- src: wget https://raw.githubusercontent.com/dockage/mailcatcher/master/docker-compose.yml

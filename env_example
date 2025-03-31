@@ -1,1 +1,6 @@
 DOMAIN='tibillet.localhost'
+TEST_EMAIL='xxxxxxx@xxxx.com'
+LABOUTIK_URL='https://laboutik.tibillet.localhost/'
+DEMO_TAGID_CLIENT1='41726643'
+DEMO_TAGID_CLIENT2='93BD3684'
+DEMO_TAGID_CLIENT3='F18923CB'

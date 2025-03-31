@@ -1,10 +1,14 @@
-// cashless_demo1.env DEBUG=True / DEMO=True / language = en
+// chargement des variables d'environnement (.env)
+import * as dotenv from 'dotenv'
+const root = process.cwd()
+dotenv.config({ path: root + '/../.env' })
+
+// DEBUG=1 / DEMO=1 / language = en
 import { test, devices, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, selectArticles, checkBillDirectService, getStyleValue, getTranslate,
   newOrderIsShow, goTableOrder, articlesListIsVisible, bigToFloat, totalListeArticles, checkAlreadyPaidBill, getEntity
 } from '../../mesModules/commun.js'
-import { env } from '../../mesModules/env.js'
 
 let page, selTableTrans, totalUppercaseTrans, currencySymbolTrans, returnTrans, transactionTrans, okTrans
 let sendPrepaTrans, articlesTrans, allTrans, valueTrans, prepaTrans, shortcutPrepaTrans, transO, transS
@@ -186,7 +190,7 @@ test.describe("Commandes", () => {
   test('Etat page préparation = "Non servie - Non payée" pour la table S01.', async () => {
     // Clique sur "Prépara." et attend le retour des préparations pour la table S01
     const [response] = await Promise.all([
-      page.waitForResponse(env.domain + 'wv/preparation/1'),
+      page.waitForResponse(process.env.LABOUTIK_URL + 'wv/preparation/1'),
       page.locator(`#commandes-table-menu div >> text=${shortcutPrepaTrans}`).click()
     ])
     // statut serveur
@@ -261,7 +265,7 @@ test.describe("Commandes", () => {
   test('Préparation table S01, 2 commandes, valider une commande(CdBoeuf et Gateau); status: non servie et non payé  ', async () => {
     // valider la préparation de la commande contenant 'CdBoeuf' et attend le retour des préparations
     const [response] = await Promise.all([
-      page.waitForResponse(env.domain + 'wv/preparation'),
+      page.waitForResponse(process.env.LABOUTIK_URL + 'wv/preparation'),
       page.locator('.com-conteneur', { hasText: 'CdBoeuf' }).locator('.test-action-validate-prepa').click()
     ])
 
@@ -284,7 +288,7 @@ test.describe("Commandes", () => {
   test('Préparation table S01, 2 commandes, valider la  2ème commande(Pression 33); status: servie et non payé  ', async () => {
     // valider la préparation de la commande contenant 'Pression 33' et attend le retour des préparations
     const [response] = await Promise.all([
-      page.waitForResponse(env.domain + 'wv/preparation'),
+      page.waitForResponse(process.env.LABOUTIK_URL + 'wv/preparation'),
       page.locator('.com-conteneur', { hasText: 'Pression 33' }).locator('.test-action-validate-prepa').click()
     ])
 
@@ -356,7 +360,7 @@ test.describe("Commandes", () => {
 
     // Clique sur "Prépara." et attend le retour des préparations pour la table S01
     const [response] = await Promise.all([
-      page.waitForResponse(env.domain + 'wv/preparation/1'),
+      page.waitForResponse(process.env.LABOUTIK_URL + 'wv/preparation/1'),
       page.locator(`#commandes-table-menu div >> text=${shortcutPrepaTrans}`).click()
     ])
 
@@ -421,7 +425,7 @@ test.describe("Commandes", () => {
 
     // Clique sur "Prépara." et attend le retour des préparations pour la table S01
     const [response] = await Promise.all([
-      page.waitForResponse(env.domain + 'wv/preparation/1'),
+      page.waitForResponse(process.env.LABOUTIK_URL + 'wv/preparation/1'),
       page.locator(`#commandes-table-menu div >> text=${shortcutPrepaTrans}`).click()
     ])
 

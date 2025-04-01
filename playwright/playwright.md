@@ -3,11 +3,12 @@
 ## Installer playwright
 Dans le dossier playwright
 ```
+npm i
 npx playwright install
-npm install @playwright/test
 ```
 
 ## Lancer les tests avec le visuel du navigateur(sans docker/conteneur) 
+Attention avant de lancer des tests vous devez remettre à zéro les db fedow/lespass et laboutik
 
 ### Tests LaBoutik
 ```

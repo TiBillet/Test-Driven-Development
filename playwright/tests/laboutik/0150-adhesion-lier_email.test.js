@@ -147,8 +147,8 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
     await response
 
     // popup warning acces email for access profil is vissible
-    // const popupTrans = lespassTranslate('validateEmailForAccessprofile', lespassLanguage)
-    // await expect(page.locator('#toastContainer div[class="toast show"] div[class="toast-body"]', { hasText: popupTrans })).toBeVisible()
+    const popupTrans = lespassTranslate('validateEmailForAccessprofile', lespassLanguage)
+    await expect(page.locator('#toastContainer div[class="toast show"] div[class="toast-body"]', { hasText: popupTrans })).toBeVisible()
 
     // go url de confirmation
     urlConfirmation = await page.locator('#toastContainer a', { hasText: 'TEST MODE' }).getAttribute('href')
@@ -159,8 +159,6 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
 
   test("Le client détient les adhésions", async ({ browser }) => {
     const page = await browser.newPage()
-    // dev
-    // urlConfirmation = 'https://lespass.tibillet.localhost/emailconfirmation/OWFjZjA2ODMtMjliMS00ZDY4LTliNTktYjBlNjMzYTdjYjg5OjF0eks5aToyeG5aMmpPYnBDeFZzVGJQa0F0Z1REa2pVV2NtWW5nOTBDR3YybE1HbTNB'
 
     // go lespass avec url de confirmation
     await page.goto(urlConfirmation)

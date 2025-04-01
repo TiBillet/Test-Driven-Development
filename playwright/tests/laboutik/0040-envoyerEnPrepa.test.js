@@ -234,8 +234,6 @@ test.describe("Commandes", () => {
 
           // pour chaque lieu de préparation (cuisine, bar, ...) tester une fois seulement la présence(visibilitée) de éléments si-dessous dans le bloque
           if (j === 0) {
-            // prendre une capture d'écran, fonctionne aussi en tests non visuels
-            await page.screenshot({ path: 'prepa-' + j + '.png', fullPage: true })
             // vérifeir l'affichage de l'heure
             await expect(page.locator('.com-conteneur', { hasText: nomArticle }).locator('.test-ref-time-value', { hasText: heure })).toBeVisible()
 

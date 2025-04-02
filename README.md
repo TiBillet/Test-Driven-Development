@@ -58,10 +58,11 @@ docker network create frontend
 
 ### Prérequis
 
-#### modifier la variable ROOT_PATH dans le script ./dev_environment_auto/star_env_dev
+#### Modifier la variable ROOT_PATH
+Dans le script ./dev_environment_auto/star_env_dev et ./playwright/stop_env   
 exemple: ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
 
-#### Vérifier que vos fichiers d'env sont correctes
+#### Vérifier que vos fichiers .env sont correctes
 
 #### Vérifier chaque conteneur(Fedow, Lespass, LaBoutik) est bien construit(build) et se lance correctement
 ```bash
@@ -80,6 +81,8 @@ docker exec -ti playwright /bin/bash -c "npx playwright test tests/lespass/"
 ```
 
 #### Lancer les tests (dans le dossier Test-Driven-Development)
+Appliquer la commande "chmod +x" à chaque fichier du dossier ./dev_environment_auto/.  
+Faire de même au script start_all_tests
 ```bash
 ./start_all_tests
 ```

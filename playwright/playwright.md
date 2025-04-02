@@ -40,5 +40,6 @@ projet configurer pour chromium / project configure for chromium
 ### Dossier des tests :
 ./tests
 
-### Nom des fichiers de test :
-00xx-xxxxxx.test.js
+### Exemples de nommage des fichiers pour les tests :
+0001-xxxxxx.test.js
+0002-xxxxxx.test.js

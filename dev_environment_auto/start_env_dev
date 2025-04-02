@@ -18,7 +18,7 @@ else
     # lancement containers et logs
     byobu select-pane -t 0
     byobu send-keys "cd $ROOT_PATH" Enter
-    byobu send-keys "./dev_environment_auto/launch_containers $1" Enter
+    byobu send-keys "./dev_environment_auto/launch_containers" Enter
 
     # lancement fedow
     byobu select-pane -t 1

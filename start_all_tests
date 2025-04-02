@@ -1,2 +1,0 @@
-#!/bin/bash
-gnome-terminal -- ./dev_environment_auto/start_env_dev all_tests

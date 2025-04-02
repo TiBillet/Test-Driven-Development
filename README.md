@@ -59,7 +59,7 @@ docker network create frontend
 ### Prérequis
 
 #### Modifier la variable ROOT_PATH
-Dans le script ./dev_environment_auto/star_env_dev et ./playwright/stop_env   
+Dans le script ./dev_environment_auto/star_env_dev et ./playwright/stop_env
 exemple: ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
 
 #### Vérifier que vos fichiers .env sont correctes
@@ -72,18 +72,21 @@ docker compose down
 ```
 
 #### Ajouter vos dossiers de tests
-Dans la méthode all_tests du fichier ./dev_environment_auto/launch_tests; exemple :
+Dans la méthode all_tests du fichier ./dev_environment_auto/launch_all_tests; exemple :
 ```bash
-echo "Lancement tests laboutik :"
+echo "- Lancement des test du dossier tests/laboutik/" 
 docker exec -ti playwright /bin/bash -c "npx playwright test tests/laboutik/"
+# ajouter ici vos dossiers de tests / add your test files here
 echo "Lancement tests lespass :"
 docker exec -ti playwright /bin/bash -c "npx playwright test tests/lespass/"
 ```
 
 #### Lancer les tests (dans le dossier Test-Driven-Development)
 Appliquer la commande "chmod +x" à chaque fichier du dossier ./dev_environment_auto/.  
-Faire de même pour ./start_all_tests, ./playwright/start_env et ./playwright/stop_env 
+Faire de même pour ./playwright/start_all_tests, ./playwright/start_env et ./playwright/stop_env 
 ```bash
+cd playwright
+./start_env
 ./start_all_tests
 ```
 

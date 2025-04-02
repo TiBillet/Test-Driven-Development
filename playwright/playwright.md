@@ -30,7 +30,8 @@ npx playwright test tests/laboutik/ --headed
 ## Attention
 Avant de lancer des tests vous devez remettre à zéro les db fedow/lespass et laboutik
 ```bash
-start_env
+./start_env
+./start_all_tests
 ```
 
 

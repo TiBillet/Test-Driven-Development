@@ -1,0 +1,15 @@
+#!/bin/bash
+all_tests () {
+  echo "- Lancement des test du dossier tests/laboutik/" 
+  docker exec -ti playwright /bin/bash -c "npx playwright test tests/laboutik/"
+  # ajouter ici vos dossiers de tests / add your test files here
+}
+
+# le dossier ./playwright/node_modules n'existe pas
+if [ ! -d "../playwright/node_modules" ]; then
+  echo "Installation de playwrigh :"
+  docker exec -ti playwright /bin/bash -c "npm i"
+fi
+
+all_tests
+

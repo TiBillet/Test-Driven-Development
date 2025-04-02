@@ -5,6 +5,6 @@ docker exec -it lespass_django /bin/bash -c "./flush.sh" | while read line; do
   echo $line
   if [[ $line == *"INFO Listening on TCP address 0.0.0.0:8002"* ]]; then 
     # tmux send-keys -t 2 "./launch_laboutik" Enter
-    tmux send-keys -t 3 "./dev_environment_auto/launch_laboutik $1" Enter
+    tmux send-keys -t 3 'docker exec -it laboutik_django /bin/bash -c "./flush.sh"' Enter
   fi
 done

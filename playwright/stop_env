@@ -1,4 +1,5 @@
 #!/bin/bash
+tmux kill-server
 ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
 cd $ROOT_PATH
 docker compose down

@@ -46,55 +46,46 @@ rsp # alias for python manage.py runserver 0.0.0.0:8000, to start the server if 
 
 You have to do the same with : `lespass_django` and `laboutik_django`
 
+## Python Test
+Flush the 3 container and run `./manage.py test` on the `laboutik_django` container
 
-### Test
-
-##### Prérequis
-###### créer le réseau "frontend" pour l'environnement de dev
+## Create network "frontend"
 ```bash
 docker network create frontend
 ```
 
-###### modifier la variable ROOT_PATH dans le script star_dev
+## Test Playwright
+
+### Prérequis
+
+#### modifier la variable ROOT_PATH dans le script ./dev_environment_auto/star_env_dev
 exemple: ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
 
-###### Vérifier que vos fichiers d'env sont correctes
+#### Vérifier que vos fichiers d'env sont correctes
 
-###### Supprimer les sessions byobu / tmux 
+#### Vérifier chaque conteneur(Fedow, Lespass, LaBoutik) est bien construit(build) et se lance correctement
 ```bash
-tmux kill-server
+docker compose build
+docker compose up -d
+docker compose down
 ```
 
-#### Construire et arrêter les containers de chaque dépôts (Fedow, Lespass, LaBoutik)
+#### Ajouter vos dossiers de tests
+Dans la méthode all_tests du fichier ./dev_environment_auto/launch_tests; exemple :
 ```bash
-docker compose up -d && docker compose down
+echo "Lancement tests laboutik :"
+docker exec -ti playwright /bin/bash -c "npx playwright test tests/laboutik/"
+echo "Lancement tests lespass :"
+docker exec -ti playwright /bin/bash -c "npx playwright test tests/lespass/"
 ```
 
-#### Lancer l'environnement de dev (dans le dossier Test-Driven-Development)
+#### Lancer les tests (dans le dossier Test-Driven-Development)
 ```bash
-./start_dev
+./start_all_tests
 ```
-
-#### Playright test
-This is the end to end test, with a headless chrome :
-```bash
-# in playwright container
-docker exec -ti playwright bash
-npm i
-clear && npx playwright test tests/laboutik/
-# think install the requested dependencies and restart the previus command
-```
-
-#### Relancer l'environnement de dev
-- Ctrl + c
-- tmux kill-server
-- ./start_dev
 
 #### Si problèmes docker (pour une nouvelle installation des containers de dev)
 ```bash
 docker system prune -a
 ```
-- Relancer l'étape Test
-
-#### Python Test
-Flush the 3 container and run `./manage.py test` on the `laboutik_django` container
+- Relancer l'étape Test Playwright

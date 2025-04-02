@@ -82,7 +82,7 @@ docker exec -ti playwright /bin/bash -c "npx playwright test tests/lespass/"
 
 #### Lancer les tests (dans le dossier Test-Driven-Development)
 Appliquer la commande "chmod +x" à chaque fichier du dossier ./dev_environment_auto/.  
-Faire de même au script start_all_tests
+Faire de même pour ./start_all_tests, ./playwright/start_env et ./playwright/stop_env 
 ```bash
 ./start_all_tests
 ```

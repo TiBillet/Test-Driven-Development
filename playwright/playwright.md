@@ -1,46 +1,44 @@
-# Playwright
+# Playwright Docker
+
+## Lancement de l'environnement de dev :
+ En local.   
+ .../Test-Driven-Development/start_env_dev
+
+## Lancement des tests laboutik
+Dans .../Test-Driven-Development/playwright/
+```
+docker exec -ti playwright bash
+# une dans le conteneur
+# instalation des dépendences
+npm i
+# lancement des tests laboutik
+npx playwright test tests/laboutik/
+```
+
+## Relancer de l'environnement de dev avant chaque test:
+Dans l'un des terminaux de developpement:   
+- ctrl + c
+- tmux kill-server
+- .../Test-Driven-Development/start_env_dev
+
+# Playwright developpement de test en local
 
 ## Installer playwright
-Dans le dossier playwright
+Dans .../Test-Driven-Development/playwright/
 ```
 npm i
 npx playwright install
 ```
 
-## Lancer les tests avec le visuel du navigateur(sans docker/conteneur) 
-Attention avant de lancer des tests vous devez remettre à zéro les db fedow/lespass et laboutik
-
-### Tests LaBoutik
+### Tests LaBoutik (avec l'interface du navigateur)
 ```
 cd playwright
 npx playwright test tests/laboutik/ --headed
 
 ```
 
-### Sortie console, Demande d'installation; réponder "y"
-```
-Need to install the following packages:
-playwright@1.51.1
-Ok to proceed? (y) y
-```
-
-
-## Docker
-
-### Lancer le conteneur playwright
-```
-cd playwright
-# launch container
-docker compose up -d
-# use container
-docker exec -ti playwright bash
-npx playwright install
-```
-
-### lancer les tests
-```
-npx playwright test tests/laboutik/
-```
+## Attention
+Avant de lancer des tests vous devez remettre à zéro les db fedow/lespass et laboutik
 
 ## Infos
 projet configurer pour chromium / project configure for chromium
@@ -50,13 +48,3 @@ projet configurer pour chromium / project configure for chromium
 
 ### Nom des fichiers de test :
 00xx-xxxxxx.test.js
-
-## Tests "LesPass" avec le visuel du navigateur(sans docker/conteneur) 
-```
-npx playwright test tests/lespass/ --headed
-
-```
-
-## docker mailcatcher
-- lien: https://hub.docker.com/r/dockage/mailcatcher
-- src: wget https://raw.githubusercontent.com/dockage/mailcatcher/master/docker-compose.yml

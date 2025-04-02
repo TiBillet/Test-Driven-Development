@@ -1,4 +1,5 @@
 #!/bin/bash
+tmux kill-server
 SESSION_NAME="TEST-DRIVEN"
 ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
 
@@ -9,7 +10,7 @@ else
     byobu new-session -d -s 'test'
     byobu rename-window -t 'test':0 $SESSION_NAME
 
-    #  # 3 terminaux
+    # 3 terminaux
     byobu split-window -v
     byobu split-window -v
     byobu split-window -v
@@ -17,7 +18,7 @@ else
     # lancement containers et logs
     byobu select-pane -t 0
     byobu send-keys "cd $ROOT_PATH" Enter
-    byobu send-keys "./launch_containers $ROOT_PATH" Enter
+    byobu send-keys "./dev_environment_auto/launch_containers $1" Enter
 
     # lancement fedow
     byobu select-pane -t 1
@@ -30,6 +31,7 @@ else
     # lancement laboutik
     byobu select-pane -t 3
     byobu send-keys "cd $ROOT_PATH" Enter
+
 
     # visualiser la session byobu dans la console
     byobu attach-session -t "test"

@@ -14,7 +14,7 @@ test.use({
   ignoreHTTPSErrors: true
 })
 
-test.describe("Créer instance", () => {
+test.describe.skip("Créer instance", () => {
 
   test("Recuperation  login", async ({ browser }) => {
     page = await browser.newPage()

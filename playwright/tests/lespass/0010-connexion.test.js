@@ -3,11 +3,12 @@
 */
 import { test, expect } from '@playwright/test'
 import * as dotenv from 'dotenv'
+import { detectLanguage, lespassTranslate } from '../../mesModules/communLespass.js'
 
 const root = process.cwd()
 dotenv.config({ path: root + '/../.env' })
-let domain = process.env.DOMAINTESTLESPASS, page, urlConfirmation='inconnue'
-const email = process.env.EMAILTESTLOGIN
+let page, urlConfirmation = 'inconnue', language
+const email = process.env.TEST_EMAIL
 
 test.use({
   viewport: { width: 2000, height: 1000 },
@@ -15,27 +16,13 @@ test.use({
 })
 
 test.describe("Lespass", () => {
-  test("Création compte email ", async ({ browser }) => {
+  test("Connexion - sans entrer l'email", async ({ browser }) => {
     page = await browser.newPage()
-    // aller web mail YOPmail.com avec compte testyoyo974
-    await page.goto('https://yopmail.com/')
+    // aller à la page lespass
+    await page.goto(process.env.LESPASS_URL)
 
-    // consentir
-    await page.locator('button[aria-label="Consent"]').click()
-
-    // entrer email
-    await page.locator('#login').fill(email)
-
-    // soumettre l'email
-    await page.locator('#refreshbut').click()
-
-    await page.close()
-  })
-
-  test("Connexion - sans email ", async ({ browser }) => {
-    page = await browser.newPage()
-    // await page.goto(env.domain + env.adminLink)
-    await page.goto(domain)
+    // détecter le langage
+    language = await detectLanguage(page)
 
     // clique bt "Me connecter"
     await page.locator('nav button[aria-controls="loginPanel"]').click()
@@ -66,41 +53,28 @@ test.describe("Lespass", () => {
     await response
 
     // message success
-    await expect(page.locator('div[class="toast-body"]', { hasText: "To access your space, please validate your email address. Don't forget to check your spam!" })).toBeVisible()
-    await page.close()
-  })
+    const successMsg = lespassTranslate('validateEmailToLogin', language)
+    await expect(page.locator('div[class="toast-body"]', { hasText: successMsg })).toBeVisible()
 
-  test("Confirmer  email ", async ({ browser }) => {
-    page = await browser.newPage()
-    await page.pause()
-    // aller web mail YOPmail.com avec compte testyoyo974
-    await page.goto('https://yopmail.com/')
-
-    // consentir
-    await page.locator('button[aria-label="Consent"]').click()
-    
-    // entrer email
-    await page.locator('#login').fill(email)
-
-    // soumettre l'email
-    await page.locator('#refreshbut').click()
-
-    // récupération url mail de confirmation
-    urlConfirmation = await page.locator('iframe[name="ifmail"]').contentFrame().getByRole('link', { name: 'Confirmer' }).getAttribute('href')
-
-    expect(urlConfirmation).toContain('https://lespass.demo.tibillet.org/emailconfirmation')
-    await page.close()
+    // await page.close()
   })
 
   test("Test login email ", async ({ browser }) => {
-    page = await browser.newPage()
-    // go lespass avec url de confirmation
-    await page.goto(urlConfirmation)
+    // url à attendre
+    const response = page.waitForRequest('**/lespass.tibillet.localhost/emailconfirmation/**')
 
-    // connexion ok
-    await expect(page.locator('#toastContainer div[class="toast-body"]', { hasText: "Vous êtes bien connecté. Bienvenue !" })).toBeVisible()
+    // cliquer bt "TEST MODE"
+    await page.locator('a', { hasText: 'TEST MODE' }).click()
 
-    // await page.pause()
+    // attend la fin du chargement de l'url
+    await response
+
+    // titre "Le Tiers-Lustre" visible
+    await expect(page.locator('h1', { hasText: 'Le Tiers-Lustre' })).toBeVisible()
+
+    const loginOkText = lespassTranslate('fullyLoggedIn', language)
+    await expect(page.locator('#toastContainer div[class="toast-body"]', { hasText: loginOkText })).toBeVisible()
+
     await page.close()
   })
 })

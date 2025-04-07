@@ -10,7 +10,7 @@ export const detectLanguage = async function (page) {
       retour = document.querySelector('html').getAttribute('lang')
     } catch (error) {
       retour = "???"
-      console.log('Language = ???')
+      console.log('DetectLanguage, error; language = ???')
     }
     return retour
   })
@@ -31,6 +31,11 @@ const lespassTransList = [
     key: 'fullyLoggedIn',
     fr: 'Vous êtes correctement identifié·e. Bienvenue !',
     en: 'You are fully logged in. Welcome!'
+  },
+  {
+    key: 'validateEmailToLogin',
+    fr: 'Pour accéder à votre espace, merci de valider votre adresse mail. Pensez à vérifier les spams !',
+    en: "To access your space, please validate your email address. Don't forget to check your spam!"
   }
 ]
 

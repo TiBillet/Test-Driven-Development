@@ -50,7 +50,11 @@ const config = {
     },*/
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      use: {
+        ...devices['Desktop Chrome'],
+        locale: 'fr-FR',
+        timezoneId: 'Europe/Paris'
+      }
     }/*,
     {
       name: 'webkit',

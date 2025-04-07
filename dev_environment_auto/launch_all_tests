@@ -3,6 +3,8 @@ all_tests () {
   echo "- Lancement des test du dossier tests/laboutik/" 
   docker exec -ti playwright /bin/bash -c "npx playwright test tests/laboutik/"
   # ajouter ici vos dossiers de tests / add your test files here
+  echo "- Lancement des test du dossier tests/lespass/" 
+  docker exec -ti playwright /bin/bash -c "npx playwright test tests/lespass/"
 }
 
 # le dossier ./playwright/node_modules n'existe pas

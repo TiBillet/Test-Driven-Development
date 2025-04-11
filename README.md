@@ -58,9 +58,12 @@ docker network create frontend
 
 ### Prérequis
 
-#### Modifier la variable ROOT_PATH
-Dans le script ./dev_environment_auto/star_env_dev et ./playwright/stop_env
+#### Modifier la variable ROOT_PATH et PLAYWRIGHT_PATH
+- Dans le script ./dev_environment_auto/star_env_dev   
 exemple: ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
+
+- Dans ./playwright/stop_env   
+exemple: PLAYWRIGHT_PATH="/media/travail/developpement/gits/Test-Driven-Development/playwright/"
 
 #### Vérifier que vos fichiers .env sont correctes
 

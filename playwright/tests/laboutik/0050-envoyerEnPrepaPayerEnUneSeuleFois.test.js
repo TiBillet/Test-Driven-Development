@@ -143,7 +143,7 @@ test.describe("Commandes, payer en une seule fois", () => {
     await expect(page.locator('.test-return-title-content')).toHaveText('Transaction ok')
 
     // sur carte 10 Unités
-    await expect(page.locator('.test-return-total-carte')).toHaveText(`--- - carte 10 ${currencySymbolTrans}`)
+    await expect(page.locator('.test-return-total-carte')).toHaveText(`CLIENT 2 - carte 10 ${currencySymbolTrans}`)
 
     // clique sur bouton "RETOUR"
     await page.locator('#popup-retour').click()

@@ -16,13 +16,19 @@ test.use({
 })
 
 test.describe("Lespass", () => {
-  test("Connexion - sans entrer l'email", async ({ browser }) => {
+  test("Connexion - sans entrer l'email", async ({browser}) => {
     page = await browser.newPage()
+
     // aller à la page lespass
     await page.goto(process.env.LESPASS_URL)
 
+    await page.pause()
+
+
     // détecter le langage
     language = await detectLanguage(page)
+    console.log('language =', language);
+
 
     // clique bt "Me connecter"
     await page.locator('nav button[aria-controls="loginPanel"]').click()
@@ -31,12 +37,13 @@ test.describe("Lespass", () => {
 
     // valider 
     await page.locator('#loginForm button[type="submit"]').click()
+    // await page.screenshot({ path: 'msgForm1.png' })
 
-    const validationMessage = await inputEmail.evaluate((element) => {
-      return element.validationMessage
+    const validationEmail = await inputEmail.evaluate((element) => {
+      return element.checkValidity()
     })
 
-    expect(validationMessage).toContain("Veuillez renseigner ce champ.")
+    expect(validationEmail).toEqual(false)
   })
 
   test("Connexion - avec email ", async () => {
@@ -55,8 +62,6 @@ test.describe("Lespass", () => {
     // message success
     const successMsg = lespassTranslate('validateEmailToLogin', language)
     await expect(page.locator('div[class="toast-body"]', { hasText: successMsg })).toBeVisible()
-
-    // await page.close()
   })
 
   test("Test login email ", async ({ browser }) => {
@@ -69,6 +74,7 @@ test.describe("Lespass", () => {
     // attend la fin du chargement de l'url
     await response
 
+    await page.screenshot({ path: 'r1.png' })
     // titre "Le Tiers-Lustre" visible
     await expect(page.locator('h1', { hasText: 'Le Tiers-Lustre' })).toBeVisible()
 

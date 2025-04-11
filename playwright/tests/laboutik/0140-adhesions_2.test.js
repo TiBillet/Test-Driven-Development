@@ -112,8 +112,8 @@ test.describe("Prise de deux adhésions", () => {
     // 'Adhésion' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: membershipTrans })).toBeVisible()
 
-    // nom du membre = "---" / anonyme
-    await expect(page.locator('.test-return-membre-name', { hasText: '---' })).toBeVisible()
+    // nom du membre = "CLIENT 2" / anonyme
+    await expect(page.locator('.test-return-membre-name', { hasText: 'CLIENT 2' })).toBeVisible()
 
     //  Total(cb) 40.00 "Unités" est affiché
     await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cbTrans}) 40.00 ${currencySymbolTrans}` })).toBeVisible()
@@ -184,8 +184,8 @@ test.describe("Prise de deux adhésions", () => {
     // 'Adhésion' est affiché
     await expect(page.locator('.test-return-title-content', { hasText: membershipTrans })).toBeVisible()
 
-    // nom du membre = "---" / anonyme
-    await expect(page.locator('.test-return-membre-name', { hasText: '---' })).toBeVisible()
+    // nom du membre = "CLIENT 2" / anonyme
+    await expect(page.locator('.test-return-membre-name', { hasText: 'CLIENT 2' })).toBeVisible()
 
     //  Total(espèce) 20.00 Unités est affiché
     await expect(page.locator('#popup-cashless .test-return-total-achats', { hasText: `${totalTrans}(${cashLowercaseTrans}) 20.00 ${currencySymbolTrans}` })).toBeVisible()

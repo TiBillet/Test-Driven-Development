@@ -1,3 +1,5 @@
+import { test, expect } from '@playwright/test'
+
 /**
  * Detect Lespass language
  * @param {*} page 
@@ -53,4 +55,41 @@ export function lespassTranslate(key, language) {
     console.log('-> lespassTranslate : unknown key')
     return '??? unknown key ???'
   }
+}
+
+
+/**
+ * Connexion lespass
+ * @param {object} page page html en cours
+ */
+export const lespassClientConnection = async function (page) {
+  await test.step('Connexion Lespass', async () => {
+    // aller à la page lespass
+    await page.goto(process.env.LESPASS_URL)
+
+    // détecter le langage
+    const language = await detectLanguage(page)
+    console.log('language =', language);
+
+    // clique bt "Me connecter"
+    await page.locator('nav button[aria-controls="loginPanel"]').click()
+
+    // entrer email
+    await page.fill('#loginEmail', process.env.TEST_EMAIL)
+
+    // valider 
+    await page.locator('#loginForm button[type="submit"]').click()
+
+    // url à attendre
+    const response = page.waitForRequest('**/lespass.tibillet.localhost/emailconfirmation/**')
+
+    // cliquer bt "TEST MODE"
+    await page.locator('a', { hasText: 'TEST MODE' }).click()
+
+    // attend la fin du chargement de l'url
+    await response
+
+    const loginOkText = lespassTranslate('fullyLoggedIn', language)
+    await expect(page.locator('#toastContainer div[class="toast-body"]', { hasText: loginOkText })).toBeVisible()
+  })
 }

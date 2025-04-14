@@ -1,7 +1,7 @@
 #!/bin/bash
 tmux kill-server
 SESSION_NAME="TEST-DRIVEN"
-ROOT_PATH="/media/travail/developpement/gits/Test-Driven-Development/"
+ROOT_PATH="../"
 
 if tmux has-session -t $SESSION_NAME 2>/dev/null; then
     echo "Session $SESSION_NAME already exists. Attaching to it."

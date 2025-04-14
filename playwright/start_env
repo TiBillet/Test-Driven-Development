@@ -1,4 +1,3 @@
 #!/bin/bash
-PLAYWRIGHT_PATH="/media/travail/developpement/gits/Test-Driven-Development/playwright/"
-cd $PLAYWRIGHT_PATH
-gnome-terminal -- ../dev_environment_auto/start_env_dev
+cd ../dev_environment_auto
+gnome-terminal -- ./start_env_dev

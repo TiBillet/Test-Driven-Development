@@ -62,20 +62,26 @@ export function lespassTranslate(key, language) {
  * Connexion lespass
  * @param {object} page page html en cours
  */
-export const lespassClientConnection = async function (page) {
+export const lespassClientConnection = async function (page, email = process.env.TEST_EMAIL) {
+/*
+  if(email !== undefined) {
+    email = process.env.TEST_EMAIL
+  }
+    */
   await test.step('Connexion Lespass', async () => {
+    console.log('-> step Connexion Lespass, email =', email);
+    
     // aller à la page lespass
     await page.goto(process.env.LESPASS_URL)
 
     // détecter le langage
     const language = await detectLanguage(page)
-    console.log('language =', language);
 
     // clique bt "Me connecter"
     await page.locator('nav button[aria-controls="loginPanel"]').click()
 
     // entrer email
-    await page.fill('#loginEmail', process.env.TEST_EMAIL)
+    await page.fill('#loginEmail', email)
 
     // valider 
     await page.locator('#loginForm button[type="submit"]').click()

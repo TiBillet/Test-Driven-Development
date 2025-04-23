@@ -4,7 +4,7 @@ import { detectLanguage, lespassTranslate } from '../../mesModules/communLespass
 
 const root = process.cwd()
 dotenv.config({ path: root + '/../.env' })
-let page, urlConfirmation = 'inconnue', language
+let page, language
 const email = process.env.TEST_EMAIL
 
 test.use({
@@ -83,7 +83,7 @@ test.describe("Lespass", () => {
     // aller à la page lespass
     await page.goto(process.env.LESPASS_URL + 'admin')
 
-    // text 'Welcome back to nTiBillet' visible
+    // text 'Welcome back to TiBillet' visible
     await expect(page.locator('h1', {hasText: 'Welcome back to'})).toBeVisible()
     await expect(page.locator('h1', {hasText: 'TiBillet'})).toBeVisible()
 

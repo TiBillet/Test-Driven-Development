@@ -6,6 +6,8 @@ const root = process.cwd()
 dotenv.config({ path: root + '/../.env' })
 let page
 const email2 = process.env.TEST_EMAIL2, currencySymbol = '€'
+// dev
+// const email2 = "client2@maj.fr", currencySymbol = '€'
 const adhesions = [
   {
     name: 'Adhésion (Le Tiers-Lustre)',
@@ -38,6 +40,7 @@ test.describe("Recharge compte TiBillet", () => {
     // attend la fin du chargement de l'url
     await response
 
+    
     // url à attendre - "Recharger en TiBillets" 
     const responseRefillWallet = page.waitForRequest('**/my_account/refill_wallet')
     // cliquer sur "Recharger en TiBillets"
@@ -45,10 +48,8 @@ test.describe("Recharge compte TiBillet", () => {
     // attend la fin du chargement de l'url
     await responseRefillWallet
 
-    await page.waitForLoadState()
-
-    // stripe label "Recharge Primary Asset"  visible
-    await expect(page.locator('.ProductSummary-info span', { hasText: "Recharge Primary Asset" })).toBeVisible()
+     // Attendre que le text "Recharge Primary Asset" de la page stripe soit affichée/présente dans le dom
+     await page.waitForSelector('span[data-testid="product-summary-name"]', { hasText: "Recharge Primary Asset", state: 'attached' })
 
     // enttrer une recharge de 20Unité
     await page.locator('#customUnitAmount').fill('')
@@ -71,11 +72,11 @@ test.describe("Recharge compte TiBillet", () => {
   })
 
   test("Retour formulaire stripe pour Recharge compte TiBillet de 20 Unités = succès", async ({ browser }) => {
+    // Attendre que la table contenant le mot "Solde" soit affichée/présente dans le dom
+    await page.waitForSelector('table', { hasText: "Solde", state: 'attached' })
+
     // message de succès "Tirelire rechargée" affiché
     await expect(page.locator('#toastContainer div[class="toast-body"]', { hasText: 'Tirelire rechargée' })).toBeVisible()
-
-    // Attend que la table contenant le mot "Solde" soit affichée/présent dans le dom
-    await page.waitForSelector('table', { hasText: "Solde", state: 'attached' })
 
     // récupère le solde et remplace le symbole décimal "." par ","
     // playwright navigateur(headed) utilise "," / playwright sans navigateur(headless) utilise "."

@@ -4,8 +4,9 @@ import { lespassClientConnection } from '../../mesModules/communLespass.js'
 
 const root = process.cwd()
 dotenv.config({ path: root + '/../.env' })
-let page 
+let page
 const email2 = process.env.TEST_EMAIL2, currencySymbol = '€'
+
 const adhesions = [
   {
     name: 'Adhésion (Le Tiers-Lustre)',
@@ -191,7 +192,7 @@ test.describe("Statut et prise d'adhésions", () => {
     await page.locator('#membership-form input[name="lastname"]').fill("Dupont")
 
     // Sélectionnner "Livraison à l'asso"
-    page.locator('#membership-form .form-check', { hasText: "Livraison à l'asso" }).locator('input').click()
+    await page.locator('#membership-form .form-check', { hasText: "Livraison à l'asso" }).locator('input').click()
 
     // url à attendre - paiement stripe
     const response = page.waitForRequest('**/memberships/')
@@ -220,6 +221,9 @@ test.describe("Statut et prise d'adhésions", () => {
   test("Retour formulaire stripe pour 'Panier AMAP (Le Tiers-Lustre)' mensuel de 40 Unité = succès", async ({ browser }) => {
     // Attendre fin de chargement
     await page.waitForNavigation()
+
+    // Attendre que la page Adhésions soit affichée/présente dans le dom
+    await page.waitForSelector('main h1', { hasText: "Adhésions", state: 'attached' })
 
     // message de succès pour l'adhésion panier amap 40 unité
     const successMsg = 'Votre adhésion a été validé. Vous allez recevoir un mail de confirmation. Merci !'
@@ -283,7 +287,7 @@ test.describe("Statut et prise d'adhésions", () => {
   test("Retour formulaire stripe pour 'Adhésion (Le Tiers-Lustre)' - Annuelle - 20,00Unité = succès", async ({ browser }) => {
     // Attendre fin de chargement
     await page.waitForNavigation()
-
+ 
     // message de succès pour l'adhésion panier amap 40 unité
     const successMsg = 'Votre adhésion a été validé. Vous allez recevoir un mail de confirmation. Merci !'
     await expect(page.locator('#toastContainer div[class="toast-body"]', { hasText: successMsg })).toBeVisible()

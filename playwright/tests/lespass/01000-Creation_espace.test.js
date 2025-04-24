@@ -12,6 +12,7 @@ test.use({
   ignoreHTTPSErrors: true
 })
 
+// en attante devalidation
 test.describe.skip("Espace pour un collectif", () => {
   // TODO: ce test est à refaire en fonction de l'application d'une traduction
   test("Espace - page visible et liens ok", async ({ browser }) => {

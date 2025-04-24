@@ -37,7 +37,7 @@ test.describe("Vérification prise d'adhésions", () => {
 
     // titre "Adhésion (Le Tiers-Lustre) annuelle" visibe
     await expect(parent.locator('.card-title', {hasText: "Adhésion (Le Tiers-Lustre) annuelle"})).toBeVisible()
-    
+
     // proprio de l'adhésion visible "pour albert Dupont"
     await expect(parent.locator('.card-body h4', { hasText: "pour albert Dupont" })).toBeVisible()
 

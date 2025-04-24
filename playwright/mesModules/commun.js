@@ -126,7 +126,7 @@ export const changeLanguage = async function (page, language) {
     // Clique sur le menu burger
     await page.locator('.menu-burger-icon').click()
 
-    // Clicque sur LANGUE
+    // Cliquer sur LANGUE
     await page.locator('#menu-burger-conteneur .test-action-change-language').click()
 
     // attente affichage "popup-cashless"

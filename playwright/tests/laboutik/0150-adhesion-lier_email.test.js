@@ -152,7 +152,7 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
 
     // go url de confirmation
     urlConfirmation = await page.locator('#toastContainer a', { hasText: 'TEST MODE' }).getAttribute('href')
-    // console.log('urlConfirmation =', urlConfirmation)
+    console.log('urlConfirmation =', urlConfirmation)
 
     await page.close()
   })
@@ -163,6 +163,7 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
     // go lespass avec url de confirmation
     await page.goto(urlConfirmation)
 
+    lespassLanguage = await detectLanguage(page)
     // identification  ok
     const popupTrans = lespassTranslate('fullyLoggedIn', lespassLanguage)
     await expect(page.locator('#toastContainer div[class="toast-body"]', { hasText: popupTrans })).toBeVisible()

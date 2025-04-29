@@ -6,7 +6,7 @@ dotenv.config({ path: root + '/../.env' })
 // LaBoutik: DEBUG=1 / DEMO=1; language = en
 
 import { test, expect } from '@playwright/test'
-import { detectLanguage, lespassTranslate } from '../../mesModules/communLespass.js'
+import { detectLanguage, lespassTranslate, lespassClientConnection } from '../../mesModules/communLespass.js'
 import { connection, changeLanguage, getTranslate, getStyleValue, goPointSale, selectArticles, getEntity, resetCardCashless, clients } from '../../mesModules/commun.js'
 
 let laboutikClient = clients.client3
@@ -15,7 +15,7 @@ let anonymousCardTrans, directServiceTrans, paiementTypeTrans, confirmPaymentTra
 const email = process.env.TEST_EMAIL
 
 // attention la taille d'écran choisie affiche le menu burger
-test.use({ viewport: { width: 1200, height: 1200 }, ignoreHTTPSErrors: true })
+test.use({ viewport: { width: 1200, height: 1300 }, ignoreHTTPSErrors: true })
 
 test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.id}`, () => {
   // connexion à laboutik
@@ -101,7 +101,7 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
     await laboutikPage.close()
   })
 
-  test("Admin: lier un email à la carte client", async ({ browser }) => {
+  test("Admin: lier un email à la carte client et vérifier les adhésions de celui-ci", async ({ browser }) => {
     // connexion admin
     const page = await browser.newPage()
     await page.goto(process.env.LABOUTIK_URL)
@@ -115,7 +115,7 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
 
-    // cliquer sur "url qrcode"
+    // **** cliquer sur "url qrcode" ****
     await page.locator('#result_list tr', { hasText: laboutikClient.tagId }).locator('td[class="field-url_qrcode"]').click()
 
     // attendre menu visible donc la fin du chargement de l'url qrcode
@@ -147,23 +147,34 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
     await response
 
     // popup warning acces email for access profil is vissible
-    const popupTrans = lespassTranslate('validateEmailForAccessprofile', lespassLanguage)
+    let popupTrans = lespassTranslate('validateEmailForAccessprofile', lespassLanguage)
     await expect(page.locator('#toastContainer div[class="toast show"] div[class="toast-body"]', { hasText: popupTrans })).toBeVisible()
 
-    // go url de confirmation
-    urlConfirmation = await page.locator('#toastContainer a', { hasText: 'TEST MODE' }).getAttribute('href')
-    console.log('urlConfirmation =', urlConfirmation)
+    // url à attendre
+    const responseConfirmation = page.waitForRequest('**/lespass.tibillet.localhost/emailconfirmation/**')
 
+    // cliquer bt "TEST MODE"
+    await page.locator('a', { hasText: 'TEST MODE' }).click()
+
+    // attend la fin du chargement de l'url
+    await responseConfirmation
+
+    await page.screenshot({ path: 'screenshot0.png' });
     await page.close()
   })
 
-  test("Le client détient les adhésions", async ({ browser }) => {
+
+  test("Vérifier les adhésions après connexion à lespass", async ({ browser }) => {
     const page = await browser.newPage()
 
-    // go lespass avec url de confirmation
-    await page.goto(urlConfirmation)
+    // connexion lespass
+    await lespassClientConnection(page, email)
+
+    // Attendre que le message de succès  soit affichée/présente dans le dom
+    await page.waitForSelector('#tibillet-toast- div', { hasText: "Succès", state: 'attached' })
 
     lespassLanguage = await detectLanguage(page)
+
     // identification  ok
     const popupTrans = lespassTranslate('fullyLoggedIn', lespassLanguage)
     await expect(page.locator('#toastContainer div[class="toast-body"]', { hasText: popupTrans })).toBeVisible()
@@ -186,12 +197,14 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
     await transactionsLoad
 
     // TODO: modification à venir
-    // contient une ligne avec l'adhésion "Adhésion (Le Tiers-Lustre) Le Tiers-Lustre" / fusion = nth(0)
-    await expect(page.locator('div[class="table-responsive"] tr', { hasText: 'Adhésion (Le Tiers-Lustre) Le Tiers-Lustre'}).nth(1)).toBeVisible()
+    // contient une ligne avec l'adhésion "Adhésion (Le Tiers-Lustre) Le Tiers-Lustre"
+    await expect(page.locator('div[class="table-responsive"] tr', { hasText: 'Adhésion (Le Tiers-Lustre) Le Tiers-Lustre' })
+      .filter({ hasText: 'Abonnement ou adhésion' })).toBeVisible()
 
     // TODO: modification à venir
-    // contient une ligne avec l'adhésion "Panier AMAP (Le Tiers-Lustre) Le Tiers-Lustre" / fusion = nth(0)
-    await expect(page.locator('div[class="table-responsive"] tr', { hasText: 'Panier AMAP (Le Tiers-Lustre) Le Tiers-Lustre'}).nth(1)).toBeVisible()
+    // contient une ligne avec l'adhésion "Panier AMAP (Le Tiers-Lustre) Le Tiers-Lustre"
+    await  expect(page.locator('div[class="table-responsive"] tr', { hasText: 'Panier AMAP (Le Tiers-Lustre) Le Tiers-Lustre' })
+      .filter({ hasText: 'Abonnement ou adhésion' })).toBeVisible()
     await page.close()
   })
 })

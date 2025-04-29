@@ -62,39 +62,48 @@ export function lespassTranslate(key, language) {
  * Connexion lespass
  * @param {object} page page html en cours
  */
-export const lespassClientConnection = async function (page, email = process.env.TEST_EMAIL) {
-/*
-  if(email !== undefined) {
-    email = process.env.TEST_EMAIL
-  }
-    */
+export const lespassClientConnection = async function (page, email) {
   await test.step('Connexion Lespass', async () => {
-    console.log('-> step Connexion Lespass, email =', email);
-    
     // aller à la page lespass
     await page.goto(process.env.LESPASS_URL)
 
     // détecter le langage
     const language = await detectLanguage(page)
 
-    // clique bt "Me connecter"
-    await page.locator('nav button[aria-controls="loginPanel"]').click()
+    // le titre de la page est bien affichée.
+    await page.waitForSelector('main h1', { hasText: "Le Tiers-Lustre", state: "visible" })
+
+    // cliquer bt "Me connecter"
+    await page.locator('#mainMenu button[data-bs-target="#loginPanel"]').click()
+
+    // le formulaire "Connexion" est vivisible
+    await page.waitForSelector('#loginPanelLabel', { state: "visible" })
 
     // entrer email
     await page.fill('#loginEmail', email)
 
+    // url à attendre
+    const responseConnection = page.waitForRequest('**/connexion/')
+
     // valider 
     await page.locator('#loginForm button[type="submit"]').click()
 
-    // url à attendre
-    const response = page.waitForRequest('**/lespass.tibillet.localhost/emailconfirmation/**')
+    // attend la fin du chargement de l'url
+    await responseConnection
+
+    // attendre affichage message "Info"
+    await page.waitForSelector('#toastContainer div', { hasText: "Info", state: "visible" })
+
+    // url: attendre confirmation email
+    const responseEmailConfirmation = page.waitForRequest('**/emailconfirmation/**')
 
     // cliquer bt "TEST MODE"
-    await page.locator('a', { hasText: 'TEST MODE' }).click()
+    await page.locator('#toastContainer .toast-body a', { hasText: 'TEST MODE' }).click()
 
-    // attend la fin du chargement de l'url
-    await response
+    // attend la fin du chargement de l'url de confirmation d'email
+    await responseEmailConfirmation
 
+    // login ok
     const loginOkText = lespassTranslate('fullyLoggedIn', language)
     await expect(page.locator('#toastContainer div[class="toast-body"]', { hasText: loginOkText })).toBeVisible()
   })

@@ -40,7 +40,9 @@ test.describe("Recharge compte TiBillet", () => {
     // attend la fin du chargement de l'url
     await response
 
-    
+    // attendre que "Monnaies" soie visible
+    await page.waitForSelector('div h3', { hasText: "Monnaies", state: 'visible' })
+
     // url à attendre - "Recharger en TiBillets" 
     const responseRefillWallet = page.waitForRequest('**/my_account/refill_wallet')
     // cliquer sur "Recharger en TiBillets"
@@ -49,7 +51,7 @@ test.describe("Recharge compte TiBillet", () => {
     await responseRefillWallet
 
      // Attendre que le text "Recharge Primary Asset" de la page stripe soit affichée/présente dans le dom
-     await page.waitForSelector('span[data-testid="product-summary-name"]', { hasText: "Recharge Primary Asset", state: 'attached' })
+     await page.waitForSelector('span[data-testid="product-summary-name"]', { hasText: "Recharge Primary Asset", state: 'visible' })
 
     // enttrer une recharge de 20Unité
     await page.locator('#customUnitAmount').fill('')

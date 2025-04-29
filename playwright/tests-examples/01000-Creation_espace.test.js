@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import * as dotenv from 'dotenv'
-import { lespassClientConnection } from '../../mesModules/communLespass.js'
+import { lespassClientConnection } from '../mesModules/communLespass.js'
 
 const root = process.cwd()
 dotenv.config({ path: root + '/../.env' })

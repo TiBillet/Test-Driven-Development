@@ -67,7 +67,6 @@ test.describe("Lespass", () => {
     // attend la fin du chargement de l'url
     await response
 
-    await page.screenshot({ path: 'r1.png' })
     // titre "Le Tiers-Lustre" visible
     await expect(page.locator('h1', { hasText: 'Le Tiers-Lustre' })).toBeVisible()
 

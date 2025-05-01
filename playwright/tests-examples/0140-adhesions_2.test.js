@@ -7,7 +7,7 @@ dotenv.config({ path: root + '/../.env' })
 import { test, expect, chromium } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, getTranslate, getStyleValue, getEntity
-} from '../../mesModules/commun.js'
+} from '../mesModules/commun.js'
 
 let page, directServiceTrans, transactionTrans, okTrans, totalTrans, currencySymbolTrans, cbTrans
 let paiementTypeTrans, confirmPaymentTrans, membershipTrans, cashTrans, returnTrans, cashLowercaseTrans

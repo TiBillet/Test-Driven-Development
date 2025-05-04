@@ -92,14 +92,14 @@ services:
     command: 'bash start_dev.sh'
 
 
-  laboutik_celery:
-#    image: tibillet/laboutik:latest
-    extends:
-      file: ../../LaBoutik/docker-compose.yml
-      service: laboutik_celery
-#    command: 'bash start_dev.sh'
-    command: 'bash start_celery.sh'
-
+#  laboutik_celery:
+##    image: tibillet/laboutik:latest
+#    extends:
+#      file: ../../LaBoutik/docker-compose.yml
+#      service: laboutik_celery
+##    command: 'bash start_dev.sh'
+#    command: 'bash start_celery.sh'
+#
 
   laboutik_nginx:
     extends:

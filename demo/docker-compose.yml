@@ -138,7 +138,7 @@ services:
       service: laboutik_redis
 
   laboutik2_django:
-    image: tibillet/laboutik:latest
+#    image: tibillet/laboutik:latest
     hostname: laboutik2_django
     container_name: laboutik2_django
     volumes:

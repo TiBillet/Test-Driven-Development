@@ -17,7 +17,7 @@ const email = process.env.TEST_EMAIL
 // attention la taille d'écran choisie affiche le menu burger
 test.use({ viewport: { width: 1200, height: 1300 }, ignoreHTTPSErrors: true })
 
-test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.id}`, () => {
+test.describe(`Prise de 2 adhesions plus lier une carte à un compte utilisateur ${laboutikClient.id}`, () => {
   // connexion à laboutik
   test("Connection", async ({ browser }) => {
     laboutikPage = await browser.newPage()
@@ -43,7 +43,7 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
   })
 
   // Prise de 2 adhésions; "Panier AMAP (Le Tiers-Lustre) Mensuelle" et "Adhésion (Le Tiers-Lustre) Mensuelle".
-  test("Carte client ?, prise de 2 adhésions en cb.", async () => {
+  test("Prise de 2 adhésions en cb, client 3.", async () => {
     // vidage carte client laboutikClient
     await resetCardCashless(laboutikPage, laboutikClient.id)
 
@@ -101,7 +101,7 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
     await laboutikPage.close()
   })
 
-  test("Admin: lier un email à la carte client et vérifier les adhésions de celui-ci", async ({ browser }) => {
+  test(`Admin: lier l'email "${email}" à la carte client et vérifier les adhésions de celui-ci.`, async ({ browser }) => {
     // connexion admin
     const page = await browser.newPage()
     await page.goto(process.env.LABOUTIK_URL)
@@ -164,7 +164,7 @@ test.describe(`Adhesion: lier une carte au compte utilisateur ${laboutikClient.i
   })
 
 
-  test("Vérifier les adhésions après connexion à lespass", async ({ browser }) => {
+  test(`Vérifier les adhésions après connexion de "${email}" à lespass.`, async ({ browser }) => {
     const page = await browser.newPage()
 
     // connexion lespass

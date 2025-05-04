@@ -153,18 +153,18 @@ services:
       - laboutik2_memcached:memcached
     command: 'bash start_dev.sh'
 
-  laboutik2_celery:
-    image: tibillet/laboutik:latest
-    hostname: laboutik2_celery
-    container_name: laboutik2_celery
-    extends:
-      file: ../../LaBoutik/docker-compose.yml
-      service: laboutik_celery
-    env_file: ./demo_env_laboutik2
-    links:
-      - laboutik2_postgres:postgres
-      - laboutik2_redis:redis
-      - laboutik2_memcached:memcached
+#  laboutik2_celery:
+#    image: tibillet/laboutik:latest
+#    hostname: laboutik2_celery
+#    container_name: laboutik2_celery
+#    extends:
+#      file: ../../LaBoutik/docker-compose.yml
+#      service: laboutik_celery
+#    env_file: ./demo_env_laboutik2
+#    links:
+#      - laboutik2_postgres:postgres
+#      - laboutik2_redis:redis
+#      - laboutik2_memcached:memcached
 #    command: 'bash start_dev.sh'
 
   laboutik2_nginx:
@@ -179,7 +179,7 @@ services:
     volumes:
       - ../../LaBoutik/www:/DjangoFiles/www
       - ../../LaBoutik/logs:/DjangoFiles/logs
-      - ../../LaBoutik/nginx:/etc/nginx/conf.d
+      - ../../LaBoutik/nginx_prod:/etc/nginx/conf.d
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend

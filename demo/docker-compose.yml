@@ -107,6 +107,10 @@ services:
       service: laboutik_nginx
     labels:
       - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.$DOMAIN`)
+    volumes:
+      - ../../LaBoutik/www:/DjangoFiles/www
+      - ../../LaBoutik/logs:/DjangoFiles/logs
+      - ../../LaBoutik/nginx_prod:/etc/nginx/conf.d
     depends_on:
       - laboutik_django
 

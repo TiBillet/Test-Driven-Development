@@ -158,7 +158,7 @@ services:
     command: 'bash start_dev.sh'
 
   laboutik2_celery:
-    image: tibillet/laboutik:latest
+#    image: tibillet/laboutik:latest
     hostname: laboutik2_celery
     container_name: laboutik2_celery
     extends:

@@ -169,7 +169,8 @@ services:
       - laboutik2_postgres:postgres
       - laboutik2_redis:redis
       - laboutik2_memcached:memcached
-    command: 'bash start_dev.sh'
+#    command: 'bash start_dev.sh'
+    command: 'bash start_celery.sh'
 
   laboutik2_nginx:
     image: nginx

@@ -110,7 +110,7 @@ services:
     volumes:
       - ../../LaBoutik/www:/DjangoFiles/www
       - ../../LaBoutik/logs:/DjangoFiles/logs
-      - ../../LaBoutik/nginx_prod:/etc/nginx/conf.d
+      - ../../LaBoutik/nginx:/etc/nginx/conf.d
     depends_on:
       - laboutik_django
 

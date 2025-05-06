@@ -184,7 +184,7 @@ services:
     volumes:
       - ../../LaBoutik/www:/DjangoFiles/www
       - ../../LaBoutik/logs:/DjangoFiles/logs
-      - ../../LaBoutik/nginx_prod:/etc/nginx/conf.d
+      - ../../LaBoutik/nginx:/etc/nginx/conf.d
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend

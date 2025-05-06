@@ -60,6 +60,7 @@ test.describe("Cashless, carte client 1", () => {
   })
 
   test("Check carte client 1, tests : bouton retour + sur carte = 0 + cotisation", async () => {
+    await page.pause()
     // vidage carte client1
     await resetCardCashless(page, 'nfc-client1')
 

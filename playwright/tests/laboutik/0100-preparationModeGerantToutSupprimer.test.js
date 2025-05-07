@@ -7,7 +7,7 @@ dotenv.config({ path: root + '/../.env' })
 import { test, expect, chromium } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, newOrderIsShow, selectArticles, getTranslate, managerMode,
-  goTableOrder, checkAlreadyPaidBill, getEntity
+  goTableOrder, checkAlreadyPaidBill, getEntity, fakeUserAgent
 } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -20,7 +20,11 @@ let deleteArticlesUppercaseTrans, noArticleCapitalizeTrans, hasBeenSelectedTrans
 const listeArticles = [{ nom: "Pression 50", nb: 2, prix: 2.5 }, { nom: "CdBoeuf", nb: 1, prix: 25 },
 { nom: "Gateau", nb: 1, prix: 8 }]
 
-test.use({ viewport: { width: 375, height: 800 }, ignoreHTTPSErrors: true })
+test.use({
+  viewport: { width: 375, height: 800 },
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
+})
 
 test.describe('Préparation: supprimer tous les articles en mode gérant.', () => {
   test("Connection", async ({ browser }) => {

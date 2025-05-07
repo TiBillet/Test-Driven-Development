@@ -5,7 +5,7 @@ dotenv.config({ path: root + '/../.env' })
 
 // cashless_demo1.env DEBUG=True / DEMO=True / language = fr
 import { test, expect } from '@playwright/test'
-import { connection, getTranslate, changeLanguage, goPointSale, selectArticles, setPointSale, getEntity } from '../../mesModules/commun.js'
+import { connection, getTranslate, changeLanguage, goPointSale, selectArticles, setPointSale, getEntity, fakeUserAgent } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
 let page
@@ -16,7 +16,8 @@ const language = "en"
 
 test.use({
 	viewport: { width: 550, height: 1000 },
-	ignoreHTTPSErrors: true
+	ignoreHTTPSErrors: true,
+	userAgent: fakeUserAgent
 })
 
 test.describe("Status, service direct,  point de ventes 'BAR 1'", () => {

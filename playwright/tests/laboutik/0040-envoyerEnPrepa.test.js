@@ -7,7 +7,8 @@ dotenv.config({ path: root + '/../.env' })
 import { test, devices, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, selectArticles, checkBillDirectService, getStyleValue, getTranslate,
-  newOrderIsShow, goTableOrder, articlesListIsVisible, bigToFloat, totalListeArticles, checkAlreadyPaidBill, getEntity
+  newOrderIsShow, goTableOrder, articlesListIsVisible, bigToFloat, totalListeArticles, checkAlreadyPaidBill, getEntity,
+  fakeUserAgent
 } from '../../mesModules/commun.js'
 
 let page, selTableTrans, totalUppercaseTrans, currencySymbolTrans, returnTrans, transactionTrans, okTrans
@@ -21,7 +22,11 @@ const listeArticles = [
 ]
 
 // attention la taille d'écran choisie affiche le menu burger
-test.use({ viewport: { width: 550, height: 1000 }, ignoreHTTPSErrors: true })
+test.use({
+  viewport: { width: 550, height: 1000 },
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
+})
 
 test.describe("Commandes", () => {
   test("Connexion", async ({ browser }) => {

@@ -5,7 +5,9 @@ dotenv.config({ path: root + '/../.env' })
 
 // DEBUG=1 / DEMO=1 / language = en
 import { test, expect } from '@playwright/test'
-import { connection, getTranslate, changeLanguage, goPointSale, selectArticles, checkBillDirectService, setPointSale } from '../../mesModules/commun.js'
+import { connection, getTranslate, changeLanguage, goPointSale, selectArticles,
+	checkBillDirectService, setPointSale, fakeUserAgent
+} from '../../mesModules/commun.js'
 
 let page, paiementTypeTrans, chequeTrans, transactionTrans, okTrans, confirmPaymentTrans
 const language = "en"
@@ -17,7 +19,8 @@ const listeArticles = [
 // attention la taille d'écran choisie affiche le menu burger
 test.use({
 	viewport: { width: 550, height: 1000 },
-	ignoreHTTPSErrors: true
+	ignoreHTTPSErrors: true,
+	userAgent: fakeUserAgent
 })
 
 test.describe("Test le moyen de paiement chèque.", () => {

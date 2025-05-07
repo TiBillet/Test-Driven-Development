@@ -10,7 +10,8 @@ import { test, expect } from '@playwright/test'
 import {
   connection, goPointSale, selectArticles, checkListArticlesOk,
   changeLanguage, newOrderIsShow, getTranslate, articlesListNoVisible,
-  checkBill, articlesListIsVisible, articleIsNotVisible, articleIsVisible, getEntity
+  checkBill, articlesListIsVisible, articleIsNotVisible, articleIsVisible, getEntity,
+  fakeUserAgent
 } from '../../mesModules/commun.js'
 
 
@@ -24,7 +25,8 @@ const language = "en"
 
 test.use({
   viewport: { width: 375, height: 800 },
-  ignoreHTTPSErrors: true
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
 })
 
 test.describe("Commandes + aller page paiement", () => {

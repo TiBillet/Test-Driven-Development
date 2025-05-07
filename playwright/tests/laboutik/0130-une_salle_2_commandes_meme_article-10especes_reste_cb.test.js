@@ -7,7 +7,7 @@ dotenv.config({ path: root + '/../.env' })
 import { test, expect } from '@playwright/test'
 import {
   connection, getTranslate, changeLanguage, goPointSale, newOrderIsShow, getStyleValue, confirmation,
-  getEntity
+  getEntity, fakeUserAgent
 } from '../../mesModules/commun.js'
 
 let page
@@ -18,7 +18,8 @@ const language = "en"
 // attention la taille d'écran choisie affiche le menu burger
 test.use({
   viewport: { width: 550, height: 1000 },
-  ignoreHTTPSErrors: true
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
 })
 
 test.describe("Test valeur fractionnée", () => {

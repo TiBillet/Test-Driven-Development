@@ -7,7 +7,9 @@ dotenv.config({ path: root + '/../.env' })
 
 import { test, expect } from '@playwright/test'
 import { detectLanguage, lespassTranslate, lespassClientConnection } from '../../mesModules/communLespass.js'
-import { connection, changeLanguage, getTranslate, getStyleValue, goPointSale, selectArticles, getEntity, resetCardCashless, clients } from '../../mesModules/commun.js'
+import { connection, changeLanguage, getTranslate, getStyleValue, goPointSale, selectArticles, getEntity,
+  resetCardCashless, clients, fakeUserAgent
+} from '../../mesModules/commun.js'
 
 let laboutikClient = clients.client3
 let laboutikPage, currencySymbolTrans, totalTrans, cbTrans, msgAwaitingCard
@@ -15,7 +17,11 @@ let anonymousCardTrans, directServiceTrans, paiementTypeTrans, confirmPaymentTra
 const email = process.env.TEST_EMAIL
 
 // attention la taille d'écran choisie affiche le menu burger
-test.use({ viewport: { width: 1200, height: 1300 }, ignoreHTTPSErrors: true })
+test.use({
+  viewport: { width: 1200, height: 1300 },
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
+})
 
 test.describe(`Prise de 2 adhesions plus lier une carte à un compte utilisateur ${laboutikClient.id}`, () => {
   // connexion à laboutik
@@ -114,7 +120,7 @@ test.describe(`Prise de 2 adhesions plus lier une carte à un compte utilisateur
 
     // permet d'attendre la fin des processus réseau
     await page.waitForLoadState('networkidle')
-
+    
     // **** cliquer sur "url qrcode" ****
     await page.locator('#result_list tr', { hasText: laboutikClient.tagId }).locator('td[class="field-url_qrcode"]').click()
 
@@ -159,7 +165,6 @@ test.describe(`Prise de 2 adhesions plus lier une carte à un compte utilisateur
     // attend la fin du chargement de l'url
     await responseConfirmation
 
-    await page.screenshot({ path: 'screenshot0.png' });
     await page.close()
   })
 

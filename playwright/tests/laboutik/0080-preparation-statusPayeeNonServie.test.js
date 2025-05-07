@@ -8,7 +8,7 @@ import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, checkListArticlesOk,
   articlesListNoVisible, checkBill, newOrderIsShow, selectArticles,
-  getTranslate, goTableOrder, getEntity
+  getTranslate, goTableOrder, getEntity, fakeUserAgent
 } from '../../mesModules/commun.js'
 
 
@@ -17,7 +17,11 @@ let okTrans, returnTrans, shortcutPrepaTrans, transP, currencySymbolTrans
 const language = "en"
 const listeArticles = [{ nom: "Pression 33", nb: 1, prix: 2 }, { nom: "CdBoeuf", nb: 1, prix: 25 },]
 
-test.use({ viewport: { width: 375, height: 800 }, ignoreHTTPSErrors: true })
+test.use({
+  viewport: { width: 375, height: 800 },
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
+})
 
 test.describe('Préparation: payée - non servie', () => {
 

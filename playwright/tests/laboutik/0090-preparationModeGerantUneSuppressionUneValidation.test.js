@@ -7,7 +7,8 @@ dotenv.config({ path: root + '/../.env' })
 import { test, expect, chromium } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, newOrderIsShow, selectArticles, checkBill,
-  getTranslate, managerMode, goTableOrder, checkAlreadyPaidBill, gridIsTestable, getEntity
+  getTranslate, managerMode, goTableOrder, checkAlreadyPaidBill, gridIsTestable, getEntity,
+  fakeUserAgent
 } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -20,7 +21,11 @@ let noArticleCapitalizeTrans, hasBeenSelectedTrans, preparationsCapitalizeTrans,
 const listeArticles = [{ nom: "Despé", nb: 2, prix: 3.2 }, { nom: "CdBoeuf", nb: 1, prix: 25 },
 { nom: "Café", nb: 2, prix: 1 }]
 
-test.use({ viewport: { width: 375, height: 800 }, ignoreHTTPSErrors: true })
+test.use({
+  viewport: { width: 375, height: 800 },
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
+})
 
 test.describe('Préparation "Non Servie - Payée": une suppression et une validation en mode gérant.', () => {
   test("Connection", async ({ browser }) => {

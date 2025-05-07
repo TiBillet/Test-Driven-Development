@@ -7,14 +7,18 @@ dotenv.config({ path: root + '/../.env' })
 import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, selectArticles, resetCardCashless, creditMoneyOnCardCashless,
-  getTranslate, getEntity
+  getTranslate, getEntity, fakeUserAgent
 } from '../../mesModules/commun.js'
 
 let page, currencySymbolTrans
 const language = "fr"
 
 // attention la taille d'écran choisie affiche le menu burger
-test.use({ viewport: { width: 550, height: 1000 }, ignoreHTTPSErrors: true })
+test.use({
+  viewport: { width: 550, height: 1000 },
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
+})
 
 test.describe("Commandes, payer en une seule fois", () => {
   test("Contexte: aller point de vente 'RESTO'", async ({ browser }) => {

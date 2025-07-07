@@ -7,7 +7,7 @@ dotenv.config({ path: root + '/../.env' })
 import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, newOrderIsShow, selectArticles, getTranslate, managerMode,
-  goTableOrder, getEntity
+  goTableOrder, getEntity, fakeUserAgent
 } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -22,7 +22,11 @@ const blockCdBoeuf = { ref: "CdBoeuf", articles: [{ nom: "CdBoeuf", nb: 2, prix:
 const blocks = [blockEau1L, blockCdBoeuf]
 
 
-test.use({ viewport: { width: 375, height: 800 }, ignoreHTTPSErrors: true })
+test.use({
+  viewport: { width: 375, height: 800 },
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
+})
 
 test.describe('Préparation: supprimer tous les articles en mode gérant, commande "Non Servie - Non Payée".', () => {
   test("Connection", async ({ browser }) => {

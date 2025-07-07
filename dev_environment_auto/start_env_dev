@@ -17,20 +17,20 @@ else
 
     # lancement containers et logs
     byobu select-pane -t 0
-    byobu send-keys "cd $ROOT_PATH" Enter
-    byobu send-keys "./dev_environment_auto/launch_containers" Enter
+    # byobu send-keys "cd $ROOT_PATH" Enter
+    byobu send-keys "./launch_containers" Enter
 
     # lancement fedow
     byobu select-pane -t 1
-    byobu send-keys "cd $ROOT_PATH" Enter
+    # byobu send-keys "cd $ROOT_PATH" Enter
 
     # lancement lespass
     byobu select-pane -t 2
-    byobu send-keys "cd $ROOT_PATH" Enter
+    # byobu send-keys "cd $ROOT_PATH" Enter
 
     # lancement laboutik
     byobu select-pane -t 3
-    byobu send-keys "cd $ROOT_PATH" Enter
+    # byobu send-keys "cd $ROOT_PATH" Enter
 
 
     # visualiser la session byobu dans la console

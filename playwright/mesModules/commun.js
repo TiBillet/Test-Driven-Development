@@ -6,6 +6,10 @@ import { test, expect, chromium } from '@playwright/test'
 // import { env } from './env.js'
 import Big from './big.js'
 
+
+// user agent
+export const fakeUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3419.0 Safari/537.36'
+
 /**
  * Clients list object 
  */

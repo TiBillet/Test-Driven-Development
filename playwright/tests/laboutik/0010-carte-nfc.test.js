@@ -13,7 +13,7 @@ dotenv.config({ path: root + '/../.env' })
 import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, resetCardCashless, creditMoneyOnCardCashless, creditGiftMoneyOnCardCashless,
-  getTranslate, getStyleValue, goPointSale, selectArticles, getEntity
+  getTranslate, getStyleValue, goPointSale, selectArticles, getEntity, fakeUserAgent
 } from '../../mesModules/commun.js'
 
 // attention la taille d'écran choisie affiche le menu burger
@@ -24,7 +24,8 @@ const language = "en"
 
 test.use({
   viewport: { width: 550, height: 1000 },
-  ignoreHTTPSErrors: true
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
 })
 
 test.describe("Cashless, carte client 1", () => {
@@ -62,7 +63,7 @@ test.describe("Cashless, carte client 1", () => {
   test("Check carte client 1, tests : bouton retour + sur carte = 0 + cotisation", async () => {
     // vidage carte client1
     await resetCardCashless(page, 'nfc-client1')
-
+    
     // Clique sur le bouton "CHECK CARTE")
     await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 

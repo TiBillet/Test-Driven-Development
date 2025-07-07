@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test'
 import {
   connection, goPointSale, selectArticles, getStyleValue,
   changeLanguage, newOrderIsShow, getTranslate, articlesListNoVisible,
-  checkBill, checkAlreadyPaidBill, getEntity
+  checkBill, checkAlreadyPaidBill, getEntity, fakeUserAgent
 } from '../../mesModules/commun.js'
 
 
@@ -29,7 +29,8 @@ const language = "en"
 
 test.use({
   viewport: { width: 375, height: 800 },
-  ignoreHTTPSErrors: true
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
 })
 
 test.describe('Envoyer en préparation et aller à la page de paiement, payer "Tout".', () => {

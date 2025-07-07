@@ -6,7 +6,7 @@ dotenv.config({ path: root + '/../.env' })
 import { test, expect } from '@playwright/test'
 import {
   connection, changeLanguage, goPointSale, selectArticles, confirmation, articlesListNoVisible,
-  checkAlreadyPaidBill, getTranslate, getEntity
+  checkAlreadyPaidBill, getTranslate, getEntity, fakeUserAgent
 } from '../../mesModules/commun.js'
 
 let page, currencySymbolTrans
@@ -15,7 +15,8 @@ const language = "fr"
 // attention la taille d'écran choisie affiche le menu burger
 test.use({
   viewport: { width: 550, height: 1000 },
-  ignoreHTTPSErrors: true
+  ignoreHTTPSErrors: true,
+  userAgent: fakeUserAgent
 })
 
 test.describe('Envoyer en préparation et aller à la page de paiement, une "Valeur" partielle et sélectionner "Tout".', () => {

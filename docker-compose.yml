@@ -147,12 +147,12 @@ services:
     extends:
       file: ../LaBoutik/docker-compose.yml
       service: laboutik_celery
+#    command: 'bash start_dev.sh'
+    command: 'bash start_celery.sh'
     extra_hosts:
       - fedow.tibillet.localhost:172.17.0.1
       - lespass.tibillet.localhost:172.17.0.1
       - laboutik.tibillet.localhost:172.17.0.1
-    command: 'bash start_dev.sh'
-    # command: 'bash start_celery.sh'
 
   laboutik_nginx:
     extends:

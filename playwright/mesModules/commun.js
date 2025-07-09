@@ -16,11 +16,11 @@ export const fakeUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb
 export const clients = {
   primaire: {
     id: 'nfc-primaire',
-    tagId: process.env.DEMO_TAGID_CM 
+    tagId: process.env.DEMO_TAGID_CM
   },
   client1: {
     id: 'nfc-client1',
-    tagId: process.env.DEMO_TAGID_CLIENT1 
+    tagId: process.env.DEMO_TAGID_CLIENT1
   },
   client2: {
     id: 'nfc-client2',
@@ -28,13 +28,13 @@ export const clients = {
   },
   client3: {
     id: 'nfc-client3',
-    tagId: process.env.DEMO_TAGID_CLIENT3 
+    tagId: process.env.DEMO_TAGID_CLIENT3
   },
   unknown: {
     id: 'nfc-unknown',
-    tagId: 'XXXXXXXX' 
+    tagId: 'XXXXXXXX'
   }
-  
+
 }
 
 /**
@@ -49,8 +49,8 @@ export const connection = async function (page) {
     // go site laboutik
     await page.goto(process.env.LABOUTIK_URL)
 
-    await page.locator('#site-name', {hasText: 'TiBillet Staff Admin'}).waitFor()
-    
+    await page.locator('#site-name', { hasText: 'TiBillet Staff Admin' }).waitFor()
+
     // permet d'attendre une fin de redirection
     // await page.waitForLoadState('networkidle')
 
@@ -130,17 +130,25 @@ export const changeLanguage = async function (page, language) {
     // Clique sur le menu burger
     await page.locator('.menu-burger-icon').click()
 
-    // Cliquer sur LANGUE
-    await page.locator('#menu-burger-conteneur .test-action-change-language').click()
+    // url à attendre
+    const responseSettings = page.waitForRequest('**/htmx/appsettings/**')
+    // Cliquer sur SETTINGS
+    await page.locator('#menu-burger-conteneur .test-action-change-settings').click()
+    // attend la fin du chargement de l'url
+    await responseSettings
 
-    // attente affichage "popup-cashless"
-    await page.locator('#popup-cashless').waitFor({ state: 'visible' })
+    // url à attendre
+    const responseLanguage = page.waitForRequest('**/htmx/appsettings/language/**')
+    // Cliquer sur langage
+    await page.locator('#service-commandes div[hx-get="/htmx/appsettings/language"]').click()
+    // attend la fin du chargement de l'url
+    await responseLanguage
 
     // langue = "en"
-    await page.locator(`#popup-cashless input[value="${language}"]`).click()
+    await page.locator(`#settings-language-list input[value="${language}"]`).click()
 
     // valider
-    await page.locator('#popup-confirme-valider').click()
+    await page.locator('#container-settings bouton-basique[onclick="changeLanguageAction();"]').click()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })

@@ -60,10 +60,11 @@ test.describe("Cashless, carte client 1", () => {
     confirmPaymentTrans = await getTranslate(page, 'confirmPayment', 'capitalize')
   })
 
+  
   test("Check carte client 1, tests : bouton retour + sur carte = 0 + cotisation", async () => {
     // vidage carte client1
     await resetCardCashless(page, 'nfc-client1')
-    
+
     // Clique sur le bouton "CHECK CARTE")
     await page.locator('#page-commandes-footer div[onclick="vue_pv.check_carte()"]').click()
 
@@ -264,6 +265,8 @@ test.describe("Cashless, carte client 1", () => {
 
     // cliquer sur carte nfc simulée
     await page.locator('#nfc-client1').click()
+
+    await page.pause()
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })

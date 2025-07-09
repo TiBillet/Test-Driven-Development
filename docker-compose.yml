@@ -28,6 +28,11 @@ services:
       - lespass_nginx
 
   #### FEDOW ####
+  # fedow_postgres:
+  #   extends:
+  #     file: ../Fedow/docker-compose.yml
+  #     service: fedow_postgres
+
   fedow_django:
     volumes:
       - ./backup:/backup_tdd
@@ -138,16 +143,16 @@ services:
       - lespass.tibillet.localhost:172.17.0.1
       - laboutik.tibillet.localhost:172.17.0.1
 
-#   laboutik_celery:
-#     extends:
-#       file: ../LaBoutik/docker-compose.yml
-#       service: laboutik_celery
-# #    command: 'bash start_dev.sh'
-#     command: 'bash start_celery.sh'
-#     extra_hosts:
-#       - fedow.tibillet.localhost:172.17.0.1
-#       - lespass.tibillet.localhost:172.17.0.1
-#       - laboutik.tibillet.localhost:172.17.0.1
+  laboutik_celery:
+    extends:
+      file: ../LaBoutik/docker-compose.yml
+      service: laboutik_celery
+#    command: 'bash start_dev.sh'
+    command: 'bash start_celery.sh'
+    extra_hosts:
+      - fedow.tibillet.localhost:172.17.0.1
+      - lespass.tibillet.localhost:172.17.0.1
+      - laboutik.tibillet.localhost:172.17.0.1
 
   laboutik_nginx:
     extends:
@@ -265,3 +270,4 @@ volumes:
   laboutik_postgres_data:
   laboutik_postgres2_data:
   fedow_database:
+  fedow_dev_db:

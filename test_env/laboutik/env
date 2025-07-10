@@ -5,11 +5,6 @@ POSTGRES_USER='laboutik_user'
 POSTGRES_DB='laboutik'
 POSTGRES_PASSWORD='K4g8g73Zt2E0BDI2PPhaDwaot37adiREZOEmDbFeRr4='
 
-# The domain of this instance ex : 'laboutik.tibillet.localhost'
-DOMAIN='laboutik.tibillet.localhost'
-# No Cashless if no Fedow nor Lespass tenant manager
-
-
 # The name of your cashless asset ex : TestCoin, FestivalCoin, etc ....
 MAIN_ASSET_NAME='TestCoin'
 
@@ -29,6 +24,10 @@ DEBUG=1
 TEST=1
 DEMO=1
 SENTRY_DNS=''
+
+DEMO_TAGID_CM='EE144CE8'
+DEMO_TAGID_CLIENT1='41726643'
+DEMO_TAGID_CLIENT2='93BD3684'
 
 # SUNMI
 APP_ID=

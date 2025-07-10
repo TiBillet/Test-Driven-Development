@@ -160,74 +160,83 @@ services:
       - frontend
 #
 ##### CASHLESS 1 ####
-#  laboutik_postgres:
-#    image: postgres:11
-#    restart: always
-#    env_file: ./laboutik/env
-#    container_name: laboutik_postgres
-#    hostname: laboutik_postgres
-#    networks:
-#      - backend
-#
-#  laboutik_memcached:
-#    image: memcached:1.6
-#    container_name: laboutik_memcached
-#    hostname: laboutik_memcached
-#    restart: always
-#    networks:
-#      - backend
-#
-#  laboutik_redis:
-#    image: redis:6-alpine
-#    restart: always
-#    container_name: laboutik_redis
-#    hostname: laboutik_redis
-#    networks:
-#      - backend
-#
-#  laboutik_django:
-#    image: tibillet/laboutik:nightly
-#    restart: always
-#    env_file: ./laboutik/env
-#    container_name: laboutik_django
-#    hostname: laboutik_django
-#    volumes:
-#      - ./www:/DjangoFiles/www
-#      - ./logs:/DjangoFiles/logs
-#    links:
-#      - laboutik_postgres:postgres
-#      - laboutik_redis:redis
-#      - laboutik_memcached:memcached
-#    depends_on:
-#      - laboutik_postgres
-#      - laboutik_redis
-#      - laboutik_memcached
-#    networks:
-#      - backend
-#    command: "bash start_services.sh"
-#
-#  laboutik_nginx:
-#    image: nginx
-#    restart: always
-#    container_name: laboutik_nginx
-#    hostname: laboutik_nginx
-#    depends_on:
-#      - laboutik_django
-#    links:
-#      - laboutik_django:laboutik_django
-#    volumes:
-#      - ./www:/DjangoFiles/www
-#      - ./logs:/DjangoFiles/logs
-#      - ./laboutik/nginx:/etc/nginx/conf.d
-#    labels:
-#      - traefik.enable=true
-#      - traefik.docker.network=frontend
-#      - traefik.http.routers.laboutik_nginx.tls.certresolver=myresolver
-#      - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.${DOMAIN}`)
-#
-#    networks:
-#      - frontend
-#      - backend
+  laboutik_postgres:
+    image: postgres:11
+    restart: always
+    env_file: ./laboutik/env
+    container_name: laboutik_postgres
+    hostname: laboutik_postgres
+    networks:
+      - backend
+
+  laboutik_memcached:
+    image: memcached:1.6
+    container_name: laboutik_memcached
+    hostname: laboutik_memcached
+    restart: always
+    networks:
+      - backend
+
+  laboutik_redis:
+    image: redis:6-alpine
+    restart: always
+    container_name: laboutik_redis
+    hostname: laboutik_redis
+    networks:
+      - backend
+
+  laboutik_django:
+    image: tibillet/laboutik:nightly
+    restart: always
+    env_file: ./laboutik/env
+    environment:
+      - DOMAIN=laboutik.$DOMAIN
+      - FEDOW_URL=https://fedow.$DOMAIN/
+      - LESPASS_TENANT_URL=https://lespass.$DOMAIN/
+      - ADMIN_EMAIL=$ADMIN_EMAIL
+      - EMAIL_HOST=$EMAIL_HOST
+      - EMAIL_PORT=$EMAIL_PORT
+      - EMAIL_HOST_USER=$EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD
+    container_name: laboutik_django
+    hostname: laboutik_django
+    volumes:
+      - ./www:/DjangoFiles/www
+      - ./logs:/DjangoFiles/logs
+    links:
+      - laboutik_postgres:postgres
+      - laboutik_redis:redis
+      - laboutik_memcached:memcached
+    depends_on:
+      - laboutik_postgres
+      - laboutik_redis
+      - laboutik_memcached
+    networks:
+      - backend
+    command: "bash start_services.sh"
+
+  laboutik_nginx:
+    image: nginx
+    restart: always
+    container_name: laboutik_nginx
+    hostname: laboutik_nginx
+    depends_on:
+      - laboutik_django
+    links:
+      - laboutik_django:laboutik_django
+    volumes:
+      - ./www:/DjangoFiles/www
+      - ./logs:/DjangoFiles/logs
+      - ./laboutik/nginx:/etc/nginx/conf.d
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      - traefik.http.routers.laboutik_nginx.tls.certresolver=myresolver
+      - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.${DOMAIN}`)
+
+    networks:
+      - frontend
+      - backend
 
 networks:
   frontend:

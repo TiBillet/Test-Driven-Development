@@ -111,7 +111,7 @@ services:
     env_file: ./lespass/env
     environment:
       - FEDOW_DOMAIN=fedow.$DOMAIN
-      - $DOMAIN=$DOMAIN
+      - DOMAIN=$DOMAIN
     volumes:
       - ./lespass/logs:/DjangoFiles/logs
     depends_on:

@@ -18,7 +18,7 @@ services:
     restart: always
     env_file: ./fedow/env
     environment:
-      - DOMAIN=$DOMAIN
+      - DOMAIN=fedow.$DOMAIN
     user: fedow
     volumes:
       - ./fedow/www:/home/fedow/Fedow/www # collect static for nginx

@@ -225,8 +225,8 @@ services:
     links:
       - laboutik_django:laboutik_django
     volumes:
-      - ./www:/DjangoFiles/www
-      - ./logs:/DjangoFiles/logs
+      - ./laboutik/www:/DjangoFiles/www
+      - ./laboutik/logs:/DjangoFiles/logs
       - ./laboutik/nginx:/etc/nginx/conf.d
     labels:
       - traefik.enable=true

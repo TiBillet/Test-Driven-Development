@@ -1,0 +1,16 @@
+#### FEDOW ####
+
+SECRET_KEY='^6^$gftxk@nu-4@ld-5r@r^5*7twh@xv7emv17c(1e$q%@6*m1' # see documentation to create one
+FERNET_KEY='sZG_NSiM11E_y2h_kKoyueJsLPUN2KhKyjFpsU_3dwg=' # see documentation to create one
+
+STRIPE_KEY='' # from your stripe account
+STRIPE_TEST=1
+STRIPE_KEY_TEST='sk_test_51L8IaaE69ziSlaLWnzb5Y2dfO969Ewvup76BlCXIrHVPFpIafRpcvCDa6P7FIkPWhQS03VzmMrWi0zqHf057QcDa00C9jmoUPJ'
+STRIPE_ENDPOINT_SECRET_TEST='whsec_7c434dca303e25ab9709c021b67888979652a5adc176434c9a09bf7ab0326ddb'
+
+DEBUG=1
+TEST=1
+DEMO=1
+
+
+

@@ -23,7 +23,7 @@ EMAIL_PORT=""
 EMAIL_HOST_USER=""
 EMAIL_HOST_PASSWORD=""
 
-TIME_ZONE='Indian/Mauritius'
+TIME_ZONE='Indian/Reunion'
 LANGUAGE_CODE='en'
 
 

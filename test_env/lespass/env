@@ -1,0 +1,41 @@
+##########################
+# TiBillet / Lespass
+# All the env are needed
+##########################
+
+# Secret
+DJANGO_SECRET='^6^$gftxk@nu-4@ld-5r@r^5*7twh@xv7emv17c(1e$q%@6*m2' # see upper to create one
+FERNET_KEY='sZG_NSiM11E_y2h_kKoyueJsLPUN2KhKyjFpsU_3dwh=' # see upper to create one
+
+STRIPE_KEY='' # from your stripe account
+# or
+STRIPE_KEY_TEST='sk_test_51L8IaaE69ziSlaLWnzb5Y2dfO969Ewvup76BlCXIrHVPFpIafRpcvCDa6P7FIkPWhQS03VzmMrWi0zqHf057QcDa00C9jmoUPJ'
+STRIPE_TEST=1 # set to 1 for use stripe test env
+
+# Database
+POSTGRES_USER='lespass_postgres_user'
+POSTGRES_PASSWORD='kKoyueJsLPUN2KhKyjFpsU' # strong ! generate a new fernet for exemple.
+POSTGRES_DB='lespass'
+
+TIME_ZONE='UTC' # or where you are
+PUBLIC='TiBillet Coop.' # The name of the root instance
+
+SUB='lespass' # the sub domain of your first place ex : if 'lespass', it will be accessible on https://lespass.tibillet.coop
+META='agenda' # the federated agenda for all events on all tenants. If 'agenda', it will be accessible, for exemple, on https://agenda.tibillet.coop
+
+ADDITIONAL_DOMAINS='domainbis.localhost' # optional - add additional domain for SaaS model, séparated with comma. ex : 'domainbis.localhost,domainter.localhost'
+
+
+# Usefull for dev/test
+# Auto login for admin, no https cert' verification, demonstration data, auto database flush, etc ...
+# don't set 1 to production !
+TEST=1
+DEBUG=1
+
+# If you have already linked an account on stripe
+TEST_STRIPE_CONNECT_ACCOUNT='acct_1Q0jBAE4Pgb7gF06'
+
+TEST_FORMBRICKS_API=""
+TEST_FORMBRICKS_EVENT_FORM=""
+TEST_FORMBRICKS_ADH_FORM=""
+

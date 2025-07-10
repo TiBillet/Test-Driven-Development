@@ -88,6 +88,8 @@ services:
     environment:
       - FEDOW_DOMAIN=fedow.$DOMAIN
       - DOMAIN=$DOMAIN
+      - ADMIN_EMAIL=$ADMIN_EMAIL
+      - TEST_EMAIL=$TEST_EMAIL
     volumes:
       - ./lespass/www:/DjangoFiles/www
       - ./lespass/logs:/DjangoFiles/logs
@@ -112,6 +114,8 @@ services:
     environment:
       - FEDOW_DOMAIN=fedow.$DOMAIN
       - DOMAIN=$DOMAIN
+      - ADMIN_EMAIL=$ADMIN_EMAIL
+      - TEST_EMAIL=$TEST_EMAIL
     volumes:
       - ./lespass/logs:/DjangoFiles/logs
     depends_on:

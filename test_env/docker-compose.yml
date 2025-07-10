@@ -194,6 +194,7 @@ services:
       - FEDOW_URL=https://fedow.$DOMAIN/
       - LESPASS_TENANT_URL=https://lespass.$DOMAIN/
       - ADMIN_EMAIL=$ADMIN_EMAIL
+      - TEST_EMAIL=$ADMIN_EMAIL
       - EMAIL_HOST=$EMAIL_HOST
       - EMAIL_PORT=$EMAIL_PORT
       - EMAIL_HOST_USER=$EMAIL_HOST_USER

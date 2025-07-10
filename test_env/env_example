@@ -1,16 +1,6 @@
 DOMAIN='' # ex : tibillet.localhost
-FEDOW_DOMAIN='' # ex : fedow.tibillet.localhost'
 
-FEDOW_URL='' # ex : https://fedow.tibillet.localhost/
-LESPASS_TENANT_URL='' # for LaBoutik ex : https://lespass.tibillet.localhost/
-LABOUTIK_URL=''
-
-TEST_EMAIL=''
 ADMIN_EMAIL=''
-
-DEMO_TAGID_CLIENT1='41726643'
-DEMO_TAGID_CLIENT2='93BD3684'
-DEMO_TAGID_CLIENT3='F18923CB'
 
 EMAIL_HOST=""
 EMAIL_PORT="465"

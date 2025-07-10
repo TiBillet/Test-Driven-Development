@@ -54,91 +54,98 @@ services:
 
   #### LESPASS ####
 
-#  lespass_postgres:
-#    image: postgres:13-bookworm
-#    restart: always
-#    container_name: lespass_postgres
-#    hostname: lespass_postgres
-#    env_file: ./lespass/env
-#    networks:
-#      - backend
-#
-#  lespass_memcached:
-#    image : memcached:1.6
-#    container_name: lespass_memcached
-#    hostname: lespass_memcached
-#    restart: always
-#    networks:
-#      - backend
-#
-#  lespass_redis:
-#    container_name: lespass_redis
-#    hostname: lespass_redis
-#    image: redis:7
-#    restart: always
-#    networks:
-#      - backend
-#
-#  lespass_django:
-#    image: tibillet/lespass:nightly
-#    restart: always
-#    container_name: lespass_django
-#    hostname: lespass_django
-#    env_file: ./lespass/env
-#    volumes:
-#      - ./lespass/www:/DjangoFiles/www
-#      - ./lespass/logs:/DjangoFiles/logs
-#    depends_on:
-#      - lespass_postgres
-#      - lespass_redis
-#      - lespass_memcached
-#    links:
-#      - lespass_postgres:postgres
-#      - lespass_redis:redis
-#      - lespass_memcached:memcached
-#    networks:
-#      - backend
-#    command: 'bash start.sh'
-#
-#  lespass_celery:
-#    image: tibillet/lespass:nightly
-#    container_name: lespass_celery
-#    restart: always
-#    hostname: lespass_celery
-#    env_file: ./lespass/env
-#    volumes:
-#      - ./lespass/logs:/DjangoFiles/logs
-#    depends_on:
-#      - lespass_postgres
-#      - lespass_redis
-#      - lespass_memcached
-#    links:
-#      - lespass_postgres:postgres
-#      - lespass_redis:redis
-#      - lespass_memcached:memcached
-#    networks:
-#      - backend
-#    command: "poetry run celery -A TiBillet worker -l INFO -B"
-#
-#  lespass_nginx:
-#    image: nginx:latest
-#    container_name: lespass_nginx
-#    restart: always
-#    hostname: lespass_nginx
-#    links:
-#      - lespass_django:lespass_django
-#    volumes:
-#      - ./lespass/www:/www
-#      - ./lespass/logs:/logs
-#      - ./lespass/nginx:/etc/nginx/conf.d
-#    labels:
-#      - traefik.enable=true
-#      - traefik.docker.network=frontend
-#      - traefik.http.routers.lespass_nginx.tls.certresolver=myresolver
-#      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`chantefrein.$DOMAIN`) || Host(`agenda.$DOMAIN`)
-#      - traefik.http.services.lespass_nginx.loadbalancer.server.port=80
-#    networks:
-#      - frontend
+  lespass_postgres:
+    image: postgres:13-bookworm
+    restart: always
+    container_name: lespass_postgres
+    hostname: lespass_postgres
+    env_file: ./lespass/env
+    networks:
+      - backend
+
+  lespass_memcached:
+    image : memcached:1.6
+    container_name: lespass_memcached
+    hostname: lespass_memcached
+    restart: always
+    networks:
+      - backend
+
+  lespass_redis:
+    container_name: lespass_redis
+    hostname: lespass_redis
+    image: redis:7
+    restart: always
+    networks:
+      - backend
+
+  lespass_django:
+    image: tibillet/lespass:nightly
+    restart: always
+    container_name: lespass_django
+    hostname: lespass_django
+    env_file: ./lespass/env
+    environment:
+      - FEDOW_DOMAIN=fedow.$DOMAIN
+      - $DOMAIN=$DOMAIN
+    volumes:
+      - ./lespass/www:/DjangoFiles/www
+      - ./lespass/logs:/DjangoFiles/logs
+    depends_on:
+      - lespass_postgres
+      - lespass_redis
+      - lespass_memcached
+    links:
+      - lespass_postgres:postgres
+      - lespass_redis:redis
+      - lespass_memcached:memcached
+    networks:
+      - backend
+    command: 'bash start.sh'
+
+  lespass_celery:
+    image: tibillet/lespass:nightly
+    container_name: lespass_celery
+    restart: always
+    hostname: lespass_celery
+    env_file: ./lespass/env
+    environment:
+      - FEDOW_DOMAIN=fedow.$DOMAIN
+      - $DOMAIN=$DOMAIN
+    volumes:
+      - ./lespass/logs:/DjangoFiles/logs
+    depends_on:
+      - lespass_postgres
+      - lespass_redis
+      - lespass_memcached
+    links:
+      - lespass_postgres:postgres
+      - lespass_redis:redis
+      - lespass_memcached:memcached
+    networks:
+      - backend
+    command: "poetry run celery -A TiBillet worker -l INFO -B"
+
+  lespass_nginx:
+    image: nginx:latest
+    container_name: lespass_nginx
+    restart: always
+    hostname: lespass_nginx
+    links:
+      - lespass_django:lespass_django
+    volumes:
+      - ./lespass/www:/www
+      - ./lespass/logs:/logs
+      - ./lespass/nginx:/etc/nginx/conf.d
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      - traefik.http.routers.lespass_nginx.tls.certresolver=myresolver
+      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`chantefrein.$DOMAIN`) || Host(`agenda.$DOMAIN`)
+      - traefik.http.services.lespass_nginx.loadbalancer.server.port=80
+    networks:
+      - backend
+      - frontend
 #
 ##### CASHLESS 1 ####
 #  laboutik_postgres:

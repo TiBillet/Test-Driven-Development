@@ -201,8 +201,8 @@ services:
     container_name: laboutik_django
     hostname: laboutik_django
     volumes:
-      - .laboutik/www:/DjangoFiles/www
-      - .laboutik/logs:/DjangoFiles/logs
+      - ./laboutik/www:/DjangoFiles/www
+      - ./laboutik/logs:/DjangoFiles/logs
     links:
       - laboutik_postgres:postgres
       - laboutik_redis:redis

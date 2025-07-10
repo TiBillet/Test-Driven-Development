@@ -90,6 +90,10 @@ services:
       - DOMAIN=$DOMAIN
       - ADMIN_EMAIL=$ADMIN_EMAIL
       - TEST_EMAIL=$TEST_EMAIL
+      - EMAIL_HOST=$EMAIL_HOST
+      - EMAIL_PORT=$EMAIL_PORT
+      - EMAIL_HOST_USER=$EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD
     volumes:
       - ./lespass/www:/DjangoFiles/www
       - ./lespass/logs:/DjangoFiles/logs
@@ -116,6 +120,10 @@ services:
       - DOMAIN=$DOMAIN
       - ADMIN_EMAIL=$ADMIN_EMAIL
       - TEST_EMAIL=$TEST_EMAIL
+      - EMAIL_HOST=$EMAIL_HOST
+      - EMAIL_PORT=$EMAIL_PORT
+      - EMAIL_HOST_USER=$EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD
     volumes:
       - ./lespass/logs:/DjangoFiles/logs
     depends_on:

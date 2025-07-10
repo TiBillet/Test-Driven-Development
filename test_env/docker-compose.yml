@@ -37,7 +37,7 @@ services:
     volumes:
       - ./fedow/www:/www # collected static from django
       - ./fedow/logs:/logs
-      - ./fedow_nginx:/etc/nginx/conf.d
+      - ./fedow/nginx:/etc/nginx/conf.d
     depends_on:
       - fedow_django
     links:

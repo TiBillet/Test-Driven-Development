@@ -60,7 +60,6 @@ test.describe("Cashless, carte client 1", () => {
     confirmPaymentTrans = await getTranslate(page, 'confirmPayment', 'capitalize')
   })
 
-  
   test("Check carte client 1, tests : bouton retour + sur carte = 0 + cotisation", async () => {
     // vidage carte client1
     await resetCardCashless(page, 'nfc-client1')
@@ -224,7 +223,7 @@ test.describe("Cashless, carte client 1", () => {
 
   })
 
-  test("Check carte client 1, prise de 2 adhésions et verification assets", async () => {
+  test("Client 1 - prise de 2 adhésions", async () => {
     // aller au point de vente "BAR 1"
     await goPointSale(page, 'Adhésions')
 
@@ -266,8 +265,6 @@ test.describe("Cashless, carte client 1", () => {
     // cliquer sur carte nfc simulée
     await page.locator('#nfc-client1').click()
 
-    await page.pause()
-
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
 
@@ -280,6 +277,11 @@ test.describe("Cashless, carte client 1", () => {
 
     // cliquer sur RETOUR
     await page.locator('#popup-retour').click()
+  })
+
+  test("Check carte - vérification assets client 1", async () => {
+    // aller au point de vente "BAR 1"
+    await goPointSale(page, 'Adhésions')
 
     // titre visible
     await expect(page.locator('.navbar-horizontal .titre-vue', { hasText: directServiceTrans })).toBeVisible()
@@ -291,8 +293,12 @@ test.describe("Cashless, carte client 1", () => {
     // attente affichage "Attente lecture carte"
     await expect(page.locator('#popup-cashless', { hasText: msgAwaitingCard })).toBeVisible()
 
+    // url à attendre
+    // const responseCheckCarte = page.waitForRequest('**/check_carte/**')
     // cliquer sur carte nfc simulée
     await page.locator('#nfc-client1').click()
+    // attend la fin du chargement de l'url
+    // await responseCheckCarte
 
     // attente affichage "popup-cashless"
     await page.locator('#popup-cashless').waitFor({ state: 'visible' })
@@ -321,8 +327,8 @@ test.describe("Cashless, carte client 1", () => {
     // TODO: pour dépanner, changera dans le futur
     // attention pour activation: 'today' devra être une variable traduite 
     const adhesions = [
-      { name: "Adhésion (Le Tiers-Lustre) Le Tiers-Lustre", activation: 'today', place: 'Lespass' },
-      { name: "Panier AMAP (Le Tiers-Lustre) Le Tiers-Lustre", activation: 'today', place: 'Lespass' },
+      { name: "Adhésion (Le Tiers-Lustre)", activation: 'today', place: 'Lespass' },
+      { name: "Panier AMAP (Le Tiers-Lustre)", activation: 'today', place: 'Lespass' },
     ]
     for (let index = 0; index < adhesions.length; index++) {
       await expect(page.locator('.test-return-membership-item-name' + (index + 1), { hasText: adhesions[index].name })).toBeVisible()

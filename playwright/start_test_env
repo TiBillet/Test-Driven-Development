@@ -1,0 +1,5 @@
+#!/bin/bash
+cd ../../TraefikV3/
+docker compose down -v --remove-orphans && docker compose up -d 
+cd ../Test-Driven-Development/test_env
+gnome-terminal -- docker compose up

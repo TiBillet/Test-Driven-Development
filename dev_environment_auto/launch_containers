@@ -1,9 +1,0 @@
-#!/bin/bash
-cd ../../TraefikV3/
-docker compose down -v --remove-orphans && docker compose up -d 
-cd ../Test-Driven-Development/test_env/
-docker compose down -v --remove-orphans && docker compose up -d
-docker compose logs -f | while read line; do
-  # Process the line here
-  echo $line
-done 

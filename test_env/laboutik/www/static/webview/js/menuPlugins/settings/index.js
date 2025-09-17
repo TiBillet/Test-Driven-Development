@@ -1,4 +1,4 @@
-window.showSettingsInterface = function () {
+window.showSettingsInterface = async function () {
   // hide menu
   document.querySelector('#menu-burger-conteneur').classList.toggle('burger-show')
 
@@ -11,7 +11,12 @@ window.showSettingsInterface = function () {
   vue_pv.asignerTitreVue(`<span data-i8n="settings,capitalize">Paramètres</span> - <span data-i8n="infos",capitalize">Infos</span>`)
 
   // ci-dessous <=> <button hx-get="/htmx/appsettings/" hx-target="#service-commandes">clique</button>
-  htmx.ajax('GET', '/htmx/appsettings/', '#service-commandes')
+  // htmx.ajax('GET', '/htmx/appsettings/', '#service-commandes')
+  htmx.ajax('POST', '/htmx/appsettings/nav', {
+    target: '#service-commandes',
+    swap: 'outerHTML',
+    values: { has_sunmi_printer: await hasSunmiPrinter() }
+  })
 
   // --- listen htmx:afterSwap and launch methods --
   document.body.addEventListener('htmx:afterSwap', async function (evt) {

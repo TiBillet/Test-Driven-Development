@@ -21,6 +21,7 @@ services:
       - DOMAIN=fedow.$DOMAIN
     user: fedow
     volumes:
+      - fedow_db:/home/fedow/Fedow/database
       - ./fedow/www:/home/fedow/Fedow/www # collect static for nginx
       - ./fedow/logs:/home/fedow/Fedow/logs
     links:
@@ -60,6 +61,8 @@ services:
     container_name: lespass_postgres
     hostname: lespass_postgres
     env_file: ./lespass/env
+    volumes:
+      - lespass_db:/var/lib/postgresql/data
     networks:
       - backend
 
@@ -166,6 +169,8 @@ services:
     env_file: ./laboutik/env
     container_name: laboutik_postgres
     hostname: laboutik_postgres
+    volumes:
+      - laboutik_db:/var/lib/postgresql/data
     networks:
       - backend
 
@@ -245,3 +250,7 @@ networks:
 
 volumes:
   lespass_static:
+  lespass_db:
+  laboutik_db:
+  laboutik2_db:
+  fedow_db:

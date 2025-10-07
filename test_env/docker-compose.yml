@@ -153,7 +153,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.routers.lespass_nginx.tls.certresolver=myresolver
-      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`chantefrein.$DOMAIN`) || Host(`agenda.$DOMAIN`)
+      - traefik.http.routers.lespass_nginx.rule=Host(`lespass.$DOMAIN`) || Host(`chantefrein.$DOMAIN`) || Host(`agenda.$DOMAIN`)
       - traefik.http.services.lespass_nginx.loadbalancer.server.port=80
     networks:
       - backend

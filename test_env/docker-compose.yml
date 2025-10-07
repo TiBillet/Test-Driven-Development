@@ -12,7 +12,7 @@ services:
       - backend
 
   fedow_django:
-    image: tibillet/fedow:nightly
+    image: tibillet/fedow:latest
     container_name: fedow_django
     hostname: fedow_django
     restart: always
@@ -80,7 +80,7 @@ services:
       - backend
 
   lespass_django:
-    image: tibillet/lespass:nightly
+    image: tibillet/lespass:latest
     restart: always
     container_name: lespass_django
     hostname: lespass_django
@@ -110,7 +110,7 @@ services:
     command: 'bash start.sh'
 
   lespass_celery:
-    image: tibillet/lespass:nightly
+    image: tibillet/lespass:latest
     container_name: lespass_celery
     restart: always
     hostname: lespass_celery
@@ -186,7 +186,7 @@ services:
       - backend
 
   laboutik_django:
-    image: tibillet/laboutik:nightly
+    image: tibillet/laboutik:latest
     restart: always
     env_file: ./laboutik/env
     environment:

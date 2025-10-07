@@ -1,0 +1,3 @@
+#!/bin/bash
+cd ../dev_environment_auto
+gnome-terminal -- ./start_demo_env

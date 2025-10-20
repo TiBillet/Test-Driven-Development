@@ -1,6 +1,7 @@
 DOMAIN='' # ex : tibillet.localhost
 
 ADMIN_EMAIL=''
+TEST_EMAIL=''
 
 EMAIL_HOST=""
 EMAIL_PORT="465"

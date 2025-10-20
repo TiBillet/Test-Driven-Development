@@ -26,7 +26,6 @@ EMAIL_HOST_PASSWORD=""
 TIME_ZONE='Indian/Reunion'
 LANGUAGE_CODE='en'
 
-
 ########## FOR SAVE CRON TASK ##########dex
 
 # can be empty if you don't backup
@@ -44,4 +43,3 @@ SENTRY_DNS=''
 DEMO_TAGID_CM='CAAAAAA1'
 DEMO_TAGID_CLIENT1='41726643'
 DEMO_TAGID_CLIENT2='93BD3684'
-

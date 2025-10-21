@@ -1,6 +1,6 @@
 #!/bin/bash
-# tmux kill-server
 cd /media/travail/developpement/gits/Test-Driven-Development/demo
 docker compose down
 cd  /media/travail/developpement/gits/TraefikV3
 docker compose down
+tmux kill-server

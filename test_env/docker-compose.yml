@@ -207,7 +207,7 @@ services:
     container_name: laboutik_django
     hostname: laboutik_django
     volumes:
-      - ./laboutik/www:/DjangoFiles/www
+      - laboutik_static:/DjangoFiles/www
       - ./laboutik/logs:/DjangoFiles/logs
     links:
       - laboutik_postgres:postgres
@@ -231,7 +231,7 @@ services:
     links:
       - laboutik_django:laboutik_django
     volumes:
-      - ./laboutik/www:/DjangoFiles/www
+      - laboutik_static:/DjangoFiles/www
       - ./laboutik/logs:/DjangoFiles/logs
       - ./laboutik/nginx:/etc/nginx/conf.d
     labels:
@@ -250,6 +250,7 @@ networks:
 
 volumes:
   lespass_static:
+  laboutik_static:
   lespass_db:
   laboutik_db:
   laboutik2_db:

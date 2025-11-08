@@ -243,6 +243,89 @@ services:
       - frontend
       - backend
 
+#
+##### CASHLESS 2 ####
+  laboutik2_postgres:
+    image: postgres:11
+    restart: always
+    env_file: ./laboutik/env
+    container_name: laboutik2_postgres
+    hostname: laboutik2_postgres
+    volumes:
+      - laboutik2_db:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  laboutik2_memcached:
+    image: memcached:1.6
+    container_name: laboutik2_memcached
+    hostname: laboutik2_memcached
+    restart: always
+    networks:
+      - backend
+
+  laboutik2_redis:
+    image: redis:6-alpine
+    restart: always
+    container_name: laboutik2_redis
+    hostname: laboutik2_redis
+    networks:
+      - backend
+
+  laboutik2_django:
+    image: tibillet/laboutik:latest
+    restart: always
+    env_file: ./laboutik/env2
+    environment:
+      - DOMAIN=laboutik2.$DOMAIN
+      - FEDOW_URL=https://fedow.$DOMAIN/
+      - LESPASS_TENANT_URL=https://chantefrein.$DOMAIN/
+      - ADMIN_EMAIL=$ADMIN_EMAIL
+      - TEST_EMAIL=$ADMIN_EMAIL
+      - EMAIL_HOST=$EMAIL_HOST
+      - EMAIL_PORT=$EMAIL_PORT
+      - EMAIL_HOST_USER=$EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD
+    container_name: laboutik2_django
+    hostname: laboutik2_django
+    volumes:
+      - laboutik2_static:/DjangoFiles/www
+      - ./laboutik/logs2:/DjangoFiles/logs
+    links:
+      - laboutik2_postgres:postgres
+      - laboutik2_redis:redis
+      - laboutik2_memcached:memcached
+    depends_on:
+      - laboutik2_postgres
+      - laboutik2_redis
+      - laboutik2_memcached
+    networks:
+      - backend
+    command: "bash start_services.sh"
+
+  laboutik2_nginx:
+    image: nginx
+    restart: always
+    container_name: laboutik_nginx
+    hostname: laboutik_nginx
+    depends_on:
+      - laboutik2_django
+    links:
+      - laboutik2_django:laboutik_django
+    volumes:
+      - laboutik2_static:/DjangoFiles/www
+      - ./laboutik/logs2:/DjangoFiles/logs
+      - ./laboutik/nginx:/etc/nginx/conf.d
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      - traefik.http.routers.laboutik_nginx.tls.certresolver=myresolver
+      - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik2.${DOMAIN}`)
+    networks:
+      - frontend
+      - backend
+
+
 networks:
   frontend:
     external: true
@@ -251,6 +334,7 @@ networks:
 volumes:
   lespass_static:
   laboutik_static:
+  laboutik2_static:
   lespass_db:
   laboutik_db:
   laboutik2_db:

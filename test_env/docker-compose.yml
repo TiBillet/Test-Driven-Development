@@ -306,8 +306,8 @@ services:
   laboutik2_nginx:
     image: nginx
     restart: always
-    container_name: laboutik_nginx
-    hostname: laboutik_nginx
+    container_name: laboutik2_nginx
+    hostname: laboutik2_nginx
     depends_on:
       - laboutik2_django
     links:
@@ -319,8 +319,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
-      - traefik.http.routers.laboutik_nginx.tls.certresolver=myresolver
-      - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik2.${DOMAIN}`)
+      - traefik.http.routers.laboutik2_nginx.tls.certresolver=myresolver
+      - traefik.http.routers.laboutik2_nginx.rule=Host(`laboutik2.${DOMAIN}`)
     networks:
       - frontend
       - backend

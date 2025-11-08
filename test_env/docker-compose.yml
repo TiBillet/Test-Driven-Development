@@ -248,7 +248,7 @@ services:
   laboutik2_postgres:
     image: postgres:11
     restart: always
-    env_file: ./laboutik/env
+    env_file: ./laboutik/env2
     container_name: laboutik2_postgres
     hostname: laboutik2_postgres
     volumes:

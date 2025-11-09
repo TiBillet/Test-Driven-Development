@@ -49,6 +49,9 @@ services:
       - traefik.http.routers.fedow_nginx.tls.certresolver=myresolver
       - traefik.http.routers.fedow_nginx.rule=Host(`fedow.$DOMAIN`)
       - traefik.http.services.fedow_nginx.loadbalancer.server.port=80
+      - traefik.http.routers.fedow_nginx.priority=100 # plus c'est grand, plus c'est prioritaire
+      - traefik.http.routers.fedow_nginx.middlewares=crowdsec@file
+
     networks:
       - frontend
       - backend
@@ -163,6 +166,7 @@ services:
       - traefik.http.routers.app-agenda.tls=true
       - traefik.http.routers.app-agenda.tls.certresolver=le-alpn
       - traefik.http.routers.app-agenda.middlewares=crowdsec@file
+      - traefik.http.routers.app-agenda.priority=2 # plus c'est grand, plus c'est prioritaire
 
 
       - traefik.http.routers.lespass_nginx.entrypoints=websecure
@@ -172,7 +176,7 @@ services:
       - traefik.http.routers.lespass_nginx.tls.domains[0].sans=*.demo-tibillet.ovh
       - traefik.http.routers.lespass_nginx.rule=HostRegexp(`^.+\.demo\-tibillet\.ovh$`) || Host(`demo-tibillet.ovh`)
       - traefik.http.routers.lespass_nginx.middlewares=crowdsec@file
-
+      - traefik.http.routers.lespass_nginx.priority=1 # plus c'est grand, plus c'est prioritaire
 
     networks:
       - backend
@@ -255,6 +259,9 @@ services:
       - traefik.docker.network=frontend
       - traefik.http.routers.laboutik_nginx.tls.certresolver=myresolver
       - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.${DOMAIN}`)
+      - traefik.http.routers.laboutik_nginx.middlewares=crowdsec@file
+      - traefik.http.routers.laboutik_nginx.priority=100 # plus c'est grand, plus c'est prioritaire
+
     networks:
       - frontend
       - backend
@@ -337,6 +344,9 @@ services:
       - traefik.docker.network=frontend
       - traefik.http.routers.laboutik2_nginx.tls.certresolver=myresolver
       - traefik.http.routers.laboutik2_nginx.rule=Host(`laboutik2.${DOMAIN}`)
+      - traefik.http.routers.laboutik2_nginx.priority=100 # plus c'est grand, plus c'est prioritaire
+      - traefik.http.routers.laboutik2_nginx.middlewares=crowdsec@file
+
     networks:
       - frontend
       - backend

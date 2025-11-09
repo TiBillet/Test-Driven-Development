@@ -46,9 +46,13 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
-      - traefik.http.routers.fedow_nginx.tls.certresolver=myresolver
-      - traefik.http.routers.fedow_nginx.rule=Host(`fedow.$DOMAIN`)
       - traefik.http.services.fedow_nginx.loadbalancer.server.port=80
+
+      - traefik.http.routers.app-agenda.rule=Host(`laboutik2.${DOMAIN}`)
+      - traefik.http.routers.app-agenda.entrypoints=websecure
+      - traefik.http.routers.app-agenda.tls=true
+      - traefik.http.routers.app-agenda.tls.certresolver=le-alpn
+      - traefik.http.routers.app-agenda.middlewares=crowdsec@file
     networks:
       - frontend
       - backend
@@ -155,9 +159,25 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
-      - traefik.http.routers.lespass_nginx.tls.certresolver=myresolver
-      - traefik.http.routers.lespass_nginx.rule=Host(`lespass.$DOMAIN`) || Host(`chantefrein.$DOMAIN`) || Host(`agenda.$DOMAIN`)
       - traefik.http.services.lespass_nginx.loadbalancer.server.port=80
+
+      # Router C — host exact agenda.nasjo.fr (TLS-ALPN)
+      - traefik.http.routers.app-agenda.rule=Host(`agenda.nasjo.fr`)
+      - traefik.http.routers.app-agenda.entrypoints=websecure
+      - traefik.http.routers.app-agenda.tls=true
+      - traefik.http.routers.app-agenda.tls.certresolver=le-alpn
+      - traefik.http.routers.app-agenda.middlewares=crowdsec@file
+
+
+      - traefik.http.routers.lespass_nginx.entrypoints=websecure
+      - traefik.http.routers.lespass_nginx.tls=true
+      - traefik.http.routers.lespass_nginx.tls.certresolver=le-ovh
+      - traefik.http.routers.lespass_nginx.tls.domains[0].main=demo-tibillet.ovh
+      - traefik.http.routers.lespass_nginx.tls.domains[0].sans=*.demo-tibillet.ovh
+      - traefik.http.routers.lespass_nginx.rule=HostRegexp(`^.+\.demo\-tibillet\.ovh$`) || Host(`demo-tibillet.ovh`)
+      - traefik.http.routers.lespass_nginx.middlewares=crowdsec@file
+
+
     networks:
       - backend
       - frontend
@@ -237,8 +257,14 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
-      - traefik.http.routers.laboutik_nginx.tls.certresolver=myresolver
-      - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.${DOMAIN}`)
+
+      # Router C — host exact agenda.nasjo.fr (TLS-ALPN)
+      - traefik.http.routers.app-agenda.rule=Host(`laboutik.${DOMAIN}`)
+      - traefik.http.routers.app-agenda.entrypoints=websecure
+      - traefik.http.routers.app-agenda.tls=true
+      - traefik.http.routers.app-agenda.tls.certresolver=le-alpn
+      - traefik.http.routers.app-agenda.middlewares=crowdsec@file
+
     networks:
       - frontend
       - backend
@@ -319,8 +345,12 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
-      - traefik.http.routers.laboutik2_nginx.tls.certresolver=myresolver
-      - traefik.http.routers.laboutik2_nginx.rule=Host(`laboutik2.${DOMAIN}`)
+
+      - traefik.http.routers.app-agenda.rule=Host(`laboutik2.${DOMAIN}`)
+      - traefik.http.routers.app-agenda.entrypoints=websecure
+      - traefik.http.routers.app-agenda.tls=true
+      - traefik.http.routers.app-agenda.tls.certresolver=le-alpn
+      - traefik.http.routers.app-agenda.middlewares=crowdsec@file
     networks:
       - frontend
       - backend

@@ -48,11 +48,13 @@ services:
       - traefik.docker.network=frontend
       - traefik.http.services.fedow_nginx.loadbalancer.server.port=80
 
-      - traefik.http.routers.fedow_nginx.rule=Host(`laboutik2.${DOMAIN}`)
+      - traefik.http.routers.fedow_nginx.rule=Host(`fedow.${DOMAIN}`)
       - traefik.http.routers.fedow_nginx.entrypoints=websecure
       - traefik.http.routers.fedow_nginx.tls=true
       - traefik.http.routers.fedow_nginx.tls.certresolver=le-alpn
       - traefik.http.routers.fedow_nginx.middlewares=crowdsec@file
+      - traefik.http.routers.fedow_nginx.priority=1
+
     networks:
       - frontend
       - backend
@@ -167,6 +169,7 @@ services:
       - traefik.http.routers.lespass_nginx_nasjo.tls=true
       - traefik.http.routers.lespass_nginx_nasjo.tls.certresolver=le-alpn
       - traefik.http.routers.lespass_nginx_nasjo.middlewares=crowdsec@file
+      - traefik.http.routers.lespass_nginx.priority=10
 
 
       - traefik.http.routers.lespass_nginx.entrypoints=websecure
@@ -176,6 +179,7 @@ services:
       - traefik.http.routers.lespass_nginx.tls.domains[0].sans=*.demo-tibillet.ovh
       - traefik.http.routers.lespass_nginx.rule=HostRegexp(`^.+\.demo\-tibillet\.ovh$`) || Host(`demo-tibillet.ovh`)
       - traefik.http.routers.lespass_nginx.middlewares=crowdsec@file
+      - traefik.http.routers.lespass_nginx.priority=100
 
 
     networks:
@@ -261,6 +265,7 @@ services:
 
       # Router C — host exact agenda.nasjo.fr (TLS-ALPN)
       - traefik.http.routers.laboutik_nginx.rule=Host(`laboutik.${DOMAIN}`)
+      - traefik.http.routers.laboutik_nginx.priority=1
       - traefik.http.routers.laboutik_nginx.entrypoints=websecure
       - traefik.http.routers.laboutik_nginx.tls=true
       - traefik.http.routers.laboutik_nginx.tls.certresolver=le-alpn
@@ -347,8 +352,8 @@ services:
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.services.laboutik2_nginx.loadbalancer.server.port=80
-
       - traefik.http.routers.laboutik2_nginx.rule=Host(`laboutik2.${DOMAIN}`)
+      - traefik.http.routers.laboutik2_nginx.priority=1
       - traefik.http.routers.laboutik2_nginx.entrypoints=websecure
       - traefik.http.routers.laboutik2_nginx.tls=true
       - traefik.http.routers.laboutik2_nginx.tls.certresolver=le-alpn

@@ -86,7 +86,7 @@ services:
       - backend
 
   lespass_django:
-    image: tibillet/lespass:nightly
+    image: tibillet/lespass:latest
     restart: always
     container_name: lespass_django
     hostname: lespass_django
@@ -116,7 +116,7 @@ services:
     command: 'bash start.sh'
 
   lespass_celery:
-    image: tibillet/lespass:nightly
+    image: tibillet/lespass:latest
     container_name: lespass_celery
     restart: always
     hostname: lespass_celery

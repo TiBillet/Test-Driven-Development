@@ -1,7 +1,7 @@
 services:
   ### TRAEFIK PROXY ####
   traefik:
-    image: "traefik:beaufort"
+    image: "traefik:latest"
     container_name: "traefik"
     hostname: "traefik"
     command:
@@ -64,12 +64,15 @@ services:
     labels:
       - traefik.http.routers.fedow_nginx.rule=Host(`fedow.$DOMAIN`)
 
+
   #### LESPASS ####
 
   lespass_postgres:
     extends:
       file: ../Lespass/docker-compose.yml
       service: lespass_postgres
+#    volumes:
+#      - ./database:/var/lib/postgresql/data
 
   lespass_memcached:
     extends:
@@ -112,7 +115,7 @@ services:
       file: ../Lespass/docker-compose.yml
       service: lespass_nginx
     labels:
-      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`linterupteur.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`bis.domainbis.localhost`) || Host(`domainbis.localhost`) || Host(`chantefrein.$DOMAIN`)
+      - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`linterupteur.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`bis.domainbis.localhost`) || Host(`domainbis.localhost`) || Host(`chantefrein.$DOMAIN`)  || Host(`la-lowcow-motiv.$DOMAIN`)
     depends_on:
       - lespass_django
 

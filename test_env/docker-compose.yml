@@ -113,8 +113,8 @@ services:
       - lespass_memcached:memcached
     networks:
       - backend
-#    command: 'bash start.sh'
-    command: "sleep infinity"
+    command: 'bash start.sh'
+#    command: "sleep infinity"
 
   lespass_celery:
     image: tibillet/lespass:latest
@@ -240,8 +240,8 @@ services:
       - laboutik_memcached
     networks:
       - backend
-#    command: "bash start_services.sh"
-    command: "sleep infinity"
+    command: "bash start_services.sh"
+#    command: "sleep infinity"
 
   laboutik_nginx:
     image: nginx

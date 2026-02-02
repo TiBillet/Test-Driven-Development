@@ -17,8 +17,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
     restart: always
     networks:
       - frontend
@@ -114,6 +114,8 @@ services:
     extends:
       file: ../Lespass/docker-compose.yml
       service: lespass_nginx
+#    volumes:
+#      - ../Lespass/nginx_prod:/etc/nginx/conf.d
     labels:
       - traefik.http.routers.lespass_nginx.rule=Host(`$DOMAIN`) || Host(`www.$DOMAIN`) || Host(`agenda.$DOMAIN`) || Host(`lespass.$DOMAIN`) || Host(`linterupteur.$DOMAIN`) || Host(`demo.$DOMAIN`) || Host(`bis.domainbis.localhost`) || Host(`domainbis.localhost`) || Host(`chantefrein.$DOMAIN`)  || Host(`la-lowcow-motiv.$DOMAIN`)
     depends_on:

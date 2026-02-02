@@ -155,7 +155,7 @@ services:
     volumes:
       - lespass_static:/www
       - ./lespass/logs:/logs
-      - ./lespass/nginx:/etc/nginx/conf.d
+      - ./lespass/nginx_prod:/etc/nginx/conf.d
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend

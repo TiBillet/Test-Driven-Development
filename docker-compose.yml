@@ -23,7 +23,7 @@ services:
     networks:
       - frontend
     depends_on:
-      - laboutik_nginx
+#      - laboutik_nginx
       - fedow_nginx
       - lespass_nginx
 

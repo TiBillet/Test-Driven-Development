@@ -10,14 +10,15 @@ else
     byobu new-session -d -s 'test'
     byobu rename-window -t 'test':0 $SESSION_NAME
 
-    # 2 terminaux
+    # 3 terminaux
+    byobu split-window -v
     byobu split-window -v
     byobu split-window -v
 
     # lancement containers et logs
     byobu select-pane -t 0
     byobu send-keys "cd $ROOT_PATH" Enter
-    byobu send-keys "./demo_env_launch_containers" Enter
+    byobu send-keys "./dev_env_launch_containers" Enter
 
     # lancement fedow
     byobu select-pane -t 1
@@ -25,6 +26,10 @@ else
 
     # lancement lespass
     byobu select-pane -t 2
+    byobu send-keys "cd $ROOT_PATH" Enter
+
+    # lancement laboutik
+    byobu select-pane -t 3
     byobu send-keys "cd $ROOT_PATH" Enter
 
 

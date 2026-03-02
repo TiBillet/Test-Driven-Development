@@ -10,9 +10,10 @@ else
     byobu new-session -d -s 'test'
     byobu rename-window -t 'test':0 $SESSION_NAME
 
-    # 2 terminaux
+    # 3 terminaux
     byobu split-window -v
     byobu split-window -v
+    
 
     # lancement containers et logs
     byobu select-pane -t 0
